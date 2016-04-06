@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Issuing expiring tokens in Python</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Petko's Blog </a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/issuing-expiring-tokens-in-python.html" rel="bookmark"
+           title="Permalink to Issuing expiring tokens in Python">Issuing expiring tokens in Python</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2010-12-03T10:50:00-08:00">
+                Published: Fri 03 December 2010
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>How to generate user activation links in Django.</h1>
+<p>Imagine the following simple user registration flow:</p>
+<ol>
+<li>User registers by setting an e-mail and a password.</li>
+<li>The server sends an e-mail containing an activation link to the user.</li>
+<li>The user clicks on the activation link and activates their account.</li>
+</ol>
+<p>One way to implement this is to generate single use tokens and save them in a database table. That solution has the benefit of being able to track that a token has been used and enforce single use. The drawback is that you need a new database table, which I wanted to avoid.</p>
+<p>My first hunch was to reuse Django's <a href="https://github.com/django/django/blob/master/django/contrib/auth/tokens.py">PasswordResetTokenGenerator</a>. However, notice that the <code>check_token</code> function requires a user. This means that the activation link needs to include information about who the user is. That can either happen by including their username or user id. Both I'm not happy with. This is a link that's supposed to be private and I don't want the user's first impression of my site to be that I'm including their username in an activation link, when most other sites don't do that.</p>
+<p>The solution that I settled on was encrypting the user id on the server. I'm generating a link of the form <code>http://sitename.com/activate?token=mytoken</code>. I generate the token using the pretty neat Python <a href="https://pypi.python.org/pypi/cryptography">cryptography</a> package. The token is created by encrypting the username with a salt.</p>
+<p>I also wanted the tokens to expire. This is simple, we can just include a timestamp in the token and compare it against the current time upon decryption.</p>
+<p>Here's a sample class that implements all of this:</p>
+<script src="https://gist.github.com/pminkov/e53d90c348f1dc47553408666431d2a2.js"></script>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
