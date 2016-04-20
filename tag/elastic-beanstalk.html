@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Petko's Coding Blog - Petko Minkov</title>
+        <title>Petko's Coding Blog - Elastic Beanstalk</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -61,40 +61,6 @@
 <p>It's possible to do all of this with a single EC2 instance and avoid paying for load balancing and RDS. What I get from these components right now is convenience and scalability. I don't really need scalability, since I don't operate at scale and might not come to that point. Convenience can be traded for the learning experience of settings up things manually. AWS has an <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html">article</a> on how to install a LAMP setup on EC2. It doesn't look too complicated. Supposedly my bill will be around $10 per month for my 1GB RAM t2.micro machine.</p>
 <p>Another option would be to use <a href="https://www.digitalocean.com/pricing/">Digital Ocean</a>. They're basically offering something similar to EC2 instances, but I haven't looked too much in detail. Digital Ocean is an IaaS provider, you need to do some manual setup. Their cost is pretty similar. An offering with 1GB of RAM costs $10 per month too. That's a very rough comparison, but it seems like we're in the same ballpark if we're not pushing the limits on disk space or bandwidth.</p>                </article>
             </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/how-to-generate-user-activation-links-in-django.html" rel="bookmark"
-                           title="Permalink to How to generate user activation links in Django">How to generate user activation links in Django</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-04-05T17:03:00-07:00">
-                Published: Tue 05 April 2016
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-<p>tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> <a href="/tag/security.html">Security</a> <a href="/tag/cryptography.html">Cryptography</a> </p>
-</footer><!-- /.post-info -->                <p>Imagine the following simple user registration flow:</p>
-<ol>
-<li>User registers by setting an e-mail and a password.</li>
-<li>The server sends an e-mail containing an activation link to the user.</li>
-<li>The user clicks on the activation link and activates their account.</li>
-</ol>
-<p>Let's focus on step 2. How do we generate this ...</p>
-                <a class="readmore" href="/how-to-generate-user-activation-links-in-django.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
         <section id="extras" class="body">
         </section><!-- /#extras -->
 

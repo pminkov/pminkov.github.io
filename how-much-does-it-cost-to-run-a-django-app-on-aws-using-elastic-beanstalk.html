@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Petko's Coding Blog - Petko Minkov</title>
+        <title>How much does it cost to run a Django app on AWS using Elastic Beanstalk?</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -14,14 +14,19 @@
         <header id="banner" class="body">
                 <h1><a href="/">Petko's Coding Blog </a></h1>
                 <nav><ul>
-                    <li><a href="/category/aws.html">AWS</a></li>
+                    <li class="active"><a href="/category/aws.html">AWS</a></li>
                     <li><a href="/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html" rel="bookmark"
+           title="Permalink to How much does it cost to run a Django app on AWS using Elastic Beanstalk?">How much does it cost to run a Django app on AWS using Elastic Beanstalk?</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html">How much does it cost to run a Django app on AWS using Elastic Beanstalk?</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-04-20T13:56:00-07:00">
                 Published: Wed 20 April 2016
@@ -32,7 +37,7 @@
         </address>
 <p>In <a href="/category/aws.html">AWS</a>.</p>
 <p>tags: <a href="/tag/aws.html">AWS</a> <a href="/tag/elastic-beanstalk.html">Elastic Beanstalk</a> <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> </p>
-</footer><!-- /.post-info --><p>I've been running a Django app on <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html">Elastic Beanstalk</a> for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.</p>
+</footer><!-- /.post-info -->      <p>I've been running a Django app on <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html">Elastic Beanstalk</a> for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.</p>
 <p>Let's first describe what my setup is. Elastic Beanstalk is AWS's PaaS offering. I use a MySQL database running on RDS, a load balancer, a single EC2 instance and I have a DNS setup on Route 53. And that's more or less what I'm paying for. My bill was <strong>$42.58</strong> last month. Breaking it down, here are the three major components it has:</p>
 <ul>
 <li><strong>EC2</strong></li>
@@ -59,42 +64,11 @@
 <p>These are minimal costs. Some of these are going to increase if my site becomes popular, but right now they are minimal.</p>
 <p><strong>How can I bring these costs down?</strong></p>
 <p>It's possible to do all of this with a single EC2 instance and avoid paying for load balancing and RDS. What I get from these components right now is convenience and scalability. I don't really need scalability, since I don't operate at scale and might not come to that point. Convenience can be traded for the learning experience of settings up things manually. AWS has an <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html">article</a> on how to install a LAMP setup on EC2. It doesn't look too complicated. Supposedly my bill will be around $10 per month for my 1GB RAM t2.micro machine.</p>
-<p>Another option would be to use <a href="https://www.digitalocean.com/pricing/">Digital Ocean</a>. They're basically offering something similar to EC2 instances, but I haven't looked too much in detail. Digital Ocean is an IaaS provider, you need to do some manual setup. Their cost is pretty similar. An offering with 1GB of RAM costs $10 per month too. That's a very rough comparison, but it seems like we're in the same ballpark if we're not pushing the limits on disk space or bandwidth.</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+<p>Another option would be to use <a href="https://www.digitalocean.com/pricing/">Digital Ocean</a>. They're basically offering something similar to EC2 instances, but I haven't looked too much in detail. Digital Ocean is an IaaS provider, you need to do some manual setup. Their cost is pretty similar. An offering with 1GB of RAM costs $10 per month too. That's a very rough comparison, but it seems like we're in the same ballpark if we're not pushing the limits on disk space or bandwidth.</p>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/how-to-generate-user-activation-links-in-django.html" rel="bookmark"
-                           title="Permalink to How to generate user activation links in Django">How to generate user activation links in Django</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-04-05T17:03:00-07:00">
-                Published: Tue 05 April 2016
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-<p>tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> <a href="/tag/security.html">Security</a> <a href="/tag/cryptography.html">Cryptography</a> </p>
-</footer><!-- /.post-info -->                <p>Imagine the following simple user registration flow:</p>
-<ol>
-<li>User registers by setting an e-mail and a password.</li>
-<li>The server sends an e-mail containing an activation link to the user.</li>
-<li>The user clicks on the activation link and activates their account.</li>
-</ol>
-<p>Let's focus on step 2. How do we generate this ...</p>
-                <a class="readmore" href="/how-to-generate-user-activation-links-in-django.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
         </section><!-- /#extras -->
 

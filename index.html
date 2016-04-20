@@ -14,13 +14,65 @@
         <header id="banner" class="body">
                 <h1><a href="/">Petko's Coding Blog </a></h1>
                 <nav><ul>
+                    <li><a href="/category/aws.html">AWS</a></li>
                     <li><a href="/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/how-to-generate-user-activation-links-in-django.html">How to generate user activation links in Django</a></h1>
+                    <h1 class="entry-title"><a href="/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html">How much does it cost to run a Django app on AWS using Elastic Beanstalk?</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-04-20T13:56:00-07:00">
+                Published: Wed 20 April 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
+        </address>
+<p>In <a href="/category/aws.html">AWS</a>.</p>
+<p>tags: <a href="/tag/aws.html">AWS</a> <a href="/tag/elastic-beanstalk.html">Elastic Beanstalk</a> <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> </p>
+</footer><!-- /.post-info --><p>I've been running a Django app on <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html">Elastic Beanstalk</a> for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.</p>
+<p>Let's first describe what my setup is. Elastic Beanstalk is AWS's PaaS offering. I use a MySQL database running on RDS, a load balancer, a single EC2 instance and I have a DNS setup on Route 53. And that's more or less what I'm paying for. My bill was <strong>$42.58</strong> last month. Breaking it down, here are the three major components it has:</p>
+<ul>
+<li><strong>EC2</strong></li>
+</ul>
+<p>I'm running a <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/t2-instances.html">t2.micro</a> instance. It costs $0.013 per hour and I payed for 745 hours. Total: <strong>$9.69</strong>.</p>
+<ul>
+<li><strong>Load balancing</strong></li>
+</ul>
+<p>Load balancing is not cheap. It costs $0.025 per hour and for 744 hours shown, that comes down to <strong>$18.60</strong>.</p>
+<ul>
+<li><strong>RDS</strong></li>
+</ul>
+<p>RDS costs $0.017 per RDS T2 Micro instance hour and for 743 hours shown, I payed <strong>$12.63</strong>.</p>
+<p>If we sum these three, it comes down to <strong>$40.92</strong>. I also payed the following:</p>
+<ul>
+<li>$0.56 for RDS service storage.</li>
+<li>$0.45 for <a href="https://aws.amazon.com/ebs/">EBS</a>.</li>
+<li>$0.51 for Route 53.</li>
+<li>$0.07 for data transfer (my site being served to places around the world, but my site is not popular yet).</li>
+<li>$0.05 for S3 costs.</li>
+<li>$0.01 for data processed by the load balancer.</li>
+<li>$0.01 for SES.</li>
+</ul>
+<p>These are minimal costs. Some of these are going to increase if my site becomes popular, but right now they are minimal.</p>
+<p><strong>How can I bring these costs down?</strong></p>
+<p>It's possible to do all of this with a single EC2 instance and avoid paying for load balancing and RDS. What I get from these components right now is convenience and scalability. I don't really need scalability, since I don't operate at scale and might not come to that point. Convenience can be traded for the learning experience of settings up things manually. AWS has an <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html">article</a> on how to install a LAMP setup on EC2. It doesn't look too complicated. Supposedly my bill will be around $10 per month for my 1GB RAM t2.micro machine.</p>
+<p>Another option would be to use <a href="https://www.digitalocean.com/pricing/">Digital Ocean</a>. They're basically offering something similar to EC2 instances, but I haven't looked too much in detail. Digital Ocean is an IaaS provider, you need to do some manual setup. Their cost is pretty similar. An offering with 1GB of RAM costs $10 per month too. That's a very rough comparison, but it seems like we're in the same ballpark if we're not pushing the limits on disk space or bandwidth.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/how-to-generate-user-activation-links-in-django.html" rel="bookmark"
+                           title="Permalink to How to generate user activation links in Django">How to generate user activation links in Django</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-04-05T17:03:00-07:00">
                 Published: Tue 05 April 2016
@@ -30,23 +82,19 @@
                 By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
         </address>
 <p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info --><p>Imagine the following simple user registration flow:</p>
+<p>tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> <a href="/tag/security.html">Security</a> <a href="/tag/cryptography.html">Cryptography</a> </p>
+</footer><!-- /.post-info -->                <p>Imagine the following simple user registration flow:</p>
 <ol>
 <li>User registers by setting an e-mail and a password.</li>
 <li>The server sends an e-mail containing an activation link to the user.</li>
 <li>The user clicks on the activation link and activates their account.</li>
 </ol>
-<p>Let's focus on step 2. How do we generate this activation link?</p>
-<p>One way to implement this is to generate single use tokens and save them in a database table. Our url then looks like <code>http://sitename.com/activate?token=mytoken</code>. That solution has the benefit of being able to track that a token has been used and enforce single use. The drawback is that you need a new database table, which I wanted to avoid.</p>
-<p>How else can we generate these tokens?</p>
-<p>My first hunch was to reuse Django's <a href="https://github.com/django/django/blob/master/django/contrib/auth/tokens.py">PasswordResetTokenGenerator</a>. However, notice that the <code>check_token</code> function requires a user. This means that the activation link needs to include information about who the user is. So our <code>/activate</code> link will need to include an url parameter that's either the username, user id, or something else that uniquely identifies a user. I'm not happy with that. This is a link that's supposed to be private and I don't want the user's first impression of my site to be that I'm including their user id in an activation link, when most other sites don't do that.</p>
-<p>The solution that I settled on was encrypting the user id on the server. I'm generating a link of the form <code>http://sitename.com/activate?token=mytoken</code>. I generate the token using the Python <a href="https://pypi.python.org/pypi/cryptography">cryptography</a> package. The token is created by encrypting the username with a salt.</p>
-<p>So why is this not what Django is doing? I suppose the answer is that Python doesn't have a symmetric encryption implementation library coming with it.</p>
-<p>In addition, I also wanted the tokens to expire. This is simple, we can just include a timestamp in the token and compare it against the current time upon decryption.</p>
-<p>Here's a sample class that implements all of this:</p>
-<script src="https://gist.github.com/pminkov/e53d90c348f1dc47553408666431d2a2.js"></script>                </article>
-            </aside><!-- /#featured -->
+<p>Let's focus on step 2. How do we generate this ...</p>
+                <a class="readmore" href="/how-to-generate-user-activation-links-in-django.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
         <section id="extras" class="body">
         </section><!-- /#extras -->
 
