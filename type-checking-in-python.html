@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
         <meta charset="utf-8" />
-        <title>Petko's Coding Blog</title>
+        <title>Type checking in Python?</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
 
         <!--[if IE]>
@@ -15,13 +15,18 @@
                 <h1><a href="/">Petko's Coding Blog </a></h1>
                 <nav><ul>
                     <li><a href="/category/aws.html">AWS</a></li>
-                    <li><a href="/category/python.html">Python</a></li>
+                    <li class="active"><a href="/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/type-checking-in-python.html" rel="bookmark"
+           title="Permalink to Type checking in Python?">Type checking in Python?</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/type-checking-in-python.html">Type checking in Python?</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-05-18T10:39:00-07:00">
                 Published: Wed 18 May 2016
@@ -32,7 +37,7 @@
         </address>
 <p>In <a href="/category/python.html">Python</a>.</p>
 
-</footer><!-- /.post-info --><p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
+</footer><!-- /.post-info -->      <p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
 One that I use in my projects is the following:</p>
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
   <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1"> != </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
@@ -64,64 +69,11 @@ AssertionError: (hello) &lt;type &#39;str&#39;&gt; != &lt;type &#39;int&#39;&gt;
 </pre></div>
 
 
-<p>So that's it - pretty simple. I use the <code>T</code> function every once in a while, to guard against type errors.</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+<p>So that's it - pretty simple. I use the <code>T</code> function every once in a while, to guard against type errors.</p>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html" rel="bookmark"
-                           title="Permalink to How much does it cost to run a Django app on AWS using Elastic Beanstalk?">How much does it cost to run a Django app on AWS using Elastic Beanstalk?</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-04-20T13:56:00-07:00">
-                Published: Wed 20 April 2016
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/aws.html">AWS</a>.</p>
-<p>tags: <a href="/tag/aws.html">AWS</a> <a href="/tag/elastic-beanstalk.html">Elastic Beanstalk</a> <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> </p>
-</footer><!-- /.post-info -->                <p>I've been running a Django app on <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html">Elastic Beanstalk</a> for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic ...</p>
-                <a class="readmore" href="/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/how-to-generate-user-activation-links-in-django.html" rel="bookmark"
-                           title="Permalink to How to generate user activation links in Django">How to generate user activation links in Django</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2016-04-05T17:03:00-07:00">
-                Published: Tue 05 April 2016
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-<p>tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> <a href="/tag/security.html">Security</a> <a href="/tag/cryptography.html">Cryptography</a> </p>
-</footer><!-- /.post-info -->                <p>Imagine the following simple user registration flow:</p>
-<ol>
-<li>User registers by setting an e-mail and a password.</li>
-<li>The server sends an e-mail containing an activation link to the user.</li>
-<li>The user clicks on the activation link and activates their account.</li>
-</ol>
-<p>Let's focus on step 2. How do we generate this ...</p>
-                <a class="readmore" href="/how-to-generate-user-activation-links-in-django.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
         </section><!-- /#extras -->
 

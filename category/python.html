@@ -21,7 +21,63 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/how-to-generate-user-activation-links-in-django.html">How to generate user activation links in Django</a></h1>
+                    <h1 class="entry-title"><a href="/type-checking-in-python.html">Type checking in Python?</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-05-18T10:39:00-07:00">
+                Published: Wed 18 May 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+
+</footer><!-- /.post-info --><p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
+One that I use in my projects is the following:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+  <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1"> != </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Here's an example of how to use this:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+  <span class="n">T</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+  <span class="n">T</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</pre></div>
+
+
+<p>Let's say that you call the function incorrectly, like this:</p>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="s2">&quot;hello&quot;</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+
+
+<p>You'll get the following exception:</p>
+<div class="highlight"><pre><span></span>&gt;&gt;&gt; sum(a, b)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 2, in sum
+  File &quot;&lt;stdin&gt;&quot;, line 2, in T
+AssertionError: (hello) &lt;type &#39;str&#39;&gt; != &lt;type &#39;int&#39;&gt;
+</pre></div>
+
+
+<p>So that's it - pretty simple. I use the <code>T</code> function every once in a while, to guard against type errors.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/how-to-generate-user-activation-links-in-django.html" rel="bookmark"
+                           title="Permalink to How to generate user activation links in Django">How to generate user activation links in Django</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-04-05T17:03:00-07:00">
                 Published: Tue 05 April 2016
@@ -32,22 +88,18 @@
         </address>
 <p>In <a href="/category/python.html">Python</a>.</p>
 <p>tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> <a href="/tag/security.html">Security</a> <a href="/tag/cryptography.html">Cryptography</a> </p>
-</footer><!-- /.post-info --><p>Imagine the following simple user registration flow:</p>
+</footer><!-- /.post-info -->                <p>Imagine the following simple user registration flow:</p>
 <ol>
 <li>User registers by setting an e-mail and a password.</li>
 <li>The server sends an e-mail containing an activation link to the user.</li>
 <li>The user clicks on the activation link and activates their account.</li>
 </ol>
-<p>Let's focus on step 2. How do we generate this activation link?</p>
-<p>One way to implement this is to generate single use tokens and save them in a database table. Our url then looks like <code>http://sitename.com/activate?token=mytoken</code>. That solution has the benefit of being able to track that a token has been used and enforce single use. The drawback is that you need a new database table, which I wanted to avoid.</p>
-<p>How else can we generate these tokens?</p>
-<p>My first hunch was to reuse Django's <a href="https://github.com/django/django/blob/master/django/contrib/auth/tokens.py">PasswordResetTokenGenerator</a>. However, notice that the <code>check_token</code> function requires a user. This means that the activation link needs to include information about who the user is. So our <code>/activate</code> link will need to include an url parameter that's either the username, user id, or something else that uniquely identifies a user. I'm not happy with that. This is a link that's supposed to be private and I don't want the user's first impression of my site to be that I'm including their user id in an activation link, when most other sites don't do that.</p>
-<p>The solution that I settled on was encrypting the user id on the server. I'm generating a link of the form <code>http://sitename.com/activate?token=mytoken</code>. I generate the token using the Python <a href="https://pypi.python.org/pypi/cryptography">cryptography</a> package. The token is created by encrypting the username with a salt.</p>
-<p>So why is this not what Django is doing? I suppose the answer is that Python doesn't have a symmetric encryption implementation library coming with it.</p>
-<p>In addition, I also wanted the tokens to expire. This is simple, we can just include a timestamp in the token and compare it against the current time upon decryption.</p>
-<p>Here's a sample class that implements all of this:</p>
-<script src="https://gist.github.com/pminkov/e53d90c348f1dc47553408666431d2a2.js"></script>                </article>
-            </aside><!-- /#featured -->
+<p>Let's focus on step 2. How do we generate this ...</p>
+                <a class="readmore" href="/how-to-generate-user-activation-links-in-django.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+                </ol><!-- /#posts-list -->
+                </section><!-- /#content -->
         <section id="extras" class="body">
         </section><!-- /#extras -->
 
