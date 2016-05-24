@@ -15,13 +15,82 @@
                 <h1><a href="/">Petko's Coding Blog </a></h1>
                 <nav><ul>
                     <li><a href="/category/aws.html">AWS</a></li>
+                    <li><a href="/category/django.html">Django</a></li>
                     <li><a href="/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html">How much does it cost to run a Django app on AWS using Elastic Beanstalk?</a></h1>
+                    <h1 class="entry-title"><a href="/using-mustache-templates-with-django.html">Using mustache templates with Django.</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-05-23T22:13:00-07:00">
+                Published: Mon 23 May 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
+        </address>
+<p>In <a href="/category/django.html">Django</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> </p>
+</footer><!-- /.post-info --><p>There are various reasons why you might want to use client side templates in a Django app. 
+For example, you might want to make your initial page load faster, return some of your data in json format and postpone some template rendering until the user needs it.</p>
+<p>Let's see how we can easily include <a href="https://mustache.github.io/">mustache</a> templates in Django. <a href="http://mustache.github.io/mustache.5.html">This</a> page explains the mustache syntax quite well.</p>
+<p>The most optimized way to include a client side template in your code would be to compile it on deployment and include the compiled JavaScript file as part of your static files.
+However, that seemed like too much work and I wanted something that I can implement faster.</p>
+<p>If you're not shipping compiled JavaScript, then your other option would be to have the template text somewhere and compile it client side. I have one main requirement though - I don't want my template code to be in a string which editors will display without HTML syntax highlighting.</p>
+<p>So, working with these constraints, let's see what we can come up with.</p>
+<p>First, let's say our template code is in <code>person.html</code> and it looks like this:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+  {{#person}}
+    The user&#39;s name is {{name}}.
+  {{/person}}
+  {{^person}}
+    There&#39;s no user defined.
+  {{/person}}
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>Now, we can include this template in the html page returned by our initial page load, like this:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="kd">var</span> <span class="nx">person_template_text</span> <span class="o">=</span> <span class="sb">`{% include &quot;myapp/templates/person.html&quot; %}`</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>In this case, <code>person_template_text</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals">template literal</a>. Template literals are JavaScript strings that can span multiple lines.</p>
+<p>Now, we just need to compile the template so that it's ready to be rendered. We'll use <a href="http://twitter.github.io/hogan.js/">hogan.js</a>, since it's advertised as faster and smaller than mustache and it fully supports mustache syntax. Let's say we're also using jQuery. We can do something along these lines:</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">person_template</span> <span class="o">=</span> <span class="nx">Hogan</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">person_template_text</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">App</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">renderPerson</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">personDict</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">person_template</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">personDict</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">app</span><span class="p">;</span>
+
+<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">();</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p>And that's it. There are many other ways to do this, which will be more optimized, but this one seems like an easy one to start with.</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html" rel="bookmark"
+                           title="Permalink to How much does it cost to run a Django app on AWS using Elastic Beanstalk?">How much does it cost to run a Django app on AWS using Elastic Beanstalk?</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2016-04-20T13:56:00-07:00">
                 Published: Wed 20 April 2016
@@ -32,40 +101,10 @@
         </address>
 <p>In <a href="/category/aws.html">AWS</a>.</p>
 <p>tags: <a href="/tag/aws.html">AWS</a> <a href="/tag/elastic-beanstalk.html">Elastic Beanstalk</a> <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> </p>
-</footer><!-- /.post-info --><p>I've been running a Django app on <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html">Elastic Beanstalk</a> for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.</p>
-<p>Let's first describe what my setup is. Elastic Beanstalk is AWS's PaaS offering. I use a MySQL database running on RDS, a load balancer, a single EC2 instance and I have a DNS setup on Route 53. And that's more or less what I'm paying for. My bill was <strong>$42.58</strong> last month. Breaking it down, here are the three major components it has:</p>
-<ul>
-<li><strong>EC2</strong></li>
-</ul>
-<p>I'm running a <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/t2-instances.html">t2.micro</a> instance. It costs $0.013 per hour and I paid for 745 hours. Total: <strong>$9.69</strong>.</p>
-<ul>
-<li><strong>Load balancing</strong></li>
-</ul>
-<p>Load balancing is not cheap. It costs $0.025 per hour and for 744 hours shown, that comes down to <strong>$18.60</strong>.</p>
-<ul>
-<li><strong>RDS</strong></li>
-</ul>
-<p>RDS costs $0.017 per RDS T2 Micro instance hour and for 743 hours shown, I paid <strong>$12.63</strong>.</p>
-<p>If we sum these three, it comes down to <strong>$40.92</strong>. I also paid the following:</p>
-<ul>
-<li>$0.56 for RDS service storage.</li>
-<li>$0.45 for <a href="https://aws.amazon.com/ebs/">EBS</a>.</li>
-<li>$0.51 for Route 53.</li>
-<li>$0.07 for data transfer (my site being served to places around the world, but my site is not popular yet).</li>
-<li>$0.05 for S3 costs.</li>
-<li>$0.01 for data processed by the load balancer.</li>
-<li>$0.01 for SES.</li>
-</ul>
-<p>These are minimal costs. Some of these are going to increase if my site becomes popular, but right now they are minimal.</p>
-<p><strong>How can I bring these costs down?</strong></p>
-<p>It's possible to do all of this with a single EC2 instance and avoid paying for load balancing and RDS. What I get from these components right now is convenience and scalability. I don't really need scalability, since I don't operate at scale and might not come to that point. Convenience can be traded for the learning experience of settings up things manually. AWS has an <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html">article</a> on how to install a LAMP setup on EC2. It doesn't look too complicated. Supposedly my bill will be around $10 per month for my 1GB RAM t2.micro machine.</p>
-<p>Another option would be to use <a href="https://www.digitalocean.com/pricing/">Digital Ocean</a>. They're basically offering something similar to EC2 instances, but I haven't looked too much in detail. Digital Ocean is an IaaS provider, you need to do some manual setup. Their cost is pretty similar. An offering with 1GB of RAM costs $10 per month too. That's a very rough comparison, but it seems like we're in the same ballpark if we're not pushing the limits on disk space or bandwidth.</p>
-<p>It should also be possibe to continue to use Elastic Beanstalk, but run a MySQL server directly on the EC2 instance. Here's a long <a href="http://d0.awsstatic.com/whitepapers/rdbms-in-the-cloud-sql-server-on-aws.pdf">white paper</a> that talks about this.</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <p>I've been running a Django app on <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html">Elastic Beanstalk</a> for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic ...</p>
+                <a class="readmore" href="/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
