@@ -23,18 +23,13 @@
             <aside id="featured" class="body">
                 <article>
                     <h1 class="entry-title"><a href="/why-i-always-use-virtualenv-to-try-out-new-libraries.html">Why I always use virtualenv to try out new libraries.</a></h1>
-<footer class="post-info">
+<div class="post-info">
         <abbr class="published" title="2016-05-24T18:14:00-07:00">
                 Published: Tue 24 May 2016
+in <a href="/category/python.html">Python</a>
         </abbr>
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info --><p>A few months ago I had only heard about virtualenv and never needed to use it in a project. Now I think of it as an indespensable and easy to use tool for Python programmers.</p>
-<p>One thing that I always do with virtualenv is to install new Python libraries in a new virtualenv before I install them into the one I'm currently working with.</p>
+</div><!-- /.post-info --><p>One thing that I always do with virtualenv is to install new Python libraries in a new virtualenv before I install them into the one I'm currently working with.</p>
 <p>Here's how I do this:</p>
 <div class="highlight"><pre><span></span>$ virtualenv venv
 New python executable in /Users/petko/work/post/venv/bin/python
@@ -82,17 +77,13 @@ Warning!!! Possibly conflicting dependencies found:
                 </header>
 
                 <div class="entry-content">
-<footer class="post-info">
+<div class="post-info">
         <abbr class="published" title="2016-05-18T10:39:00-07:00">
                 Published: Wed 18 May 2016
+in <a href="/category/python.html">Python</a>
         </abbr>
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info -->                <p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
+</div><!-- /.post-info -->                <p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
 One that I use in my projects is the following:</p>
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
   <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1"> != </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
@@ -111,17 +102,13 @@ One that I use in my projects is the following:</p>
                 </header>
 
                 <div class="entry-content">
-<footer class="post-info">
+<div class="post-info">
         <abbr class="published" title="2016-04-05T17:03:00-07:00">
                 Published: Tue 05 April 2016
+in <a href="/category/python.html">Python</a>
         </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
 <p>Tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> <a href="/tag/security.html">Security</a> <a href="/tag/cryptography.html">Cryptography</a> </p>
-</footer><!-- /.post-info -->                <p>Imagine the following simple user registration flow:</p>
+</div><!-- /.post-info -->                <p>Imagine the following simple user registration flow:</p>
 <ol>
 <li>User registers by setting an e-mail and a password.</li>
 <li>The server sends an e-mail containing an activation link to the user.</li>

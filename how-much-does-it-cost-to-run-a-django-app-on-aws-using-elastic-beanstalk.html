@@ -28,17 +28,13 @@
     </header>
 
     <div class="entry-content">
-<footer class="post-info">
+<div class="post-info">
         <abbr class="published" title="2016-04-20T13:56:00-07:00">
                 Published: Wed 20 April 2016
+in <a href="/category/aws.html">AWS</a>
         </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/aws.html">AWS</a>.</p>
 <p>Tags: <a href="/tag/aws.html">AWS</a> <a href="/tag/elastic-beanstalk.html">Elastic Beanstalk</a> <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> </p>
-</footer><!-- /.post-info -->    </div>
+</div><!-- /.post-info -->    </div>
     <div>
       <p>I've been running a Django app on <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html">Elastic Beanstalk</a> for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.</p>
 <p>Let's first describe what my setup is. Elastic Beanstalk is AWS's PaaS offering. I use a MySQL database running on RDS, a load balancer, a single EC2 instance and I have a DNS setup on Route 53. And that's more or less what I'm paying for. My bill was <strong>$42.58</strong> last month. Breaking it down, here are the three major components it has:</p>

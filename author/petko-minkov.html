@@ -23,18 +23,13 @@
             <aside id="featured" class="body">
                 <article>
                     <h1 class="entry-title"><a href="/why-i-always-use-virtualenv-to-try-out-new-libraries.html">Why I always use virtualenv to try out new libraries.</a></h1>
-<footer class="post-info">
+<div class="post-info">
         <abbr class="published" title="2016-05-24T18:14:00-07:00">
                 Published: Tue 24 May 2016
+in <a href="/category/python.html">Python</a>
         </abbr>
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info --><p>A few months ago I had only heard about virtualenv and never needed to use it in a project. Now I think of it as an indespensable and easy to use tool for Python programmers.</p>
-<p>One thing that I always do with virtualenv is to install new Python libraries in a new virtualenv before I install them into the one I'm currently working with.</p>
+</div><!-- /.post-info --><p>One thing that I always do with virtualenv is to install new Python libraries in a new virtualenv before I install them into the one I'm currently working with.</p>
 <p>Here's how I do this:</p>
 <div class="highlight"><pre><span></span>$ virtualenv venv
 New python executable in /Users/petko/work/post/venv/bin/python
@@ -82,17 +77,13 @@ Warning!!! Possibly conflicting dependencies found:
                 </header>
 
                 <div class="entry-content">
-<footer class="post-info">
+<div class="post-info">
         <abbr class="published" title="2016-05-23T22:13:00-07:00">
                 Published: Mon 23 May 2016
+in <a href="/category/django.html">Django</a>
         </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/django.html">Django</a>.</p>
 <p>Tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> </p>
-</footer><!-- /.post-info -->                <p>There are various reasons why you might want to use client side templates in a Django app. 
+</div><!-- /.post-info -->                <p>There are various reasons why you might want to use client side templates in a Django app. 
 For example, you might want to make your initial page load faster, return some of your data in json format and postpone some template rendering until the user needs it.</p>
 <p>Let's see ...</p>
                 <a class="readmore" href="/using-mustache-templates-with-django.html">read more</a>
@@ -106,17 +97,13 @@ For example, you might want to make your initial page load faster, return some o
                 </header>
 
                 <div class="entry-content">
-<footer class="post-info">
+<div class="post-info">
         <abbr class="published" title="2016-05-18T10:39:00-07:00">
                 Published: Wed 18 May 2016
+in <a href="/category/python.html">Python</a>
         </abbr>
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
-
-</footer><!-- /.post-info -->                <p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
+</div><!-- /.post-info -->                <p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
 One that I use in my projects is the following:</p>
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
   <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1"> != </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
@@ -135,17 +122,13 @@ One that I use in my projects is the following:</p>
                 </header>
 
                 <div class="entry-content">
-<footer class="post-info">
+<div class="post-info">
         <abbr class="published" title="2016-04-20T13:56:00-07:00">
                 Published: Wed 20 April 2016
+in <a href="/category/aws.html">AWS</a>
         </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/aws.html">AWS</a>.</p>
 <p>Tags: <a href="/tag/aws.html">AWS</a> <a href="/tag/elastic-beanstalk.html">Elastic Beanstalk</a> <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> </p>
-</footer><!-- /.post-info -->                <p>I've been running a Django app on <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html">Elastic Beanstalk</a> for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic ...</p>
+</div><!-- /.post-info -->                <p>I've been running a Django app on <a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html">Elastic Beanstalk</a> for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic ...</p>
                 <a class="readmore" href="/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
@@ -157,17 +140,13 @@ One that I use in my projects is the following:</p>
                 </header>
 
                 <div class="entry-content">
-<footer class="post-info">
+<div class="post-info">
         <abbr class="published" title="2016-04-05T17:03:00-07:00">
                 Published: Tue 05 April 2016
+in <a href="/category/python.html">Python</a>
         </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
-        </address>
-<p>In <a href="/category/python.html">Python</a>.</p>
 <p>Tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> <a href="/tag/security.html">Security</a> <a href="/tag/cryptography.html">Cryptography</a> </p>
-</footer><!-- /.post-info -->                <p>Imagine the following simple user registration flow:</p>
+</div><!-- /.post-info -->                <p>Imagine the following simple user registration flow:</p>
 <ol>
 <li>User registers by setting an e-mail and a password.</li>
 <li>The server sends an e-mail containing an activation link to the user.</li>
