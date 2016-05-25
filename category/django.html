@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Petko's Coding Blog - Django</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="/category/aws.html">AWS</a></li>
+                    <li class="active"><a href="/category/django.html">Django</a></li>
+                    <li><a href="/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/using-mustache-templates-with-django.html">Using mustache templates with Django.</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2016-05-23T22:13:00-07:00">
+                Published: Mon 23 May 2016
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/petko-minkov.html">Petko Minkov</a>
+        </address>
+<p>In <a href="/category/django.html">Django</a>.</p>
+<p>tags: <a href="/tag/python.html">Python</a> <a href="/tag/django.html">Django</a> </p>
+</footer><!-- /.post-info --><p>There are various reasons why you might want to use client side templates in a Django app. 
+For example, you might want to make your initial page load faster, return some of your data in json format and postpone some template rendering until the user needs it.</p>
+<p>Let's see how we can easily include <a href="https://mustache.github.io/">mustache</a> templates in Django. <a href="http://mustache.github.io/mustache.5.html">This</a> page explains the mustache syntax quite well.</p>
+<p>The most optimized way to include a client side template in your code would be to compile it on deployment and include the compiled JavaScript file as part of your static files.
+However, that seemed like too much work and I wanted something that I can implement faster.</p>
+<p>If you're not shipping compiled JavaScript, then your other option would be to have the template text somewhere and compile it client side. I have one main requirement though - I don't want my template code to be in a string which editors will display without HTML syntax highlighting.</p>
+<p>So, working with these constraints, let's see what we can come up with.</p>
+<p>First, let's say our template code is in <code>person.html</code> and it looks like this:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+  {{#person}}
+    The user&#39;s name is {{name}}.
+  {{/person}}
+  {{^person}}
+    There&#39;s no user defined.
+  {{/person}}
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>Now, we can include this template in the html page returned by our initial page load, like this:</p>
+<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+  <span class="kd">var</span> <span class="nx">person_template_text</span> <span class="o">=</span> <span class="sb">`{% include &quot;myapp/templates/person.html&quot; %}`</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>In this case, <code>person_template_text</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals">template literal</a>. Template literals are JavaScript strings that can span multiple lines.</p>
+<p>Now, we just need to compile the template so that it's ready to be rendered. We'll use <a href="http://twitter.github.io/hogan.js/">hogan.js</a>, since it's advertised as faster and smaller than mustache and it fully supports mustache syntax. Let's say we're also using jQuery. We can do something along these lines:</p>
+<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">person_template</span> <span class="o">=</span> <span class="nx">Hogan</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">person_template_text</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">App</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">renderPerson</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">personDict</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">person_template</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">personDict</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">app</span><span class="p">;</span>
+
+<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">();</span>
+<span class="p">});</span>
+</pre></div>
+
+
+<p>And that's it. There are many other ways to do this, which will be more optimized, but this one seems like an easy one to start with.</p>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
