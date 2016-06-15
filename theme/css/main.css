@@ -372,8 +372,7 @@ img.left, figure.left {float: left; margin: 0 2em 2em 0;}
 .hentry {
 	display: block;
 	clear: both;
-	border-bottom: 1px solid #eee;
-	padding: 1.5em 0;
+        padding-bottom: 0.3em;
 }
 li:last-child .hentry, #content > .hentry {border: 0; margin: 0;}
 #content > .hentry {padding: 1em 0;}
