@@ -40,7 +40,7 @@ in <a href="/category/concurrency.html">Concurrency</a>
     <div>
       <p>Today I'll write a bit about implementing a simple thread safe counter and improving its speed.</p>
 <p>Implementing a basic mutli-threaded counter is a fairly easy task. Using pthreads, you just need to wrap the counter increment in a lock.</p>
-<p>The code looks like this:</p>
+<p>The code (<a href="https://github.com/pminkov/wip/tree/master/mt-counters">github link</a>) looks like this:</p>
 <div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;mythreads.h&quot;</span><span class="cp"></span>
 
 <span class="k">struct</span> <span class="n">counter_t</span> <span class="p">{</span>
