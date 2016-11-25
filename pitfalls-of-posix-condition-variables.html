@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Pitfalls of POSIX condition variables.</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="/category/aws.html">AWS</a></li>
+                    <li class="active"><a href="/category/concurrency.html">Concurrency</a></li>
+                    <li><a href="/category/django.html">Django</a></li>
+                    <li><a href="/category/linux.html">Linux</a></li>
+                    <li><a href="/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/pitfalls-of-posix-condition-variables.html" rel="bookmark"
+           title="Permalink to Pitfalls of POSIX condition variables.">Pitfalls of POSIX condition variables.</a></h1>
+    </header>
+
+    <div class="entry-content">
+<div class="post-info">
+        <abbr class="published" title="2016-11-24T20:23:00-08:00">
+                Published: Thu 24 November 2016
+in <a href="/category/concurrency.html">Concurrency</a>
+        </abbr>
+<p>Tags: <a href="/tag/concurrency.html">Concurrency</a> <a href="/tag/linux.html">Linux</a> </p>
+</div><!-- /.post-info -->    </div>
+    <div>
+      <p>I'm reading this awesome <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/">book</a> about operating systems. I find that with OSs, you can't understand things by just reading the text.
+You have to write code, write out things on paper and read certain passages multiple times. That's the difference between learning and reading. Hopefully I'm learning something.</p>
+<p>So this book has a nice chapter on <a href="https://computing.llnl.gov/tutorials/pthreads/#ConditionVariables">condition variables</a>. The way condition variables operate is fairly clear, but I found two pitfalls that I had to dig deeper into in order to see what's going on.</p>
+<p>First, a crash course in how condition variables operate. I'm using shortened function names for readability. A condition variable is a variable that you can use to make a thread wait for some condition to be true. So roughly, it looks like this:</p>
+<div class="highlight"><pre><span></span>// Thread one.
+lock(mutex);
+wait(condition, mutex);
+unlock(mutex);
+
+// Thread two.
+lock(mutex);
+signal(condition);
+unlock(mutex);
+</pre></div>
+
+
+<p>Let's say that the first thing that happens here is that thread one obtains the mutex. Thread two runs and blocks on its call to <code>lock</code>. Now thread one proceeds and calls <code>wait(condition, mutex)</code>. What happens here is that mutex is unlocked and thread one goes to sleep. It's waiting for the condition to become true. Thread two is able to obtain the lock and it then signals to thread one that the condition is satisfied. Thread one obtains a lock on the mutex again and finishes its job.</p>
+<p>Now that this is out of the way, let's look at the pitfalls.</p>
+<h4>Pitfall 1</h4>
+<blockquote>
+<p>When a thread signals a condition, if the thread holds a lock on the mutex, a waiting thread returns from <code>wait()</code> only after the first thread unlocks the mutex.</p>
+</blockquote>
+<p>Looking at our example, intuitively it looks like when we call <code>signal()</code>, the first thread should return from wait. After all, the signal has been sent. But that's not the case. If thread two has more work to do after the signal, all of this will be done and just once <code>unlock()</code> is called, that's when thread one will return from the wait.
+Thread one will then lock the mutex and once it's done with its work, it will unlock it. This is way more logical than the mess that would happen if <code>signal()</code> makes <code>wait()</code> return immediately.</p>
+<h4>Pitfall 2</h4>
+<blockquote>
+<p>Calling <code>signal()</code> doesn't necessarily unblock all threads waiting on this signal.</p>
+</blockquote>
+<p>Well this one caused me to scratch my head when I was going through one of the exercises in the book. I assumed a call to <code>signal()</code> simply unblocks all the waiting threads. No, it possibly unblocks only one of them. Apparently there's a <code>pthread_cond_broadcast</code> <a href="https://linux.die.net/man/3/pthread_cond_signal">function</a> that can unblock all waiting threads.</p>
+<p>So that's it. Happy coding.</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+        </section><!-- /#extras -->
+
+        <!--
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                  Blah blha blah
+                </address>
+        </footer>
+        -->
+        <!-- /#contentinfo -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-243631-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>
