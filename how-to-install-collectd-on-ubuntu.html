@@ -39,9 +39,11 @@ in <a href="/category/linux.html">Linux</a>
 
 </div><!-- /.post-info -->    </div>
     <div>
-      <p>Some time ago I found out about collectd and I was curious to see what it does. Here's how to install it on Ubuntu and visualize the data it has collected.</p>
+      <p>Some time ago I found out about <a href="https://collectd.org/">collectd</a> and I was curious to see what it does. collectd collects statistics about the machine its running on - cpu, disk, memory, processes, battery, etc. </p>
+<p>Here's how to install it on Ubuntu and visualize the data it has collected.</p>
 <p><br></p>
 <h3>Step 1: Install the collectd package.</h3>
+<p>Easy, just install the package:<br></p>
 <p><code>sudo apt-get install collectd</code></p>
 <p><br></p>
 <h3>Step 2: Make sure collectd and apache are running.</h3>
@@ -65,10 +67,10 @@ in <a href="/category/linux.html">Linux</a>
 <p>First, you need to install the cgi module. So, go to <code>/etc/apache2/mods-enabled</code> and run this: <code>$ sudo ln -s ../mods-available/cgi.load</code>. You have now enabled the <code>cgi</code> module.</p>
 <p>Next you'll have to change <code>apache2.conf</code>, located in <code>/etc/apache2</code> (Ubuntu doesn't use <code>httpd.conf</code>).</p>
 <p>Add these lines to it:</p>
-<div class="highlight"><pre><span></span><span class="nt">&lt;Directory</span> <span class="err">/var/www</span><span class="nt">/&gt;</span>
+<div class="highlight"><pre><span></span>&lt;Directory /var/www/&gt;
         Options +ExecCGI
         AddHandler cgi-script .cgi
-<span class="nt">&lt;/Directory&gt;</span>
+&lt;/Directory&gt;
 </pre></div>
 
 
