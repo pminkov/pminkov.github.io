@@ -39,8 +39,7 @@ in <a href="/category/linux.html">Linux</a>
 
 </div><!-- /.post-info -->    </div>
     <div>
-      <h1>The Linux init system.</h1>
-<p>I decided that I'll dig down into <a href="https://en.wikipedia.org/wiki/Init">init systems</a> in Linux and learn more about them. I'm running Ubuntu 16.04, so this might look different on other distributions.</p>
+      <p>I decided that I'll dig down into <a href="https://en.wikipedia.org/wiki/Init">init systems</a> in Linux and learn more about them. I'm running Ubuntu 16.04, so this might look different on other distributions.</p>
 <p>The init system in Linux is mainly responsible for starting essential service processes, mounting file systems and possibly other tasks. The main init systems are systemd, System V init and Upstart. Ubuntu uses systemd.</p>
 <p>The init system starts after the Kernel starts its first user space process - init. Indeed, let's see what's running with PID 1:</p>
 <div class="highlight"><pre><span></span>$ ps 1
@@ -62,7 +61,7 @@ lrwxrwxrwx <span class="m">1</span> root root <span class="m">20</span> Sep <spa
 <li>System configuration directory: <code>/etc/systemd</code>. Make your local changes here.</li>
 </ul>
 <p>Well, these are not all directories that contain unit files. Here's the full set of paths that systemd uses:</p>
-<div class="highlight"><pre><span></span><span class="nv">$systemctl</span> -p UnitPath show
+<div class="highlight"><pre><span></span>$ systemctl -p UnitPath show
 <span class="nv">UnitPath</span><span class="o">=</span>/etc/systemd/system /run/systemd/system /run/systemd/generator /usr/local/lib/systemd/system /lib/systemd/system /usr/lib/systemd/system /run/systemd/generator.late
 </pre></div>
 
@@ -218,7 +217,7 @@ Startup finished in 3.989s <span class="o">(</span>kernel<span class="o">)</span
 
 
 <p>This command prints the time it took to startup our system.</p>
-<p>I hope things are more clear now. Until next time!</p>
+<p>So that's all for today. There's definitely more to explore in systemd land - the syntax of unit files, how systemd executes them and so on. I'll leave that for some other time.</p>
     </div><!-- /.entry-content -->
 
   </article>
