@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/misc.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-01-15T12:10:00-08:00</updated><entry><title>The Cloud Infrastructure Landscape</title><link href="http://pminkov.github.io/blog/the-cloud-infrastructure-landscape.html" rel="alternate"></link><published>2017-01-15T12:10:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-15:blog/the-cloud-infrastructure-landscape.html</id><summary type="html">&lt;p&gt;I'm taking a &lt;a href="https://www.edx.org/course/introduction-cloud-infrastructure-linuxfoundationx-lfs151-x"&gt;Cloud Infrastructure&lt;/a&gt; class on EdX and I have found it to be a really nice overview of the cloud space. It's missing anything related to Hadoop and data analytics, but it describes probably all the tools related to running applications in the cloud. Of course, since the class describes so many tools, it can't do so in depth, but you can pick whatever is interesting to you and learn more about it.&lt;/p&gt;
+&lt;p&gt;Here's a list of all the tools described in it, which list I might use as a future reference for myself. I'd say that knowing a bit about such a big amount of products definitely helps when you're trying to come up with a cloud infrastructure for a project.&lt;/p&gt;
+&lt;p&gt;So, big list, based on the course contents:&lt;/p&gt;
+&lt;h3&gt;Virtualization&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.linux-kvm.org/page/Main_Page"&gt;KVM&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.virtualbox.org/wiki/VirtualBox"&gt;VirtualBox&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.vagrantup.com/"&gt;Vagrant&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;I use VirtualBox to run Linux on Mac OS X and highly recommend it. Mac OS X is not good if you're trying to learn Linux, too many differences.&lt;/p&gt;
+&lt;h3&gt;Infrastructure as a Service (IaaS)&lt;br&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://aws.amazon.com/ec2/"&gt;Amazon EC2&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://azure.microsoft.com/en-us/services/virtual-machines/?b=16.51a"&gt;Azure Virtual Machines&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.digitalocean.com/"&gt;Digital Ocean&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://cloud.google.com/compute/"&gt;Google Compute Engine&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.openstack.org/"&gt;OpenStack&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;I've only tried EC2 out of these, but it's pretty simple and I like the fact that you can do so many things through the UI, it makes it easier to start with it.&lt;/p&gt;
+&lt;h3&gt;Platform as a Sevice (PaaS)&lt;br&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.cloudfoundry.org/learn/features/"&gt;Cloud Foundry&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.openshift.com/"&gt;OpenShift&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.heroku.com/"&gt;Heroku&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://deis.com/"&gt;Deis&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://aws.amazon.com/elasticbeanstalk/"&gt;AWS Elastic Beanstalk&lt;/a&gt; (my addition)&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;I've used Elastic Beanstalk and it's a good way to abstract configuration of load balancers, Apache instances and so on.&lt;/p&gt;
+&lt;h3&gt;Containers&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://linuxcontainers.org/"&gt;LXC (Linux Containers)&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.docker.com/"&gt;Docker&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Docker is the leader here. I'm surprised that companies like Google or VMWare haven't come up with their own solution. Maybe soon.&lt;/p&gt;
+&lt;h3&gt;Micro OSes for Containers&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.projectatomic.io/"&gt;Atomic Host&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.coreos.com/"&gt;CoreOS&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://vmware.github.io/photon/"&gt;VMWare Photon&lt;/a&gt;&lt;br&gt;
+&lt;a href="http://rancher.com/rancher-os/"&gt;RancherOS&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Pretty neat concept of building a minimal OS that's targeted towards running containers.&lt;/p&gt;
+&lt;h3&gt;Container Orchestration&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.docker.com/products/docker-swarm"&gt;Docker Swarm&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://kubernetes.io/"&gt;Kubernetes&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Unikernels&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://github.com/emc-advanced-dev/unik"&gt;Unik&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Container as a Service (CaaS)&lt;br&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.docker.com/products/docker-datacenter"&gt;Docker Datacenter&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://wiki.openstack.org/wiki/Magnum"&gt;Project Magnum on OpenStack&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Software Defined Storage and Storage Management for Containers&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://ceph.com/"&gt;Ceph&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.gluster.org/"&gt;Gluster&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://storpool.com/"&gt;StorPool&lt;/a&gt; (My addition)&lt;br&gt; &lt;/p&gt;
+&lt;h3&gt;Continuous Integration / Continuous Delivery&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://jenkins.io/"&gt;Jenkins&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://drone.io/"&gt;Drone&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://travis-ci.com/getting_started"&gt;Travis CI&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://app.shippable.com/"&gt;Shippable&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;These are very easy to try out if you have projects on GitHub. Here's &lt;a href="https://github.com/pminkov/webserver"&gt;one&lt;/a&gt; on which I slapped the Drone badge.&lt;/p&gt;
+&lt;h3&gt;Tools for Configuration Management&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.ansible.com/"&gt;Ansible&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://puppet.com/"&gt;Puppet&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://docs.saltstack.com/en/latest/"&gt;SaltStack&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.chef.io/"&gt;Chef&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Useful tools for running commands on multiple servers.&lt;/p&gt;
+&lt;h3&gt;Build and Release Tools&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.terraform.io/docs/providers/"&gt;Terraform&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://bosh.io"&gt;BOSH&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Key-Value Pair Stores&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://coreos.com/etcd/"&gt;etcd&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.consul.io/"&gt;Consul&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Building Images&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.packer.io/"&gt;Packer&lt;/a&gt;&lt;br&gt;&lt;/p&gt;
+&lt;p&gt;Pretty neat. Just describe your instance and build a VM / Amazon image / Docker container. I can see that being pretty useful when you're building AMIs for AWS. Better than building it manually and not being able to reproduce it on another platform.&lt;/p&gt;
+&lt;h3&gt;Debugging, Logging, Monitoring&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.sysdig.com/"&gt;Sysdig&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://github.com/google/cadvisor"&gt;cAdvisor&lt;/a&gt;&lt;br&gt;
+&lt;a href="http://www.fluentd.org/"&gt;Fluentd&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://www.datadoghq.com/"&gt;Datadog&lt;/a&gt;&lt;br&gt;&lt;/p&gt;</summary></entry><entry><title>Thoughts on C programming.</title><link href="http://pminkov.github.io/blog/thoughts-on-c-programming.html" rel="alternate"></link><published>2017-01-01T17:58:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-01:blog/thoughts-on-c-programming.html</id><summary type="html">&lt;p&gt;I recently wrote a &lt;a href="https://github.com/pminkov/webserver"&gt;webserver&lt;/a&gt; in C and wanted to share my thoughts on writing code in C. This was practically my first somewhat substantial C project. I've had two jobs in which I was writing C++, but I never programmed in C.&lt;/p&gt;
+&lt;p&gt;So, in no particular order, here are my thoughts on C.
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;The language is simple.&lt;/h3&gt;
+&lt;p&gt;C is a pretty simple language. Unlike complicated languages like Scala, C has a very limited set of language features. There's a good side to that - you can start faster with C and I appreciate the simplicity coming from working with a more limited language. On the other hand, you have to write more code to do certain things.
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Lack of object oriented programming makes writing code more difficult.&lt;/h3&gt;
+&lt;p&gt;It's difficult to organize code when you don't have classes. It seems like your option is to just put pieces of code in separate files if you want to do that. But then, function names will still have to be different. So you end up with a lot of functions containing the name of the type they're supposed to operate on, like maybe &lt;code&gt;add_to_tree&lt;/code&gt; and then &lt;code&gt;remove_from_tree&lt;/code&gt; instead of simple &lt;code&gt;add&lt;/code&gt; and &lt;code&gt;remove&lt;/code&gt; methods on a &lt;code&gt;Tree&lt;/code&gt; class.
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;Not knowing the size of arrays and strings in advance is difficult.&lt;/h3&gt;
+&lt;p&gt;Unlike C++, C doesn't have its STL library, so if you're allocating arrays or strings, you often have to know their size in advance. Imagine running a process with &lt;code&gt;popen&lt;/code&gt; and having to store its output to a string. You can't know the size of the output in advance, so you have to allocate a buffer of a certain size, expecting it to be big enough in all cases. That's of course impossible, so you'll need to code your own variable size string.&lt;/p&gt;
+&lt;p&gt;C library functions are also not immune to this problem. For example, the &lt;code&gt;getcwd&lt;/code&gt; is a function that gets the current working directory. It receives a buffer of a certain size and writes the directory name to it. If the buffer is smaller than the directory name, the function will return NULL.&lt;/p&gt;
+&lt;p&gt;Luckily, in a lot of cases, you'd know the size of the data in advance, but writing code that has to do with strings and arrays is still more difficult than just using a STL &lt;code&gt;vector&lt;/code&gt; or a &lt;code&gt;stack&lt;/code&gt;.
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;&lt;/p&gt;
+&lt;h3&gt;You have to be meticulous in checking return codes of standard library functions.&lt;/h3&gt;
+&lt;p&gt;Most of the functions in the C standard library return something that indicates the success or failure of the function. Unlike languages that have exceptions, if you don't check the return values, it's entirely possible that your code will continue to execute and ignore some errors. Since often times you'll find yourself thinking "I doubt this can fail", writing good C code requires an extra level of discipline.&lt;/p&gt;</summary></entry><entry><title>Scala scopes.</title><link href="http://pminkov.github.io/blog/scala-scopes.html" rel="alternate"></link><published>2012-04-27T23:26:00-07:00</published><author><name>softwarecomments</name></author><id>tag:pminkov.github.io,2012-04-27:blog/scala-scopes.html</id><summary type="html">&lt;p&gt;After some programming with Scala, there are a couple of language
+features which I really like. One of them is scopes that can evaluate to
+a value. How does that look like:&lt;/p&gt;
+&lt;p&gt;
+&lt;script src="https://gist.github.com/2516506.js" type="text/javascript"&gt;&lt;![CDATA[// &lt;![CDATA[&lt;/p&gt;
+
+&lt;p&gt;// &lt;![CDATA[&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;// ]]]]]]&gt;&lt;![CDATA[&gt;&lt;![CDATA[&gt;&lt;/p&gt;
+
+&lt;p&gt;// ]]]]&gt;&lt;![CDATA[&gt;]]&gt;&lt;/script&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+Ignore the obvious inefficiencies of the code and take a look at how you
+can put a block of code inside the inner scope. What's good about that?
+This inner scope is like a lighweight function. The benefits are:&lt;/p&gt;
+&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Variables in the function are not seen outside of the scope. Great,
+    because you'll get a compile error if you try to use one of
+    those variables. Once you're working in the scope you know that any
+    variable you declare inside of it won't be used on the outside.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You have a logical block of computation that has a clear start and
+    finish, which makes the code easier to read and work with.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Unlike a function, you don't need to declare function parameters.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The drawback is of course that this can become an excuse for creating
+long functions, with a lot of scopes like this one inside of them. If
+that's avoided, this language feature leads to easier to understand
+code.&lt;/p&gt;
+&lt;/p&gt;</summary></entry><entry><title>Fun problem with Scala.</title><link href="http://pminkov.github.io/blog/fun-problem-with-scala.html" rel="alternate"></link><published>2012-03-06T23:28:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2012-03-06:blog/fun-problem-with-scala.html</id><summary type="html">&lt;p&gt;Here's a fun problem to solve with Scala.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+Given N lists, dedupe them with the following rules. Go through the
+first list, dedupe it. Go through every consecutive list and only leave
+items which are not in a previous list and also take care of removing
+duplicates.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+The challenge here is to do this without using vars and by only using
+vals. If you use vars, the solution is trivial.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+The solution to this problem is using foldLeft. foldLeft essentially
+gives you a way to operate on the elements of a list while aggregating
+some state. The state you aggregate is the elements you've already seen
+and the current result. The final solution looks like this:&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;script src="https://gist.github.com/1991619.js" type="text/javascript"&gt;&amp;lt;![CDATA[// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt;// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt;// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt;// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt; &lt;/p&gt;&lt;p&gt;// ]]]]]]]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&lt;/p&gt;&lt;p&gt;// ]]]]]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&lt;/p&gt;&lt;p&gt;// ]]]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&lt;/p&gt;&lt;p&gt;// ]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;]]&amp;gt;&lt;/script&gt;
+&lt;/p&gt;
+&lt;/p&gt;
+And while we're at it, let's see how the C++ solution looks like, for
+comparison. My C++ might be a bit rusty, but the result is longer.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;script src="https://gist.github.com/1991674.js" type="text/javascript"&gt;&amp;lt;![CDATA[// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt;// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt;// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt;// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt; &lt;/p&gt;&lt;p&gt;// ]]]]]]]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&lt;/p&gt;&lt;p&gt;// ]]]]]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&lt;/p&gt;&lt;p&gt;// ]]]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&lt;/p&gt;&lt;p&gt;// ]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;]]&amp;gt;&lt;/script&gt;
+&lt;/p&gt;
+&lt;/p&gt;&lt;/p&gt;</summary></entry></feed>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/aws.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-01-30T12:07:00-08:00</updated><entry><title>How to shut down and restore an Elastic Beanstalk environment.</title><link href="http://pminkov.github.io/blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html" rel="alternate"></link><published>2017-01-30T12:07:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-30:blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html</id><summary type="html">&lt;p&gt;Let's say you're running an &lt;a href="https://aws.amazon.com/elasticbeanstalk/"&gt;Elastic Beanstalk&lt;/a&gt; application. You might want to stop it so that you're not paying money for it. There's one way to do this by running commands. You can use &lt;code&gt;eb terminate&lt;/code&gt; and &lt;code&gt;eb restore&lt;/code&gt;, but if you terminate a setup with a database and you restore it, the contents of the database won't be restored. You can also only restore an environment that has been terminated within the last 6 weeks.&lt;/p&gt;
+&lt;p&gt;Let's see how we can terminate and restore without the 6 weeks restriction and let's also see how does the database backup and restore look like.&lt;/p&gt;
+&lt;p&gt;The first thing that you have to do is to save your environment, which pretty much consists of:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Elastic Beanstalk &lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/environment-configuration-savedconfig.html"&gt;configuration&lt;/a&gt;. This is located in the &lt;code&gt;.elasticbeanstalk&lt;/code&gt; directory.&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/ebextensions.html"&gt;Environment customizations&lt;/a&gt;. They're located in the &lt;code&gt;.ebextensions&lt;/code&gt; directory.&lt;/li&gt;
+&lt;li&gt;Your source code. Located in your base directory.&lt;/li&gt;
+&lt;li&gt;A database (optional).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;My particular app is a single instance Python/Django application with a MySQL database hosted in RDS.&lt;/p&gt;
+&lt;p&gt;So let's get started.&lt;/p&gt;
+&lt;h2&gt;Backing up your environment.&lt;/h2&gt;
+&lt;p&gt;First, get the name of your environment. Mine is &lt;code&gt;neatlinks-dev&lt;/code&gt;. Run the following commands after that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_DATE_LABEL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;date +&lt;span class="s2"&gt;&amp;quot;D%F-T%H-%M-%S&amp;quot;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Name of saved config.&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_CONFIG&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;saved-&lt;span class="nv"&gt;$EB_DATE_LABEL&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Name of database snapshot.&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_SNAPSHOT_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;snapshot-&lt;span class="nv"&gt;$EB_DATE_LABEL&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Instance id for our current database.&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_DB&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;aaeag9ndvxonft&amp;quot;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Save the environment cname, we&amp;#39;ll need it later.&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_CNAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;neatlinks-dev-www&amp;#39;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Save current config.&lt;/span&gt;
+eb config save neatlinks-dev --cfg &lt;span class="nv"&gt;$EB_CONFIG&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Create and wait for database snapshot.&lt;/span&gt;
+aws rds create-db-snapshot &lt;span class="se"&gt;\&lt;/span&gt;
+    --db-instance-identifier &lt;span class="nv"&gt;$EB_DB&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    --db-snapshot-identifier &lt;span class="nv"&gt;$EB_SNAPSHOT_NAME&lt;/span&gt;
+&lt;span class="nb"&gt;time&lt;/span&gt; aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-snapshot-completed &lt;span class="se"&gt;\&lt;/span&gt;
+    --db-instance-identifier &lt;span class="nv"&gt;$EB_DB&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    --db-snapshot-identifier &lt;span class="nv"&gt;$EB_SNAPSHOT_NAME&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So we did two things:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;We saved the environment configuration. You can list your saved configurations by running &lt;code&gt;eb config list&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;We created a snapshot of the database.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;At this point we can terminate our environment by calling &lt;code&gt;eb terminate&lt;/code&gt;. And that's it - Amazon is not charging you anymore - your EC2 instance, RDS instance, load balancers, etc. are down. I don't have a load balancer, but I can verify that everything else is gone.&lt;/p&gt;
+&lt;p&gt;You should now commit your configs to your source control so that you have them saved when you come back.&lt;/p&gt;
+&lt;p&gt;Now, your application is sitting safely saved for a while and you decide to restore it.&lt;/p&gt;
+&lt;h2&gt;Restoring your environment.&lt;/h2&gt;
+&lt;p&gt;If you have deleted your application, you'll need to run &lt;code&gt;eb init&lt;/code&gt;. After that, we'll run the following commands:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Create environment. It&amp;#39;s important to specify a cname, so that we don&amp;#39;t have to&lt;/span&gt;
+&lt;span class="c1"&gt;# change our DNS config. This takes a lot of time, so I bump the timeout.&lt;/span&gt;
+&lt;span class="c1"&gt;# This command will print the name of your new database instance.&lt;/span&gt;
+&lt;span class="nb"&gt;time&lt;/span&gt; eb create neatlinks-dev --cfg &lt;span class="nv"&gt;$EB_CONFIG&lt;/span&gt; --cname &lt;span class="nv"&gt;$EB_CNAME&lt;/span&gt; --timeout 30
+
+&lt;span class="c1"&gt;# Get this id from the printed output of &amp;quot;eb create&amp;quot;.&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_NEW_DB&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;aa1q3no37rzd407&amp;quot;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Delete DB instance. We&amp;#39;ll replace it with the snapshot.&lt;/span&gt;
+aws rds delete-db-instance --db-instance-identifier &lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt; --skip-final-snapshot
+aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-instance-deleted --db-instance-identifier &lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Restore from snapshot.&lt;/span&gt;
+aws rds restore-db-instance-from-db-snapshot &lt;span class="se"&gt;\&lt;/span&gt;
+        --db-instance-identifier &lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+        --db-snapshot-identifier &lt;span class="nv"&gt;$EB_SNAPSHOT_NAME&lt;/span&gt;
+aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-instance-available --db-instance-identifier &lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Your production setup is ready now! Your application probably won't work though, because your DB endpoint is different. Edit your source code or your own configuration files so that your application connects to the new database. Once done, call &lt;code&gt;eb deploy&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;That's it. Your application should be running now. You can use this procedure to rename your Elastic Beanstalk application and environment as well, which is a feature that's missing from the &lt;code&gt;eb&lt;/code&gt; CLI app.&lt;/p&gt;</summary></entry><entry><title>How much does it cost to run a Django app on AWS using Elastic Beanstalk?</title><link href="http://pminkov.github.io/blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html" rel="alternate"></link><published>2016-04-20T13:56:00-07:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-04-20:blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html</id><summary type="html">&lt;p&gt;I've been running a Django app on &lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html"&gt;Elastic Beanstalk&lt;/a&gt; for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.&lt;/p&gt;
+&lt;p&gt;Let's first describe what my setup is. Elastic Beanstalk is AWS's PaaS offering. I use a MySQL database running on RDS, a load balancer, a single EC2 instance and I have a DNS setup on Route 53. And that's more or less what I'm paying for. My bill was &lt;strong&gt;$42.58&lt;/strong&gt; last month. Breaking it down, here are the three major components it has:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;EC2&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I'm running a &lt;a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/t2-instances.html"&gt;t2.micro&lt;/a&gt; instance. It costs $0.013 per hour and I paid for 745 hours. Total: &lt;strong&gt;$9.69&lt;/strong&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Load balancing&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Load balancing is not cheap. It costs $0.025 per hour and for 744 hours shown, that comes down to &lt;strong&gt;$18.60&lt;/strong&gt;.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;RDS&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;RDS costs $0.017 per RDS T2 Micro instance hour and for 743 hours shown, I paid &lt;strong&gt;$12.63&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;If we sum these three, it comes down to &lt;strong&gt;$40.92&lt;/strong&gt;. I also paid the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;$0.56 for RDS service storage.&lt;/li&gt;
+&lt;li&gt;$0.45 for &lt;a href="https://aws.amazon.com/ebs/"&gt;EBS&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;$0.51 for Route 53.&lt;/li&gt;
+&lt;li&gt;$0.07 for data transfer (my site being served to places around the world, but my site is not popular yet).&lt;/li&gt;
+&lt;li&gt;$0.05 for S3 costs.&lt;/li&gt;
+&lt;li&gt;$0.01 for data processed by the load balancer.&lt;/li&gt;
+&lt;li&gt;$0.01 for SES.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These are minimal costs. Some of these are going to increase if my site becomes popular, but right now they are minimal.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;How can I bring these costs down?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;It's possible to do all of this with a single EC2 instance and avoid paying for load balancing and RDS. What I get from these components right now is convenience and scalability. I don't really need scalability, since I don't operate at scale and might not come to that point. Convenience can be traded for the learning experience of settings up things manually. AWS has an &lt;a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html"&gt;article&lt;/a&gt; on how to install a LAMP setup on EC2. It doesn't look too complicated. Supposedly my bill will be around $10 per month for my 1GB RAM t2.micro machine.&lt;/p&gt;
+&lt;p&gt;Another option would be to use &lt;a href="https://www.digitalocean.com/pricing/"&gt;Digital Ocean&lt;/a&gt;. They're basically offering something similar to EC2 instances, but I haven't looked too much in detail. Digital Ocean is an IaaS provider, you need to do some manual setup. Their cost is pretty similar. An offering with 1GB of RAM costs $10 per month too. That's a very rough comparison, but it seems like we're in the same ballpark if we're not pushing the limits on disk space or bandwidth.&lt;/p&gt;
+&lt;p&gt;It should also be possibe to continue to use Elastic Beanstalk, but run a MySQL server directly on the EC2 instance. Here's a long &lt;a href="http://d0.awsstatic.com/whitepapers/rdbms-in-the-cloud-sql-server-on-aws.pdf"&gt;white paper&lt;/a&gt; that talks about this.&lt;/p&gt;</summary><category term="AWS"></category><category term="Elastic Beanstalk"></category><category term="Python"></category><category term="Django"></category></entry></feed>

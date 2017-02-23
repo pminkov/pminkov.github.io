@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>What I learned from reading Dive into Python.</title>
+        <link rel="stylesheet" href="http://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="http://pminkov.github.io/blog/category/aws.html">AWS</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li class="active"><a href="http://pminkov.github.io/blog/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://pminkov.github.io/blog/what-i-learned-from-reading-dive-into-python.html" rel="bookmark"
+           title="Permalink to What I learned from reading Dive into Python.">What I learned from reading Dive into Python.</a></h1>
+    </header>
+
+    <div class="entry-content">
+<div class="post-info">
+        <abbr class="published" title="2016-06-15T09:57:00-07:00">
+                Published: Wed 15 June 2016
+in <a href="http://pminkov.github.io/blog/category/python.html">Python</a>
+        </abbr>
+
+</div><!-- /.post-info -->    </div>
+    <div>
+      <p>I recently started reading <a href="http://www.diveintopython.net/toc/index.html">Dive into Python</a>. I've been meaning to fill some gaps in my Python knowledge, since I've used the language for about ten years, but feel like I have just picked whatever parts I needed to do my work and don't have a very solid base.</p>
+<p>I'll summarize some of the new things I learned from this book:</p>
+<h3>Chapter 2 (Your First Python Program)</h3>
+<ul>
+<li><code>sys.path</code> contains the list of directories that Python uses to lookup module imports.</li>
+<li>One use of the <code>__name__</code> attribute is to write testing code. When a module is imported <code>__name__</code> is the name of the module. When a module python file is executed from the command line <code>__name__</code> is equal to <code>__main__</code>. Personally this feels like a bit of a hack to me, since you can use something like say Django's unit testing platform, but it might come handy sometime.</li>
+</ul>
+<h3>Chapter 3 (Native Datatypes)</h3>
+<ul>
+<li>Here's a cool trick mentioned in this chapter:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="n">MONDAY</span><span class="p">,</span> <span class="n">TUESDAY</span><span class="p">,</span> <span class="n">WEDNESDAY</span><span class="p">,</span> <span class="n">THURSDAY</span><span class="p">,</span> <span class="n">FRIDAY</span><span class="p">,</span> <span class="n">SATURDAY</span><span class="p">,</span> <span class="n">SUNDAY</span><span class="p">)</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>Chapter 4 (The Power Of Introspection):</h3>
+<ul>
+<li>Some useful functions are mentioned: <code>dir</code> (try on a module or an object instance), <code>callable</code>, <code>getattr</code>, <code>__doc__</code>.</li>
+</ul>
+<p>So you can do something interesting, like this:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="n">Sum:</span>
+  <span class="s">&quot;&quot;&quot;Sums numbers&quot;&quot;&quot;</span>
+  <span class="n">member</span> = <span class="mi">3</span>
+
+  <span class="n">def</span> <span class="n">sum2</span>(<span class="k">self</span>, <span class="n">a</span>, <span class="n">b</span>):
+    <span class="s">&quot;&quot;&quot;Sum two numbers&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> + <span class="n">b</span>
+
+  <span class="n">def</span> <span class="n">sum3</span>(<span class="k">self</span>, <span class="n">a</span>, <span class="n">b</span>, <span class="n">c</span>):
+    <span class="s">&quot;&quot;&quot;Sum three numbers&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> + <span class="n">b</span> + <span class="n">c</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> == <span class="s">&#39;__main__&#39;</span>:
+  <span class="n">methods</span> = [<span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="n">in</span> <span class="n">dir</span>(<span class="n">Sum</span>) <span class="k">if</span> <span class="n">callable</span>(<span class="n">getattr</span>(<span class="n">Sum</span>, <span class="n">f</span>))]
+  <span class="n">docs</span> = <span class="s">&#39;\n&#39;</span>.<span class="nb">join</span>([<span class="s">&quot;%s %s&quot;</span> % (<span class="n">f</span>, <span class="n">getattr</span>(<span class="n">Sum</span>, <span class="n">f</span>).<span class="n">__doc__</span>) <span class="k">for</span> <span class="n">f</span> <span class="n">in</span> <span class="n">methods</span>])
+  <span class="nb">print</span> <span class="n">docs</span>
+</pre></div>
+
+
+<p>And run it:</p>
+<div class="highlight"><pre><span></span>$ python ./sum.py
+sum2 Sum two numbers
+sum3 Sum three numbers
+</pre></div>
+
+
+<ul>
+<li>The "and-or trick"</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="n">is_mammal</span> <span class="o">=</span> <span class="n">use_rpc</span> <span class="ow">and</span> <span class="n">remote_check_is_mammal</span><span class="p">(</span><span class="n">animal</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DEFAULT_IS_MAMMAL</span>
+</pre></div>
+
+
+<p>That's like <code>?:</code> in C++. I think I did well with creating a good example here :).</p>
+<h3>Chapter 5 (Objects and Object-Orientation)</h3>
+<ul>
+<li><code>var1 is var2</code> checks for object identity. Here's a good <a href="http://stackoverflow.com/questions/13650293/understanding-pythons-is-operator">stackoverflow</a> article that gives examples.</li>
+<li>You can change a class variable using <code>self.__class__.variable_name = new_value</code>.</li>
+<li>You can create your own dictionary by inheriting from <code>UserDict</code>.</li>
+<li>If you call <code>x["hello"] = 3</code>, this calls the <code>__setitem__</code> method. There are other similar methods, like <code>__getitem__</code>, etc.</li>
+</ul>
+<h3>Chapter 6 (Exceptions and file handling)</h3>
+<ul>
+<li>You can use <code>else</code> in exceptions code. Like this:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RPC</span><span class="p">:</span>
+  <span class="k">def</span> <span class="nf">remote_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">find_function</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">RPC</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+  <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;No such function.&#39;</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;Function was found.&#39;</span>
+  <span class="k">finally</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;Enough lookups.&#39;</span>
+    <span class="k">print</span>
+
+<span class="n">find_function</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">)</span>
+<span class="n">find_function</span><span class="p">(</span><span class="s1">&#39;remote_call&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Output:</p>
+<div class="highlight"><pre><span></span>python ./ex.py 
+No such <span class="k">function</span>.
+Enough lookups.
+
+Function was found.
+Enough lookups.
+</pre></div>
+
+
+<ul>
+<li>When you open a file, you have a variety of functions and attributes on the file object, like <code>seek</code>, <code>read</code>, <code>mode</code>, <code>name</code>. For example, to see how big a file is you can just call <code>f.seek(0, 2)</code> to seek until the end and then <code>f.tell()</code> to output the number of bytes.</li>
+<li>A class' module is accessible by calling <code>ClassName.__module__</code>. All imported modules are in the <code>sys.modules</code> dictionary. Example:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">sum</span> <span class="kn">import</span> <span class="n">Sum</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">sys</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">Sum</span><span class="o">.</span><span class="n">__module__</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">module</span> <span class="s1">&#39;sum&#39;</span> <span class="kn">from</span> <span class="s1">&#39;sum.py&#39;</span><span class="o">&gt;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">Sum</span><span class="o">.</span><span class="n">__module__</span><span class="p">],</span> <span class="s1">&#39;Sum&#39;</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="nc">sum</span><span class="o">.</span><span class="n">Sum</span> <span class="n">at</span> <span class="mh">0x109535a10</span><span class="o">&gt;</span>
+</pre></div>
+
+
+<h3>Chapter 7 (Regular Expressions)</h3>
+<ul>
+<li><code>\\b</code> matches a word boundary. This can be so useful.</li>
+<li>Verbose regular expressions. Again, very useful. Example:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">raw_regex</span> <span class="o">=</span> <span class="s2">r&quot;&quot;&quot;</span>
+<span class="s2">  (\d{3})</span>
+<span class="s2">  \D*</span>
+<span class="s2">  (\d{3})</span>
+<span class="s2">  \D*</span>
+<span class="s2">  (\d{4})</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">examples</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s2">&quot;4153125633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;415-312-5633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;415 312 5633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;work 415 312 5633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;(415) - 312 - 5633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;1 415 312 5633&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">phone_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">raw_regex</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">:</span>
+  <span class="n">groups</span> <span class="o">=</span> <span class="n">phone_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">example</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+  <span class="k">assert</span> <span class="n">groups</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;415&#39;</span><span class="p">,</span> <span class="s1">&#39;312&#39;</span><span class="p">,</span> <span class="s1">&#39;5633&#39;</span><span class="p">)</span>
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <!--
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                  Blah blha blah
+                </address>
+        </footer>
+        -->
+        <!-- /#contentinfo -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-243631-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>

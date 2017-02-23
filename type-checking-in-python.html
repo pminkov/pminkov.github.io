@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Type checking in Python?</title>
+        <link rel="stylesheet" href="http://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="http://pminkov.github.io/blog/category/aws.html">AWS</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li class="active"><a href="http://pminkov.github.io/blog/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://pminkov.github.io/blog/type-checking-in-python.html" rel="bookmark"
+           title="Permalink to Type checking in Python?">Type checking in Python?</a></h1>
+    </header>
+
+    <div class="entry-content">
+<div class="post-info">
+        <abbr class="published" title="2016-05-18T10:39:00-07:00">
+                Published: Wed 18 May 2016
+in <a href="http://pminkov.github.io/blog/category/python.html">Python</a>
+        </abbr>
+
+</div><!-- /.post-info -->    </div>
+    <div>
+      <p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
+One that I use in my projects is the following:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+  <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1"> != </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Here's an example of how to use this:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+  <span class="n">T</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+  <span class="n">T</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+</pre></div>
+
+
+<p>Let's say that you call the function incorrectly, like this:</p>
+<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="s2">&quot;hello&quot;</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+</pre></div>
+
+
+<p>You'll get the following exception:</p>
+<div class="highlight"><pre><span></span>&gt;&gt;&gt; sum(a, b)
+Traceback (most recent call last):
+  File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
+  File &quot;&lt;stdin&gt;&quot;, line 2, in sum
+  File &quot;&lt;stdin&gt;&quot;, line 2, in T
+AssertionError: (hello) &lt;type &#39;str&#39;&gt; != &lt;type &#39;int&#39;&gt;
+</pre></div>
+
+
+<p>So that's it - pretty simple. I use the <code>T</code> function every once in a while, to guard against type errors.</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <!--
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                  Blah blha blah
+                </address>
+        </footer>
+        -->
+        <!-- /#contentinfo -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-243631-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>

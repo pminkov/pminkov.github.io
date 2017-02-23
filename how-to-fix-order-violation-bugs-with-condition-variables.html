@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>How to fix order-violation bugs with condition variables.</title>
+        <link rel="stylesheet" href="http://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="http://pminkov.github.io/blog/category/aws.html">AWS</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li class="active"><a href="http://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://pminkov.github.io/blog/how-to-fix-order-violation-bugs-with-condition-variables.html" rel="bookmark"
+           title="Permalink to How to fix order-violation bugs with condition variables.">How to fix order-violation bugs with condition variables.</a></h1>
+    </header>
+
+    <div class="entry-content">
+<div class="post-info">
+        <abbr class="published" title="2016-11-29T11:22:00-08:00">
+                Published: Tue 29 November 2016
+in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
+        </abbr>
+
+</div><!-- /.post-info -->    </div>
+    <div>
+      <p>Let's look at the following code and try to find the bug in it.</p>
+<div class="highlight"><pre><span></span>Thread 1:
+void init() {
+  ...
+  mThread = PR_CreateThread(mMain, ...)
+  ...
+}
+
+Thread 2:
+void mMain(...) {
+  ...
+  mState = mThread-&gt;State;
+  ...
+}
+</pre></div>
+
+
+<p>The problem is that if thread two executes before thread one, it can access <code>mThread</code> which is not initialized. We need to make thread two wait for thread one. This is done with condition variables. But let's see how we're going to implement it.</p>
+<h3>Solution 1 (Incorrect) - Simple wait and signal</h3>
+<p>Let's say that we're not giving this a lot of thought and just put a wait and signal in the code. We have this code:</p>
+<div class="highlight"><pre><span></span>pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;
+
+Thread 1:
+void init() {
+  ...
+  mThread = PR_CreateThread(mMain, ...)
+  pthread_mutex_lock(&amp;mtLock);
+  pthread_cond_signal(&amp;mtCond);
+  pthread_mutex_unlock(&amp;mtLock);
+  ...
+}
+
+Thread 2:
+void mMain(...) {
+  ...
+  pthread_mutex_lock(&amp;mtLock);
+  pthread_cond_wait(&amp;mtCond, &amp;mtLock);
+  pthread_mutex_unlock(&amp;mtLock);
+  mState = mThread-&gt;State;
+  ...
+}
+</pre></div>
+
+
+<p>The problem here is that thread one can execute before thread two. In this case, thread one will signal on the condition variable, but nobody is waiting on it. Once thread two executes, it will start waiting and nobody is going to signal on the condition variable. Thus, thread two will stay in block state.</p>
+<h3>Solution 2 (Correct) - Using a synchronization variable.</h3>
+<div class="highlight"><pre><span></span>  pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
+  pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;
+  int mtInit = 0;
+
+  Thread 1:
+  void init() {
+    ...
+1   mThread = PR_CreateThread(mMain, ...)
+2   pthread_mutex_lock(&amp;mtLock);
+3   mtInit = 1;
+4   pthread_cond_signal(&amp;mtCond);
+5   pthread_mutex_unlock(&amp;mtLock);
+    ...
+  }
+
+  Thread 2:
+  void mMain(...) {
+    ...
+6   pthread_mutex_lock(&amp;mtLock);
+7   if (mtInit == 0)
+8     pthread_cond_wait(&amp;mtCond, &amp;mtLock);
+9   pthread_mutex_unlock(&amp;mtLock);
+10  mState = mThread-&gt;State;
+    ...
+  }
+</pre></div>
+
+
+<p>Here we have used the <code>mtInit</code> variable to prevent the bug in Solution 1 from hapenning. Let's try to reproduce the conditions that led to a bug in out first solution. Let's say thread one executes before thread two. When thread two runs, it will see that <code>mtInit</code> is 1 and it won't wait. That basically solves our problem. Let's trace things more carfully with two possible scenarios. Of course, there are other possibilities too, but with these two I have enough confidence in the correctness of the solution.</p>
+<div class="highlight"><pre><span></span>Scenario 1 - Thread 1 before Thread 2.
+
+Line   T1    T2   COMMENT
+       1
+       2          Locked mutex
+             6    Blocked, because mutex is locked.
+       3
+       4          Signals on the condition variable.
+       5          Unblocks mutex.
+             6    Continues, mutex was unblocked.
+             7    False, jump to line 9.
+             9    Unlock mutex, done
+</pre></div>
+
+
+<p>So in this scenario, thread one obtains the lock first and the solution is correct.</p>
+<div class="highlight"><pre><span></span>Scenario 2 - Thread 2 before Thread 1.
+
+Line   T1    T2   COMMENT
+             6    Locked mutex.
+             7
+             8    Unlocks mutex, waiting on condition variable.
+       1      
+       2          Locks mutex.
+       3      
+       4          Signals, but mutex is still locked, so thread two doesn&#39;t do anything.
+       5          Unlocks mutex. Now thread two can continue.
+             8    Returns from wait(), locks mutex.
+             9    Unlocks mutex.
+</pre></div>
+
+
+<p>This scenario works too.</p>
+<p>There's one change that we should do though. Instead of an if statement in line 7, we should use a while. Why? Because when thread two wakes up in line 7 and obtains a lock on the mutex, it should re-verify that the condition that made it wait is not true anymore. While not a problem in this code segment, this can be a problem in other cases.</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <!--
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                  Blah blha blah
+                </address>
+        </footer>
+        -->
+        <!-- /#contentinfo -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-243631-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>

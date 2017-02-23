@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/django.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2016-05-23T22:13:00-07:00</updated><entry><title>Using mustache templates with Django.</title><link href="http://pminkov.github.io/blog/using-mustache-templates-with-django.html" rel="alternate"></link><published>2016-05-23T22:13:00-07:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-05-23:blog/using-mustache-templates-with-django.html</id><summary type="html">&lt;p&gt;There are various reasons why you might want to use client side templates in a Django app. 
+For example, you might want to make your initial page load faster, return some of your data in json format and postpone some template rendering until the user needs it.&lt;/p&gt;
+&lt;p&gt;Let's see how we can easily include &lt;a href="https://mustache.github.io/"&gt;mustache&lt;/a&gt; templates in Django. &lt;a href="http://mustache.github.io/mustache.5.html"&gt;This&lt;/a&gt; page explains the mustache syntax quite well.&lt;/p&gt;
+&lt;p&gt;The most optimized way to include a client side template in your code would be to compile it on deployment and include the compiled JavaScript file as part of your static files.
+However, that seemed like too much work and I wanted something that I can implement faster.&lt;/p&gt;
+&lt;p&gt;If you're not shipping compiled JavaScript, then your other option would be to have the template text somewhere and compile it client side. I have one main requirement though - I don't want my template code to be in a string which editors will display without HTML syntax highlighting.&lt;/p&gt;
+&lt;p&gt;So, working with these constraints, let's see what we can come up with.&lt;/p&gt;
+&lt;p&gt;First, let's say our template code is in &lt;code&gt;person.html&lt;/code&gt; and it looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+  {{#person}}
+    The user&amp;#39;s name is {{name}}.
+  {{/person}}
+  {{^person}}
+    There&amp;#39;s no user defined.
+  {{/person}}
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, we can include this template in the html page returned by our initial page load, like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;script&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;person_template_text&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sb"&gt;`{% include &amp;quot;myapp/templates/person.html&amp;quot; %}`&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;script&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In this case, &lt;code&gt;person_template_text&lt;/code&gt; is a &lt;a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"&gt;template literal&lt;/a&gt;. Template literals are JavaScript strings that can span multiple lines.&lt;/p&gt;
+&lt;p&gt;Now, we just need to compile the template so that it's ready to be rendered. We'll use &lt;a href="http://twitter.github.io/hogan.js/"&gt;hogan.js&lt;/a&gt;, since it's advertised as faster and smaller than mustache and it fully supports mustache syntax. Let's say we're also using jQuery. We can do something along these lines:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;App&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;person_template&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;Hogan&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;compile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;person_template_text&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nx"&gt;App&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;prototype&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;renderPerson&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;personDict&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;person_template&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;render&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;personDict&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;app&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;document&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;ready&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nx"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;App&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And that's it. There are many other ways to do this, which will be more optimized, but this one seems like an easy one to start with.&lt;/p&gt;</summary><category term="Python"></category><category term="Django"></category></entry><entry><title>How to generate user activation links in Django.</title><link href="http://pminkov.github.io/blog/how-to-generate-user-activation-links-in-django.html" rel="alternate"></link><published>2016-04-05T17:03:00-07:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-04-05:blog/how-to-generate-user-activation-links-in-django.html</id><summary type="html">&lt;p&gt;Imagine the following simple user registration flow:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;User registers by setting an e-mail and a password.&lt;/li&gt;
+&lt;li&gt;The server sends an e-mail containing an activation link to the user.&lt;/li&gt;
+&lt;li&gt;The user clicks on the activation link and activates their account.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Let's focus on step 2. How do we generate this activation link?&lt;/p&gt;
+&lt;p&gt;One way to implement this is to generate single use tokens and save them in a database table. Our url then looks like &lt;code&gt;http://sitename.com/activate?token=mytoken&lt;/code&gt;. That solution has the benefit of being able to track that a token has been used and enforce single use. The drawback is that you need a new database table, which I wanted to avoid.&lt;/p&gt;
+&lt;p&gt;How else can we generate these tokens?&lt;/p&gt;
+&lt;p&gt;My first hunch was to reuse Django's &lt;a href="https://github.com/django/django/blob/master/django/contrib/auth/tokens.py"&gt;PasswordResetTokenGenerator&lt;/a&gt;. However, notice that the &lt;code&gt;check_token&lt;/code&gt; function requires a user. This means that the activation link needs to include information about who the user is. So our &lt;code&gt;/activate&lt;/code&gt; link will need to include an url parameter that's either the username, user id, or something else that uniquely identifies a user. I'm not happy with that. This is a link that's supposed to be private and I don't want the user's first impression of my site to be that I'm including their user id in an activation link, when most other sites don't do that.&lt;/p&gt;
+&lt;p&gt;The solution that I settled on was encrypting the user id on the server. I'm generating a link of the form &lt;code&gt;http://sitename.com/activate?token=mytoken&lt;/code&gt;. I generate the token using the Python &lt;a href="https://pypi.python.org/pypi/cryptography"&gt;cryptography&lt;/a&gt; package. The token is created by encrypting the username with a salt.&lt;/p&gt;
+&lt;p&gt;So why is this not what Django is doing? I suppose the answer is that Python doesn't have a symmetric encryption implementation library coming with it.&lt;/p&gt;
+&lt;p&gt;In addition, I also wanted the tokens to expire. This is simple, we can just include a timestamp in the token and compare it against the current time upon decryption.&lt;/p&gt;
+&lt;p&gt;Here's a sample class that implements all of this:&lt;/p&gt;
+&lt;script src="https://gist.github.com/pminkov/e53d90c348f1dc47553408666431d2a2.js"&gt;&lt;/script&gt;</summary></entry><entry><title>Simulating HTTP responses in Django.</title><link href="http://pminkov.github.io/blog/simulating-http-responses-in-django.html" rel="alternate"></link><published>2011-11-11T19:15:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2011-11-11:blog/simulating-http-responses-in-django.html</id><summary type="html">&lt;p&gt;One of the most important aspects of your web application's client side
+code is how it handles errors and slow connections. In the case of an
+error, some reasonable error message should be displayed and in the case
+of a slow connection, the user shouldn't be left staring at the web app
+wondering why did it freeze and you should at least display a spinning
+wheel or some other "in progress" indicator.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+To solve that problem in Django, you can write a simple Django
+application that simulates errors and slow connections. The way it works
+is by installing a middleware component that catches HTTP requests and
+returns error codes, or sleeps for some time before returning.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+I'll illustrate how to implement a very simple version of that idea.
+Let's say that you'll have a handler sitting at "/http_simulate", which
+when accessed will switch the server from error mode to healthy mode and
+then back. The second thing you need is a middleware that knows what
+mode the server is in and depending on that, fiddles with the HTTP
+request and produces an error HTTP response.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+Here's how a very simple middleware class would look like:&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;script src="https://gist.github.com/1359978.js"&gt; &lt;/script&gt;
+Notice how that middleware class ignores requests which go to the view
+that switches to error mode. You want to be able to switch back to
+normal mode once you switch to error mode.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+The second part you need is a view that switches the &lt;code&gt;IN_ERROR_MODE&lt;/code&gt;
+variable.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;
+&lt;script src="https://gist.github.com/1359984.js"&gt; &lt;/script&gt;
+After you have this code, you can just create a simple Django
+application and install that middleware in your settings.py file. Be
+careful to not have that turned on in your production environment.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+There are also many ways in which this can be extended:&lt;/p&gt;
+&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Support for different error codes.&lt;/li&gt;
+&lt;li&gt;Support for slow connections by sleeping before sending the
+    HTTP response.&lt;/li&gt;
+&lt;li&gt;Setting error mode for only specific urls, not for every request
+    sent to the server.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/p&gt;</summary></entry></feed>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/machine-learning.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2012-07-29T22:33:00-07:00</updated><entry><title>Plotting in Octave.</title><link href="http://pminkov.github.io/blog/plotting-in-octave.html" rel="alternate"></link><published>2012-07-29T22:33:00-07:00</published><author><name>softwarecomments</name></author><id>tag:pminkov.github.io,2012-07-29:blog/plotting-in-octave.html</id><summary type="html">&lt;p&gt;Plotting functions in Octave is quite easy and helpful.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+In the lecture on neural networks from Stanford's
+&lt;a href="http://ml-class.org/"&gt;machine learning class&lt;/a&gt; a function related to neural
+networks is introduced. The function has two inputs - x1 and x2 and it's
+supposed to model a logical AND operation. The function is based on the
+sigmoid function.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+The sigmoid function looks like this:&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Google sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-google.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+Computing the sigmoid function in Octave can be seen
+&lt;a href="https://gist.github.com/3205075" title="Sidmoid"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+The given example plugs x1 and x2 into the sigmoid function by
+computing:&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+f(x1, x2) = sigmoid(-30 + 20*x1 + 20*x2)&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+f(1, 1) evaluates to 1&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+f(0, 0), f(0, 1) and f(1, 0) evaluate to 0.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+Intuitively that make sense. Even if x1 or x2 is 1, -30 + 20 is -10,
+which corresponds to a very low value for the sigmoid function, as you
+can see from the graph above.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+I got curious about how this function looks like for values between zero
+and one and wrote this &lt;a href="https://gist.github.com/3205016"&gt;short Octave
+program&lt;/a&gt; to plot the output. And here
+it is. Pretty neat, I'd say.&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Octave sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-octave.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+It's easy to see that the function behaves as expected at (0,0), (0,1)
+and (1,0) and (1,1) and that for values in between its computed values
+are somewhere in between as well.&lt;/p&gt;
+&lt;/p&gt;</summary></entry><entry><title>Stanford's machine learning class.</title><link href="http://pminkov.github.io/blog/stanfords-machine-learning-class.html" rel="alternate"></link><published>2012-07-27T15:00:45-07:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2012-07-27:blog/stanfords-machine-learning-class.html</id><summary type="html">&lt;p&gt;Stanford's machine learning class on coursera is pretty good. What's
+surprising to me is that exercises take much more time than listening to
+lectures and taking after class quizes.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+The programming environment used for the class is Octave. The most
+challenging part so far with writing code in Octave is coming up with
+what's called vectorization solutions. The idea of vectorization is that
+instead of writing loops, you compute values by vector and matrix
+operations.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+Let's look at a simple example. Imagine that you have a vector of zeros
+and ones. You have to convert it to a vector where for each one we have
+a one and for each zero we have minus one. That came up as a component
+of the cost function computation in logistic regression.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+An iterative solution in Scala might look like this:&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+v.map(x =&amp;gt; if (x == 0) -1 else 1)&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+How would that look in Octave if we can't use loops and if statements? A
+function F that maps from {0, 1} to {-1, 1} actually looks like this:&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+F(x) = 2x - 1&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+Pretty cool. Now if our vector of zeros and ones is A, by using that
+function, we can compute the desired value by doing this:&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+D = 2 * A - 1&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+This is pretty much only a part of a typical vectorized computation in
+machine learning. Crafting those takes some time, but at the end there's
+a good a-ha moment and usually a quite short solution.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+So far I went through the linear and logistic regression lectures. Both
+methods are widely practical and it's very easy to come up with usage
+example. Those methods are examples of supervised learning algorithms,
+since we train them on a data set and then once we've computed a model
+we just plug new examples into it and come up with results.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+In practice, I doubt that anyone is going to implement their own
+gradient descent algorithms to come up with model coefficients. I'd
+expect that usually a library / package like Matlab / Octave / R will be
+used to train a model. Implementing the model itself is quite trivial
+and would be just a couple of lines of code.&lt;/p&gt;
+&lt;/p&gt;</summary></entry></feed>

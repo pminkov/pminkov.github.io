@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Using pandas to read a table from an HTML page.</title>
+        <link rel="stylesheet" href="http://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="http://pminkov.github.io/blog/category/aws.html">AWS</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li class="active"><a href="http://pminkov.github.io/blog/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://pminkov.github.io/blog/using-pandas-to-read-a-table-from-an-html-page.html" rel="bookmark"
+           title="Permalink to Using pandas to read a table from an HTML page.">Using pandas to read a table from an HTML page.</a></h1>
+    </header>
+
+    <div class="entry-content">
+<div class="post-info">
+        <abbr class="published" title="2016-10-31T13:56:00-07:00">
+                Published: Mon 31 October 2016
+in <a href="http://pminkov.github.io/blog/category/python.html">Python</a>
+        </abbr>
+
+</div><!-- /.post-info -->    </div>
+    <div>
+      <p>Today I wanted to write a bit of simple code to try out a hypothesis I had about stock prices. I found historical data at <a href="http://www.multpl.com/s-p-500-historical-prices/table/by-year">multpl.com</a>. At first I thought I'd have to write my own code using Python's <a href="https://docs.python.org/2/library/htmlparser.html">HTMLParser</a>. As much as I like to write code, I decided to save myself some time and find something that already does this. To my surprise, <a href="http://pandas.pydata.org/">pandas</a>, already has a <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_html.html">function</a> that reads data from HTML tables. Great. Let's see how it works.</p>
+<p>First, I installed pandas, lxml and a bunch of other requirements in a <a href="http://pminkov.github.io/why-i-always-use-virtualenv-to-try-out-new-libraries.html">virtual environment</a>.</p>
+<p>To read the tables from the webpage, I used the following lines of code:</p>
+<div class="highlight"><pre><span></span>  <span class="n">tables</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="s1">&#39;http://www.multpl.com/s-p-500-historical-prices/table/by-month&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+  <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+  <span class="n">table</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+
+<p>The <code>header</code> parameter, says that we should use the first row in a table as the dataframe's column names. Spefically for this table, one of the columns was getting a somewhat wrong name, but it was easy to fix it with this line of code:</p>
+<div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">]</span>
+</pre></div>
+
+
+<p>There we go, we have read historical stock prices into a pandas dataframe. To iterate and print them, we can do it like this:</p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+   <span class="n">date</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span>
+   <span class="n">price</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span>
+   <span class="k">print</span> <span class="n">date</span><span class="p">,</span> <span class="n">price</span>
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <!--
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                  Blah blha blah
+                </address>
+        </footer>
+        -->
+        <!-- /#contentinfo -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-243631-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>
