@@ -1,8 +1,8 @@
 body {
-    background-color: #f0f0f2;
-    margin: 0;
-    padding: 0;
-    font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #f0f0f2;
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 #main {
   width:600px;
@@ -17,17 +17,17 @@ body {
 
 }
 a:link, a:visited {
-    color: #479cb8;
-    text-decoration: none;
+  color: #479cb8;
+  text-decoration: none;
 }
 @media (max-width: 700px) {
-    body {
-        background-color: #fff;
-    }
-    div {
-        width: auto;
-        margin: 0 auto;
-        border-radius: 0;
-        padding: 1em;
-    }
+  body {
+      background-color: #fff;
+  }
+  #main {
+      width: auto;
+      margin: 0 auto;
+      border-radius: 0;
+      padding: 1em;
+  }
 }
