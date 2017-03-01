@@ -1,5 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/linux.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-02-13T21:09:00-08:00</updated><entry><title>The Linux init system.</title><link href="http://pminkov.github.io/blog/the-linux-init-system.html" rel="alternate"></link><published>2017-02-13T21:09:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-02-13:blog/the-linux-init-system.html</id><summary type="html">&lt;p&gt;I decided that I'll dig down into &lt;a href="https://en.wikipedia.org/wiki/Init"&gt;init systems&lt;/a&gt; in Linux and learn more about them. I'm running Ubuntu 16.04, so this might look different on other distributions.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/linux.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-03-01T12:26:00-08:00</updated><entry><title>Examining a process in Linux.</title><link href="http://pminkov.github.io/blog/examining-a-process-in-linux.html" rel="alternate"></link><published>2017-03-01T12:26:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-01:blog/examining-a-process-in-linux.html</id><summary type="html">&lt;p&gt;I've been thinking about writing a blog post about Linux tools and commands related to processes. Let's take a look at some of them.&lt;/p&gt;
+&lt;p&gt;The process that we'll be looking at is a &lt;a href="https://github.com/pminkov/webserver"&gt;webserver&lt;/a&gt; that I wrote some time ago to practice my C and write some code that does network related work. This webserver runs a &lt;a href="https://github.com/pminkov/threadpool"&gt;threadpool&lt;/a&gt; where N threads are waiting for server requests that they're going to execute.&lt;/p&gt;
+&lt;p&gt;So let's start the server:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./server
+Running on port: 8000
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Great. So which process is this server running as? We can use the &lt;code&gt;pidof&lt;/code&gt; command to find that out. Its output looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ pidof server
+8876
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If we had other processes which were running an executable with that name, we'd see more process ids, but since we only have one, we see one process id.&lt;/p&gt;
+&lt;p&gt;What next? Let's see how the process is layed out in memory. To do this, we can use the &lt;code&gt;pmap&lt;/code&gt; command. Its output looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo pmap -p 8876
+8876:   ./server
+&lt;span class="m"&gt;0000000000400000&lt;/span&gt;     16K r-x-- /home/petko/work/github/webserver/server
+&lt;span class="m"&gt;0000000000603000&lt;/span&gt;      4K r---- /home/petko/work/github/webserver/server
+&lt;span class="m"&gt;0000000000604000&lt;/span&gt;      4K rw--- /home/petko/work/github/webserver/server
+000000000110f000    132K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5ca731000      4K -----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5ca732000   8192K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5caf32000      4K -----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5caf33000   8192K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5cb733000      4K -----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5cb734000   8192K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5cbf34000      4K -----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5cbf35000   8192K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5cc735000   1792K r-x-- /lib/x86_64-linux-gnu/libc-2.23.so
+00007fd5cc8f5000   2044K ----- /lib/x86_64-linux-gnu/libc-2.23.so
+00007fd5ccaf4000     16K r---- /lib/x86_64-linux-gnu/libc-2.23.so
+00007fd5ccaf8000      8K rw--- /lib/x86_64-linux-gnu/libc-2.23.so
+00007fd5ccafa000     16K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5ccafe000     96K r-x-- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007fd5ccb16000   2044K ----- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007fd5ccd15000      4K r---- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007fd5ccd16000      4K rw--- /lib/x86_64-linux-gnu/libpthread-2.23.so
+00007fd5ccd17000     16K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5ccd1b000    152K r-x-- /lib/x86_64-linux-gnu/ld-2.23.so
+00007fd5ccf22000     12K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5ccf3e000      8K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5ccf40000      4K r---- /lib/x86_64-linux-gnu/ld-2.23.so
+00007fd5ccf41000      4K rw--- /lib/x86_64-linux-gnu/ld-2.23.so
+00007fd5ccf42000      4K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007ffca0861000    132K rw---   &lt;span class="o"&gt;[&lt;/span&gt; stack &lt;span class="o"&gt;]&lt;/span&gt;
+00007ffca09eb000      8K r----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007ffca09ed000      8K r-x--   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+ffffffffff600000      4K r-x--   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+total            39316K
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;What you see here are virtual memory addresses. For example, let's take a look at this line:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;00007fd5cc735000   1792K r-x-- /lib/x86_64-linux-gnu/libc-2.23.so&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;This is the code for &lt;code&gt;libc&lt;/code&gt;, which is the C standard library. This code is shared between processes that need it. We can see the &lt;code&gt;x&lt;/code&gt; flag, which means that this is executable memory. The size if roughly the same as the size of this &lt;code&gt;so&lt;/code&gt; file. This library is memory mapped into a region starting at address &lt;code&gt;00007fd5cc735000&lt;/code&gt;, but in physical memory it's only stored in one place. To learn more about memory in Linux, here's a &lt;a href="https://techtalk.intersec.com/2013/07/memory-part-1-memory-types/"&gt;great post&lt;/a&gt; going into detail about it.&lt;/p&gt;
+&lt;p&gt;Another interesting command is &lt;code&gt;lsof&lt;/code&gt;. &lt;code&gt;lsof&lt;/code&gt; stands for "list of open files". Let's see its output:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo lsof -p 8876
+COMMAND  PID  USER   FD   TYPE DEVICE SIZE/OFF    NODE NAME
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  cwd    DIR    8,1     &lt;span class="m"&gt;4096&lt;/span&gt;  &lt;span class="m"&gt;262299&lt;/span&gt; /home/petko/work/github/webserver
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  rtd    DIR    8,1     &lt;span class="m"&gt;4096&lt;/span&gt;       &lt;span class="m"&gt;2&lt;/span&gt; /
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  txt    REG    8,1    &lt;span class="m"&gt;25536&lt;/span&gt;  &lt;span class="m"&gt;306491&lt;/span&gt; /home/petko/work/github/webserver/server
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  mem    REG    8,1  &lt;span class="m"&gt;1864888&lt;/span&gt; &lt;span class="m"&gt;1184834&lt;/span&gt; /lib/x86_64-linux-gnu/libc-2.23.so
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  mem    REG    8,1   &lt;span class="m"&gt;138744&lt;/span&gt; &lt;span class="m"&gt;1184980&lt;/span&gt; /lib/x86_64-linux-gnu/libpthread-2.23.so
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  mem    REG    8,1   &lt;span class="m"&gt;162632&lt;/span&gt; &lt;span class="m"&gt;1184806&lt;/span&gt; /lib/x86_64-linux-gnu/ld-2.23.so
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko    0u   CHR  136,9      0t0      &lt;span class="m"&gt;12&lt;/span&gt; /dev/pts/9
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko    1u   CHR  136,9      0t0      &lt;span class="m"&gt;12&lt;/span&gt; /dev/pts/9
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko    2u   CHR  136,9      0t0      &lt;span class="m"&gt;12&lt;/span&gt; /dev/pts/9
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko    3u  IPv4  &lt;span class="m"&gt;81993&lt;/span&gt;      0t0     TCP *:8000 &lt;span class="o"&gt;(&lt;/span&gt;LISTEN&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As you can see, we have file descriptors 0,1 and 2, which are stdin, stdout and stderr. They are linked to the terminal in which the process is running in. You can write to that terminal btw. Just type &lt;code&gt;echo "hello world" &amp;gt; /dev/pts/9&lt;/code&gt; and you'll see that text in the terminal where your webserver is running. File descriptor number 3 is our socket which accepts connections.&lt;/p&gt;
+&lt;p&gt;Another interesting way to inspect processes is the ps command. Its basic output looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ps --pid 8876
+  PID TTY          TIME CMD
+ &lt;span class="m"&gt;8876&lt;/span&gt; pts/9    00:00:00 server
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This is simple. We can also show the threads inside a process, like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ps  m --pid &lt;span class="m"&gt;8876&lt;/span&gt; -o pid,tid,cmd
+  PID   TID CMD
+ &lt;span class="m"&gt;8876&lt;/span&gt;     - ./server
+    -  &lt;span class="m"&gt;8876&lt;/span&gt; -
+    -  &lt;span class="m"&gt;8877&lt;/span&gt; -
+    -  &lt;span class="m"&gt;8878&lt;/span&gt; -
+    -  &lt;span class="m"&gt;8879&lt;/span&gt; -
+    -  &lt;span class="m"&gt;8880&lt;/span&gt; -
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We have five threads here. One is our main thread and the other four are the threadpool threads. The &lt;code&gt;m&lt;/code&gt; option tells ps to show the threads of a process. The &lt;code&gt;-o&lt;/code&gt; option specifies fields to output. We can even get fancy and output the addresses of the threads' stack pointers and instruction pointers, like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ps  m --pid &lt;span class="m"&gt;8876&lt;/span&gt; -o pid,tid,cmd,esp,eip
+  PID   TID CMD                              ESP      EIP
+ &lt;span class="m"&gt;8876&lt;/span&gt;     - ./server                           -        -
+    -  &lt;span class="m"&gt;8876&lt;/span&gt; -                           a0880b70 ccb0e7ad
+    -  &lt;span class="m"&gt;8877&lt;/span&gt; -                           cc733ec0 ccb0b3a0
+    -  &lt;span class="m"&gt;8878&lt;/span&gt; -                           cbf32ec0 ccb0b3a0
+    -  &lt;span class="m"&gt;8879&lt;/span&gt; -                           cb731ec0 ccb0b3a0
+    -  &lt;span class="m"&gt;8880&lt;/span&gt; -                           caf30ec0 ccb0b3a0
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So all the threads are at the same instruction, but they have different stack pointers, which makes sense. If I execute something on one of the threads, both the &lt;code&gt;ESP&lt;/code&gt; and &lt;code&gt;EIP&lt;/code&gt; can possibly change.&lt;/p&gt;
+&lt;p&gt;A lot of data about processes lives in the &lt;code&gt;proc&lt;/code&gt; filesytem, located in &lt;code&gt;/proc&lt;/code&gt;. For each running process, there's a subdirectory of &lt;code&gt;/proc&lt;/code&gt; named after the process id. For example, for our process &lt;code&gt;8876&lt;/code&gt;, there's a &lt;code&gt;status&lt;/code&gt; file which lists various information about the process. Let's look at it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat /proc/8876/status
+Name:   server
+State:  S &lt;span class="o"&gt;(&lt;/span&gt;sleeping&lt;span class="o"&gt;)&lt;/span&gt;
+Tgid:   8876
+Ngid:   0
+Pid:    8876
+PPid:   2604
+TracerPid:      0
+Uid:    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;    1000
+Gid:    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;    1000
+FDSize: 256
+Groups: &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;24&lt;/span&gt; &lt;span class="m"&gt;27&lt;/span&gt; &lt;span class="m"&gt;30&lt;/span&gt; &lt;span class="m"&gt;46&lt;/span&gt; &lt;span class="m"&gt;113&lt;/span&gt; &lt;span class="m"&gt;128&lt;/span&gt; &lt;span class="m"&gt;999&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt; 
+NStgid: 8876
+NSpid:  8876
+NSpgid: 8876
+NSsid:  2604
+VmPeak:    &lt;span class="m"&gt;39316&lt;/span&gt; kB
+VmSize:    &lt;span class="m"&gt;39316&lt;/span&gt; kB
+VmLck:         &lt;span class="m"&gt;0&lt;/span&gt; kB
+VmPin:         &lt;span class="m"&gt;0&lt;/span&gt; kB
+VmHWM:       &lt;span class="m"&gt;800&lt;/span&gt; kB
+VmRSS:       &lt;span class="m"&gt;800&lt;/span&gt; kB
+VmData:    &lt;span class="m"&gt;32988&lt;/span&gt; kB
+VmStk:       &lt;span class="m"&gt;136&lt;/span&gt; kB
+VmExe:        &lt;span class="m"&gt;16&lt;/span&gt; kB
+VmLib:      &lt;span class="m"&gt;2040&lt;/span&gt; kB
+VmPTE:        &lt;span class="m"&gt;48&lt;/span&gt; kB
+VmPMD:        &lt;span class="m"&gt;12&lt;/span&gt; kB
+VmSwap:        &lt;span class="m"&gt;0&lt;/span&gt; kB
+HugetlbPages:          &lt;span class="m"&gt;0&lt;/span&gt; kB
+Threads:        5
+SigQ:   0/7848
+SigPnd: 0000000000000000
+ShdPnd: 0000000000000000
+SigBlk: 0000000000000000
+SigIgn: 0000000000000000
+SigCgt: 0000000180000000
+CapInh: 0000000000000000
+CapPrm: 0000000000000000
+CapEff: 0000000000000000
+CapBnd: 0000003fffffffff
+CapAmb: 0000000000000000
+Seccomp:        0
+Cpus_allowed:   1
+Cpus_allowed_list:      0
+Mems_allowed:   00000000,00000001
+Mems_allowed_list:      0
+voluntary_ctxt_switches:        3
+nonvoluntary_ctxt_switches:     2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;There's a lot of data in here, but remember how we used &lt;code&gt;ps&lt;/code&gt; to count the number of threads in this process. That's also available here on the line saying &lt;code&gt;Threads:    5&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Our last command is &lt;code&gt;pidstat&lt;/code&gt;. &lt;code&gt;pidstat&lt;/code&gt; shows statistics about a running process, which can be updated at a regular time interval. A possible invocation can be:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ pidstat -p &lt;span class="m"&gt;8876&lt;/span&gt; 1
+Linux 4.4.0-64-generic &lt;span class="o"&gt;(&lt;/span&gt;virtbox&lt;span class="o"&gt;)&lt;/span&gt;        03/01/2017      _x86_64_        &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; CPU&lt;span class="o"&gt;)&lt;/span&gt;
+
+12:22:00 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
+12:22:01 PM  &lt;span class="m"&gt;1000&lt;/span&gt;      &lt;span class="m"&gt;8876&lt;/span&gt;    0.00    0.00    0.00    0.00     &lt;span class="m"&gt;0&lt;/span&gt;  server
+12:22:02 PM  &lt;span class="m"&gt;1000&lt;/span&gt;      &lt;span class="m"&gt;8876&lt;/span&gt;    0.00    0.00    0.00    0.00     &lt;span class="m"&gt;0&lt;/span&gt;  server
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Our server is not doing anything right now, so you see a lot of zeroes.&lt;/p&gt;
+&lt;p&gt;There are many other interesting commands that you can look to figure out what processes are doing. &lt;code&gt;strace&lt;/code&gt; shows system calls run by a process. &lt;code&gt;ltrace&lt;/code&gt; shows dynamic library calls. &lt;code&gt;tcpdump&lt;/code&gt; can be used to show traffic going in and out of a process.&lt;/p&gt;
+&lt;p&gt;So, that's all for today. Happy running of processes.&lt;/p&gt;</summary></entry><entry><title>The Linux init system.</title><link href="http://pminkov.github.io/blog/the-linux-init-system.html" rel="alternate"></link><published>2017-02-13T21:09:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-02-13:blog/the-linux-init-system.html</id><summary type="html">&lt;p&gt;I decided that I'll dig down into &lt;a href="https://en.wikipedia.org/wiki/Init"&gt;init systems&lt;/a&gt; in Linux and learn more about them. I'm running Ubuntu 16.04, so this might look different on other distributions.&lt;/p&gt;
 &lt;p&gt;The init system in Linux is mainly responsible for starting essential service processes, mounting file systems and possibly other tasks. The main init systems are systemd, System V init and Upstart. Ubuntu uses systemd.&lt;/p&gt;
 &lt;p&gt;The init system starts after the Kernel starts its first user space process - init. Indeed, let's see what's running with PID 1:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ps 1
