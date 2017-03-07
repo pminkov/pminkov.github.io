@@ -20,8 +20,17 @@ a:link, a:visited {
   color: #479cb8;
   text-decoration: none;
 }
+
+#name > h1 {
+  padding-bottom:0;
+  margin-bottom:0;
+}
+
 #main > div {
   margin-bottom: 1em;
+}
+#name {
+  margin-bottom:1.5em !important;
 }
 @media (max-width: 700px) {
   body {
