@@ -1,5 +1,233 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-03-01T12:26:00-08:00</updated><entry><title>Examining a process in Linux.</title><link href="http://pminkov.github.io/blog/examining-a-process-in-linux.html" rel="alternate"></link><published>2017-03-01T12:26:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-01:blog/examining-a-process-in-linux.html</id><summary type="html">&lt;p&gt;I've been thinking about writing a blog post about Linux tools and commands related to processes. Let's take a look at some of them.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-03-07T12:42:00-08:00</updated><entry><title>Starting with Kubernetes on Google Container Engine</title><link href="http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html" rel="alternate"></link><published>2017-03-07T12:42:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-07:blog/starting-with-kubernetes-on-google-container-engine.html</id><summary type="html">&lt;p&gt;This is a tutorial of how to run a simple Kubernetes app on &lt;a href="https://cloud.google.com/container-engine/"&gt;GKE&lt;/a&gt; (Google Container Engine).&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://kubernetes.io/"&gt;Kubernetes&lt;/a&gt; is a container orchestration software that started at Google. Right now it's an open source project maintained by &lt;a href="https://www.cncf.io/"&gt;Cloud Native Computing Foundation&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;So what's Kubernetes all about? Roughly, it's about managing a cluster (a set of machines) on which we have containers running. &lt;/p&gt;
+&lt;h3&gt;Why containers?&lt;/h3&gt;
+&lt;p&gt;Well, that's a question that probably has a lot of answers, but containers are very lightweight virtual machines more or less. The technology under them is different than virtual machines though. We can orchestrate a set of VMs, but containers are much easier to work with. For example I have one VM running on my MacBook - it eats a lot of memory, it's managed by VirtualBox, it has a lot of stuff installed on it. I can't imagine having to run a bunch of these. Containers though, they're much easier to setup (you just write a text file that describes them - the Dockerfile) and much more lightweight. Their memory footprint can be pretty low. Containers can run on different OSs, some of which are very lightweight. Ok, enough about containers - back to Kubernetes.&lt;/p&gt;
+&lt;h3&gt;What's in a cluster?&lt;/h3&gt;
+&lt;p&gt;I mentioned clusters. But what's a cluster. A cluster has a set of nodes (think computers) on which we have pods, where each pod is a unit that contains several containers. That's the basic structure.&lt;/p&gt;
+&lt;h3&gt;Running a simple Kubernetes app on GKE.&lt;/h3&gt;
+&lt;p&gt;Alright, let's roll our sleeves. Google has its own &lt;a href="https://cloud.google.com/container-engine/docs/quickstart"&gt;Quickstart&lt;/a&gt; tutorial, but what I don't like about it is that it doesn't describe how to create your own container and it doesn't talk about the Kubernetes dashboard. But a lot of the steps here you can see in Google's tutorial as well.&lt;/p&gt;
+&lt;p&gt;So let's start.&lt;/p&gt;
+&lt;h3&gt;Create a project.&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Go to the &lt;a href="https://console.cloud.google.com"&gt;Cloud Console&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Create a project. Mine is called "mykube". Every project has an id that you're mostly working with. Mine is &lt;code&gt;mykube-160819&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Install necessary tools and initialize them.&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Install the &lt;a href="https://cloud.google.com/sdk/downloads"&gt;Google Cloud SDK&lt;/a&gt;. There's a web interface for working with the SDK, called Google Cloud Shell, but I like having the tools installed locally.&lt;/li&gt;
+&lt;li&gt;Initialize gcloud by running &lt;code&gt;gcloud init&lt;/code&gt;. You'll be asked for the name of your project.&lt;/li&gt;
+&lt;li&gt;Set a &lt;a href="https://cloud.google.com/compute/docs/regions-zones/regions-zones#available"&gt;Compute Engine zone&lt;/a&gt;, like this:&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;gcloud config &lt;span class="nb"&gt;set&lt;/span&gt; compute/zone us-central1-b
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That's it. You can view your configuration:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud config list
+Your active configuration is: &lt;span class="o"&gt;[&lt;/span&gt;mykube&lt;span class="o"&gt;]&lt;/span&gt;
+
+&lt;span class="o"&gt;[&lt;/span&gt;compute&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;zone&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; us-central1-b
+&lt;span class="o"&gt;[&lt;/span&gt;core&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;account&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; pminkov@gmail.com
+&lt;span class="nv"&gt;disable_usage_reporting&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; False
+&lt;span class="nv"&gt;project&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; mykube-160819
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Let's authenticate gcloud too:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;gcloud auth application-default login
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Run a container image.&lt;/h3&gt;
+&lt;p&gt;Our container is going to be a node.js application that we'll build ourselves. I wanted to experiment with an app that takes a bit more memory, so here's how my code looks like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nx"&gt;$&lt;/span&gt; &lt;span class="nx"&gt;cat&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nx"&gt;server&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;js&lt;/span&gt; 
+&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;randomInt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;floor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;random&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nx"&gt;n&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;http&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;20000000&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;nums&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nb"&gt;Array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nx"&gt;nums&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;randomInt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;handleRequest&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Received request for URL: &amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;request&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;writeHead&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;index&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;randomInt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Returning element at index &amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;index&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;: &amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;nums&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;\n&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;end&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Hello World!&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;www&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createServer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;handleRequest&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Listening on port 8080&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="nx"&gt;www&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;8080&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We also need a Dockerfile:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat ./Dockerfile 
+FROM node:4
+EXPOSE 8080
+COPY server.js .
+CMD node server.js
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In order to run a container on GKE, we need to upload it to &lt;a href="https://cloud.google.com/container-registry/"&gt;Google Container Registry&lt;/a&gt;. Let's do it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PROJECT_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;mykube-160819
+$ docker build -t gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver .
+Sending build context to Docker daemon 3.584 kB
+Step 1/4 : FROM node:4
+ ---&amp;gt; d7efee1f035d
+Step 2/4 : EXPOSE 8080
+ ---&amp;gt; Using cache
+ ---&amp;gt; 147e7888542d
+Step 3/4 : COPY server.js .
+ ---&amp;gt; Using cache
+ ---&amp;gt; b610e7975d20
+Step 4/4 : CMD node server.js
+ ---&amp;gt; Using cache
+ ---&amp;gt; 4e15133cdab2
+Successfully built 4e15133cdab2
+$ gcloud docker -- push gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver
+The push refers to a repository &lt;span class="o"&gt;[&lt;/span&gt;gcr.io/mykube-160819/myserver&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="c1"&gt;# Note that I already have a project called &amp;quot;hikube&amp;quot; which has the same docker image.&lt;/span&gt;
+&lt;span class="c1"&gt;# The &amp;quot;mykube&amp;quot; project is something I created for this tutorial.&lt;/span&gt;
+1bcf3881e79d: Mounted from hikube-160719/myserver 
+65e403c25ee9: Mounted from hikube-160719/myserver 
+4732c3666dd7: Mounted from hikube-160719/myserver 
+a1fbf6fa923f: Mounted from hikube-160719/myserver 
+1b8ef9ac5116: Mounted from hikube-160719/myserver 
+41ef8cc0bccb: Mounted from hikube-160719/myserver 
+100396c46221: Mounted from hikube-160719/myserver 
+7b4b54c74241: Mounted from hikube-160719/myserver 
+d17d48b2382a: Mounted from hikube-160719/myserver 
+latest: digest: sha256:4ad68f056e870938823f6c9555355c149cf7c42a213d7243d915f1a4bcfb9cb1 size: 2213
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you go to the Google Cloud Console and open the Google Container Registry, you'll see the container uploaded:&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Google Container Registry" src="http://pminkov.github.io/blog/images/k8s-intro/k1-registry.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;Now let's create a cluster that we'll be deploying our server to:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud container clusters create example-cluster
+Creating cluster example-cluster...done.                                                                                                                                               
+Created &lt;span class="o"&gt;[&lt;/span&gt;https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster&lt;span class="o"&gt;]&lt;/span&gt;.
+kubeconfig entry generated &lt;span class="k"&gt;for&lt;/span&gt; example-cluster.
+NAME             ZONE           MASTER_VERSION  MASTER_IP       MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
+example-cluster  us-central1-b  1.5.3           104.198.190.52  n1-standard-1  1.5.3         &lt;span class="m"&gt;3&lt;/span&gt;          RUNNING
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Congratulations! We have a cluster running.&lt;/p&gt;
+&lt;p&gt;A little segway. kubectl has a config that determines which cluster you're working with. You can switch between different clusters. Try it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl config current-context
+gke_mykube-160819_us-central1-b_example-cluster
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We're good here - our context is for the "mykube" cluster. The cluster is empty, we can verify it like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods
+No resources found.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now let's start out server finally:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl run myserver --image&lt;span class="o"&gt;=&lt;/span&gt;gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver --port&lt;span class="o"&gt;=&lt;/span&gt;8080
+deployment &lt;span class="s2"&gt;&amp;quot;myserver&amp;quot;&lt;/span&gt; created
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We have created a deployment that contains a pod. Let's see what pods we have now:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods
+NAME                        READY     STATUS              RESTARTS   AGE
+myserver-3430466764-04b36   0/1       ContainerCreating   &lt;span class="m"&gt;0&lt;/span&gt;          17s
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Nice, our container is getting spinned. We wait for a bit and we see:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods
+NAME                        READY     STATUS    RESTARTS   AGE
+myserver-3430466764-04b36   1/1       Running   &lt;span class="m"&gt;0&lt;/span&gt;          58s
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We can now expose the container:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl expose deployment myserver --type&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;LoadBalancer&amp;quot;&lt;/span&gt;
+service &lt;span class="s2"&gt;&amp;quot;myserver&amp;quot;&lt;/span&gt; exposed
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;This will also take some time:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get service myserver
+NAME       CLUSTER-IP   EXTERNAL-IP   PORT&lt;span class="o"&gt;(&lt;/span&gt;S&lt;span class="o"&gt;)&lt;/span&gt;          AGE
+myserver   10.3.247.6   &amp;lt;pending&amp;gt;     8080:31574/TCP   34s
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Aaand, it's done:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get service myserver
+NAME       CLUSTER-IP   EXTERNAL-IP      PORT&lt;span class="o"&gt;(&lt;/span&gt;S&lt;span class="o"&gt;)&lt;/span&gt;          AGE
+myserver   10.3.247.6   104.155.177.47   8080:31574/TCP   1m
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If we go to &lt;code&gt;http://104.155.177.47:8080/&lt;/code&gt;, we'll see:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Returning element at index 6110645: 116527640
+Hello World!
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now, the tedious part is over. Let's have some fun. We can monitor our cluster through the Kubernetes dashboard. For a reason unclear to me, this dashboard is not available on the Google website. You have to run a proxy to do it. Like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl proxy
+Starting to serve on 127.0.0.1:8001
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We can see the dashboard at &lt;code&gt;localhost:8001/ui&lt;/code&gt;. It looks like this:&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Kubernetes Dashboard" src="http://pminkov.github.io/blog/images/k8s-intro/k2-dashboard.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;This dashboard is a lot of fun. You can dig into everything available in it. You can probably see everything it shows through kubectl as well, but it's easier to do it by using an UI.&lt;/p&gt;
+&lt;p&gt;Here's something else that's fun. Your cluster doesn't run on thin air. It runs on Google Compute Engine instances (I believe this is equivalent to AWS' EC2). In your cloud console, you can navigate to your instances and you can even SSH to an instance from the web UI (I wow-ed the first time I did this, much easier than setting up ssh access on AWS).&lt;/p&gt;
+&lt;p&gt;Our cluster has three nodes.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get nodes
+NAME                                             STATUS    AGE
+gke-example-cluster-default-pool-2567fc65-1h40   Ready     21m
+gke-example-cluster-default-pool-2567fc65-g7lc   Ready     21m
+gke-example-cluster-default-pool-2567fc65-n0cp   Ready     21m
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;These are three GCE instances. Where is our pod running at?&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods -o wide
+NAME                        READY     STATUS    RESTARTS   AGE       IP         NODE
+myserver-3430466764-04b36   1/1       Running   &lt;span class="m"&gt;0&lt;/span&gt;          18m       10.0.1.5   gke-example-cluster-default-pool-2567fc65-g7lc
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It's running on &lt;code&gt;gke-example-cluster-default-pool-2567fc65-g7lc&lt;/code&gt;. Now I can navigate to the web page for this instance and ssh to it. Here's a screenshot of how that looks like:&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Compute Engine SSH" src="http://pminkov.github.io/blog/images/k8s-intro/k3-compute-engine.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;I ran &lt;code&gt;ps aux --sort '%mem'&lt;/code&gt; to see which process takes most memory. Since my server uses a lot of memory, it's at the top. It's using 179MB of resident memory.&lt;/p&gt;
+&lt;p&gt;It's pretty nice that you're able to nagivate from a high level system like Kubernetes all the way down to ssh-ing to a machine that runs your containers. When you're ssh-ed you can execute &lt;code&gt;docker ps&lt;/code&gt; to see what containers are running, run &lt;code&gt;top&lt;/code&gt; to see what's going on on the machine and do all of the other systems debugging tasks that you can think of.&lt;/p&gt;
+&lt;p&gt;And finally, let's delete our cluster:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud container clusters delete example-cluster
+The following clusters will be deleted.
+ - &lt;span class="o"&gt;[&lt;/span&gt;example-cluster&lt;span class="o"&gt;]&lt;/span&gt; in &lt;span class="o"&gt;[&lt;/span&gt;us-central1-b&lt;span class="o"&gt;]&lt;/span&gt;
+
+Do you want to &lt;span class="k"&gt;continue&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Y/n&lt;span class="o"&gt;)&lt;/span&gt;?  
+
+Deleting cluster example-cluster...done.                                                                                                                                               
+Deleted &lt;span class="o"&gt;[&lt;/span&gt;https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster&lt;span class="o"&gt;]&lt;/span&gt;.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;That's all for today - enjoy.&lt;/p&gt;</summary></entry><entry><title>Examining a process in Linux.</title><link href="http://pminkov.github.io/blog/examining-a-process-in-linux.html" rel="alternate"></link><published>2017-03-01T12:26:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-01:blog/examining-a-process-in-linux.html</id><summary type="html">&lt;p&gt;I've been thinking about writing a blog post about Linux tools and commands related to processes. Let's take a look at some of them.&lt;/p&gt;
 &lt;p&gt;The process that we'll be looking at is a &lt;a href="https://github.com/pminkov/webserver"&gt;webserver&lt;/a&gt; that I wrote some time ago to practice my C and write some code that does network related work. This webserver runs a &lt;a href="https://github.com/pminkov/threadpool"&gt;threadpool&lt;/a&gt; where N threads are waiting for server requests that they're going to execute.&lt;/p&gt;
 &lt;p&gt;So let's start the server:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./server
