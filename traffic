@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Displaying text directions with <code>setPanel()</code></title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+      #right-panel {
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+
+      #right-panel select, #right-panel input {
+        font-size: 15px;
+      }
+
+      #right-panel select {
+        width: 100%;
+      }
+
+      #right-panel i {
+        font-size: 12px;
+      }
+      #right-panel {
+        height: 100%;
+        float: right;
+        width: 410px;
+        overflow: auto;
+      }
+      #map {
+        margin-right: 400px;
+      }
+
+      #times {
+        text-align: center;
+      }
+
+      #times .time_slot {
+        width:9em;
+        background-color:#ddd;
+      }
+
+      #times .used_time {
+        width:2.5em;
+        text-align:center;
+        background-color:#eee;
+      }
+
+      #floating-panel #title {
+        font-size:18px;
+        margin-bottom:1em;
+        background:#eee;
+        border-radius: 4px;
+        padding:4px;
+      }
+
+      #floating-panel input {
+        padding:4px;
+        margin: 4px;
+        width:20em;
+        font-size:15px;
+      }
+
+      #floating-panel {
+        background: #fff;
+        padding: 5px;
+        font-family: Arial;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 2px rgba(33, 33, 33, 0.4);
+        display: none;
+      }
+      @media print {
+        #map {
+          height: 500px;
+          margin: 0;
+        }
+        #right-panel {
+          float: none;
+          width: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="floating-panel">
+      <div id=title>
+        Commute Time Calculator
+      </div>
+      <div>
+        A:
+        <input id="address-from" value="Union Square, San Francisco, CA">
+      </div>
+      <div>
+        B:
+        <input id="address-to" value="Jack London Square, Oakland, CA">
+      </div>
+      <button id="go">Go!</button>
+    </div>
+    <div id="right-panel">
+      <div>
+        <table id="times">
+          <tr>
+            <td>Hour</td>
+            <td>A to B</td>
+            <td>B to A</td>
+          </tr>
+        </table>
+      </div>
+    
+    </div>
+    <div id="map"></div>
+  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="traffic-times.js"></script>
+    <script async defer 
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtDFC3VLvbxSFJ-8tAWIFhVipSdH81Eio&callback=initMap"></script>
+  </body>
+</html>
