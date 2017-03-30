@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-03-30T16:17:00-07:00</updated><entry><title>Removing a node from a Kubernetes cluster on GKE (Google Container Engine)</title><link href="http://pminkov.github.io/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html" rel="alternate"></link><published>2017-03-30T16:17:00-07:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-30:blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html</id><summary type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that to resize a cluster. I believe that's a rare need, but in case you have it, here's how to do it.&lt;/p&gt;
-&lt;h4&gt;Drain your node&lt;/h4&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-03-30T16:17:00-07:00</updated><entry><title>Removing a node from a Kubernetes cluster on GKE (Google Container Engine)</title><link href="http://pminkov.github.io/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html" rel="alternate"></link><published>2017-03-30T16:17:00-07:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-30:blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html</id><summary type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped me understand more about the GCE structures behind a Kubernetes cluster.&lt;/p&gt;
+&lt;p&gt;So let's start. The first thing you need to do is:&lt;/p&gt;
+&lt;h3&gt;Drain your node&lt;/h3&gt;
 &lt;p&gt;Let's look at my nodes:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kl get nodes
 NAME                                      STATUS    AGE
@@ -16,8 +17,8 @@ error: pods with &lt;span class="nb"&gt;local&lt;/span&gt; storage &lt;span clas
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Great, the node is now drained.&lt;/p&gt;
-&lt;h4&gt;Removing the GCE VM&lt;/h4&gt;
+&lt;p&gt;Great, the node is now drained. Next is:&lt;/p&gt;
+&lt;h3&gt;Removing the GCE VM&lt;/h3&gt;
 &lt;p&gt;Your Kubernetes cluster runs in an &lt;a href="https://cloud.google.com/compute/docs/instance-groups/"&gt;instance group&lt;/a&gt;. We'll need to know what this group is. Here's how to do it from the command line.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;GROUP_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;gcloud container clusters describe jcluster --format json &lt;span class="p"&gt;|&lt;/span&gt; jq  --raw-output &lt;span class="s1"&gt;&amp;#39;.instanceGroupUrls[0]&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; rev &lt;span class="p"&gt;|&lt;/span&gt; cut -d&lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; -f &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; rev&lt;span class="k"&gt;)&lt;/span&gt;
 $ &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$GROUP_ID&lt;/span&gt;
@@ -33,7 +34,7 @@ gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1           
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;If I just run &lt;code&gt;gcloud compute instances delete&lt;/code&gt; that won't work! That's because I have an instance group of size 2 and if I delete one of the machines, GCE will start a new one. I have to use the &lt;code&gt;gcloud compute  instance-groups managed delete-instances&lt;/code&gt; command, followed by &lt;code&gt;gcloud compute instance-groups managed wait-until-stable&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If I just run &lt;code&gt;gcloud compute instances delete&lt;/code&gt; that won't work! That's because I have an instance group of size 2 and if I delete one of the machines, GCE will start a new one. I have to use the &lt;code&gt;gcloud compute  instance-groups managed delete-instances&lt;/code&gt; command, followed by &lt;code&gt;gcloud compute instance-groups managed wait-until-stable&lt;/code&gt; if I want to wait until the job is done.&lt;/p&gt;
 &lt;p&gt;Let's see how that looks like:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud compute instance-groups managed delete-instances &lt;span class="nv"&gt;$GROUP_ID&lt;/span&gt; --instances&lt;span class="o"&gt;=&lt;/span&gt;gke-jcluster-default-pool-9cc4e660-rx9p
 Updated &lt;span class="o"&gt;[&lt;/span&gt;https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp&lt;span class="o"&gt;]&lt;/span&gt;.
@@ -73,7 +74,10 @@ gke-jcluster-default-pool-9cc4e660-xr4z   Ready     2d
 $ gcloud compute instances list
 NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
 gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               10.128.0.4   104.197.237.135  RUNNING
-&lt;/pre&gt;&lt;/div&gt;</summary></entry><entry><title>Starting with Kubernetes on Google Container Engine</title><link href="http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html" rel="alternate"></link><published>2017-03-07T12:42:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-07:blog/starting-with-kubernetes-on-google-container-engine.html</id><summary type="html">&lt;p&gt;This is a tutorial of how to run a simple Kubernetes app on &lt;a href="https://cloud.google.com/container-engine/"&gt;GKE&lt;/a&gt; (Google Container Engine).&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So that's it. Regardless of whether you need to delete individual nodes, it's interesting to take a look at how you can do that.&lt;/p&gt;</summary></entry><entry><title>Starting with Kubernetes on Google Container Engine</title><link href="http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html" rel="alternate"></link><published>2017-03-07T12:42:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-07:blog/starting-with-kubernetes-on-google-container-engine.html</id><summary type="html">&lt;p&gt;This is a tutorial of how to run a simple Kubernetes app on &lt;a href="https://cloud.google.com/container-engine/"&gt;GKE&lt;/a&gt; (Google Container Engine).&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://kubernetes.io/"&gt;Kubernetes&lt;/a&gt; is a container orchestration software that started at Google. Right now it's an open source project maintained by &lt;a href="https://www.cncf.io/"&gt;Cloud Native Computing Foundation&lt;/a&gt;. &lt;/p&gt;
 &lt;p&gt;So what's Kubernetes all about? Roughly, it's about managing a cluster (a set of machines) on which we have containers running. &lt;/p&gt;
 &lt;h3&gt;Why containers?&lt;/h3&gt;

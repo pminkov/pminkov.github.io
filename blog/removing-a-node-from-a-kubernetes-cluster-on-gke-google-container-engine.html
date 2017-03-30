@@ -40,8 +40,9 @@ in <a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a>
 
 </div><!-- /.post-info -->    </div>
     <div>
-      <p>In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that to resize a cluster. I believe that's a rare need, but in case you have it, here's how to do it.</p>
-<h4>Drain your node</h4>
+      <p>In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped me understand more about the GCE structures behind a Kubernetes cluster.</p>
+<p>So let's start. The first thing you need to do is:</p>
+<h3>Drain your node</h3>
 <p>Let's look at my nodes:</p>
 <div class="highlight"><pre><span></span>$ kl get nodes
 NAME                                      STATUS    AGE
@@ -57,8 +58,8 @@ error: pods with <span class="nb">local</span> storage <span class="o">(</span>u
 </pre></div>
 
 
-<p>Great, the node is now drained.</p>
-<h4>Removing the GCE VM</h4>
+<p>Great, the node is now drained. Next is:</p>
+<h3>Removing the GCE VM</h3>
 <p>Your Kubernetes cluster runs in an <a href="https://cloud.google.com/compute/docs/instance-groups/">instance group</a>. We'll need to know what this group is. Here's how to do it from the command line.</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">GROUP_ID</span><span class="o">=</span><span class="k">$(</span>gcloud container clusters describe jcluster --format json <span class="p">|</span> jq  --raw-output <span class="s1">&#39;.instanceGroupUrls[0]&#39;</span> <span class="p">|</span> rev <span class="p">|</span> cut -d<span class="s1">&#39;/&#39;</span> -f <span class="m">1</span> <span class="p">|</span> rev<span class="k">)</span>
 $ <span class="nb">echo</span> <span class="nv">$GROUP_ID</span>
@@ -74,7 +75,7 @@ gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1           
 </pre></div>
 
 
-<p>If I just run <code>gcloud compute instances delete</code> that won't work! That's because I have an instance group of size 2 and if I delete one of the machines, GCE will start a new one. I have to use the <code>gcloud compute  instance-groups managed delete-instances</code> command, followed by <code>gcloud compute instance-groups managed wait-until-stable</code></p>
+<p>If I just run <code>gcloud compute instances delete</code> that won't work! That's because I have an instance group of size 2 and if I delete one of the machines, GCE will start a new one. I have to use the <code>gcloud compute  instance-groups managed delete-instances</code> command, followed by <code>gcloud compute instance-groups managed wait-until-stable</code> if I want to wait until the job is done.</p>
 <p>Let's see how that looks like:</p>
 <div class="highlight"><pre><span></span>$ gcloud compute instance-groups managed delete-instances <span class="nv">$GROUP_ID</span> --instances<span class="o">=</span>gke-jcluster-default-pool-9cc4e660-rx9p
 Updated <span class="o">[</span>https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp<span class="o">]</span>.
@@ -115,6 +116,9 @@ $ gcloud compute instances list
 NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
 gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               10.128.0.4   104.197.237.135  RUNNING
 </pre></div>
+
+
+<p>So that's it. Regardless of whether you need to delete individual nodes, it's interesting to take a look at how you can do that.</p>
     </div><!-- /.entry-content -->
 
   </article>
