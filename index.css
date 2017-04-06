@@ -29,13 +29,13 @@ img.site {
 }
 
 #name {
-  padding-bottom:1em;
-
+  padding: 1em;
+  background-color: #a7dff9
 }
 
 #name > h1 {
-  padding-bottom:0;
-  margin-bottom:0;
+  padding: 0;
+  margin: 0;
 }
 
 #content {
