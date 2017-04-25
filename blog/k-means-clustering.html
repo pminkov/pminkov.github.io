@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>k-means clustering</title>
+        <link rel="stylesheet" href="http://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li class="active"><a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://pminkov.github.io/blog/k-means-clustering.html" rel="bookmark"
+           title="Permalink to k-means clustering">k-means clustering</a></h1>
+    </header>
+
+    <div class="entry-content">
+<div class="post-info">
+        <abbr class="published" title="2017-04-24T21:10:00-07:00">
+                Published: Mon 24 April 2017
+in <a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a>
+        </abbr>
+
+</div><!-- /.post-info -->    </div>
+    <div>
+      <p>(This blog post is an import from this <a href="https://github.com/pminkov/notebooks/blob/master/k-means%20clustering.ipynb">Jupyter notebook</a>).</p>
+<p>k-means clustering partitions n observations into k clusters in which each observation belongs to the cluster with the nearest mean.</p>
+<p>Here we're implementing a heuristic algorithm for k-means clustering.</p>
+<p>We have N points that we want to partition into K clusters.</p>
+<p>It works this way:</p>
+<h3>Step 1: Initialize clusters</h3>
+<ol>
+<li>Pick K random points from the N points.</li>
+<li>Assign each of the other N-K points to a cluster Ci where "i" is the index of the closest point from the K points selected above.</li>
+</ol>
+<h3>Step 2: Iterate on changing the clusters until convergence</h3>
+<p>Repeat until no changes:</p>
+<ol>
+<li>For each cluster, compute its mean.</li>
+<li>Iterate over all N points and assign each one to a cluster indexed by the closest mean.</li>
+</ol>
+<p>This is displayed and inplemented below:</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+
+<span class="k">def</span> <span class="nf">plot_points</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">use_colors</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+  <span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+  <span class="n">ys</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+  <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">==</span> <span class="n">N</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">use_colors</span><span class="p">:</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="p">[(</span><span class="n">cc</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">K</span><span class="p">))</span> <span class="k">for</span> <span class="n">cc</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">edgecolors</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+  <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="c1"># Number of points.</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">720</span>
+
+<span class="c1"># Number of clusters.</span>
+<span class="n">K</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+  <span class="n">x</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+  <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+
+<span class="n">plot_points</span><span class="p">(</span><span class="s1">&#39;Initial </span><span class="si">%d</span><span class="s1"> points which we</span><span class="se">\&#39;</span><span class="s1">ll split into </span><span class="si">%d</span><span class="s1"> clusters.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">K</span><span class="p">),</span> <span class="n">use_colors</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_1_0.png" /></p>
+<div class="highlight"><pre><span></span><span class="n">cluster</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span>
+
+<span class="n">indices</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+<span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+
+<span class="n">mean_point_idxs</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="n">K</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+  <span class="n">cluster</span><span class="p">[</span> <span class="n">mean_point_idxs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+
+<span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+  <span class="k">if</span> <span class="n">idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mean_point_idxs</span><span class="p">:</span>
+    <span class="c1"># Find closest.</span>
+    <span class="n">ci</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">mindistance</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">30</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+      <span class="n">cm</span> <span class="o">=</span> <span class="n">mean_point_idxs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+      <span class="n">distance</span> <span class="o">=</span> <span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="n">cm</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">points</span><span class="p">[</span><span class="n">cm</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+      <span class="k">if</span> <span class="n">distance</span> <span class="o">&lt;</span> <span class="n">mindistance</span><span class="p">:</span>
+        <span class="n">mindistance</span> <span class="o">=</span> <span class="n">distance</span>
+        <span class="n">ci</span> <span class="o">=</span> <span class="n">i</span>
+
+    <span class="n">cluster</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span>
+
+<span class="n">plot_points</span><span class="p">(</span><span class="s1">&#39;Initial cluster assignment.&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_2_0.png" /></p>
+<div class="highlight"><pre><span></span><span class="k">for</span> <span class="nb">iter</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">):</span>
+  <span class="c1"># Compute mean for every cluster.</span>
+  <span class="n">sumx</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">K</span>
+  <span class="n">sumy</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">K</span>
+  <span class="n">totals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">K</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="n">sumx</span><span class="p">[</span> <span class="n">cluster</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">]</span> <span class="o">+=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">sumy</span><span class="p">[</span> <span class="n">cluster</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">]</span> <span class="o">+=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">totals</span><span class="p">[</span> <span class="n">cluster</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+  <span class="c1"># Compute new means.</span>
+  <span class="n">meanx</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">K</span>
+  <span class="n">meany</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">K</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+    <span class="n">meanx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sumx</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">totals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">meany</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sumy</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">totals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+  <span class="c1"># Create new clusters.</span>
+  <span class="n">new_cluster</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">N</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="n">mindist</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">30</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">K</span><span class="p">):</span>
+      <span class="n">dist</span> <span class="o">=</span> <span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">meanx</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">meany</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+      <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">mindist</span><span class="p">:</span>
+        <span class="n">mindist</span> <span class="o">=</span> <span class="n">dist</span>
+        <span class="n">cluster_idx</span> <span class="o">=</span> <span class="n">j</span>
+
+    <span class="n">new_cluster</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster_idx</span>
+
+  <span class="k">if</span> <span class="n">cluster</span> <span class="o">==</span> <span class="n">new_cluster</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;DONE&#39;</span>
+    <span class="k">break</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">moved</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">cluster</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">new_cluster</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span> <span class="n">moved</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">print</span> <span class="s1">&#39;MOVED =&#39;</span><span class="p">,</span> <span class="n">moved</span>
+
+    <span class="n">cluster</span> <span class="o">=</span> <span class="n">new_cluster</span>
+
+  <span class="n">plot_points</span><span class="p">(</span><span class="s1">&#39;Clusters after iteration </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">iter</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>      
+</pre></div>
+
+
+<div class="highlight"><pre><span></span>MOVED = 111
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_1.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 66
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_3.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 36
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_5.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 28
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_7.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 29
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_9.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 25
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_11.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 21
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_13.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 21
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_15.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 11
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_17.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 9
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_19.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 7
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_21.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 4
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_23.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 4
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_25.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 4
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_27.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 3
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_29.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 3
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_31.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 2
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_33.png" /></p>
+<div class="highlight"><pre><span></span>MOVED = 3
+</pre></div>
+
+
+<p><img alt="png" src="http://pminkov.github.io/blog/images/k-means clustering_files/k-means clustering_3_35.png" /></p>
+<div class="highlight"><pre><span></span>DONE
+</pre></div>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <!--
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                  Blah blha blah
+                </address>
+        </footer>
+        -->
+        <!-- /#contentinfo -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-243631-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>
