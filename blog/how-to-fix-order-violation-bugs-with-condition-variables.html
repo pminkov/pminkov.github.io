@@ -152,7 +152,6 @@ Line   T1    T2   COMMENT
 <p>There's one change that we should do though. Instead of an if statement in line 7, we should use a while. Why? Because when thread two wakes up in line 7 and obtains a lock on the mutex, it should re-verify that the condition that made it wait is not true anymore. While not a problem in this code segment, this can be a problem in other cases.</p>
     </div><!-- /.entry-content -->
     <div class="comments">
-      <h2>Comments !</h2>
       <div id="disqus_thread"></div>
       <script type="text/javascript">
         var disqus_shortname = 'pminkov-blog';
