@@ -71,6 +71,21 @@ Thread one will then lock the mutex and once it's done with its work, it will un
 <p>Well this one caused me to scratch my head when I was going through one of the exercises in the book. I assumed a call to <code>signal()</code> simply unblocks all the waiting threads. No, it possibly unblocks only one of them. Apparently there's a <code>pthread_cond_broadcast</code> <a href="https://linux.die.net/man/3/pthread_cond_signal">function</a> that can unblock all waiting threads.</p>
 <p>So that's it. Happy coding.</p>
     </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'pitfalls-of-posix-condition-variables.html';
+        var disqus_url = 'http://pminkov.github.io/blog/pitfalls-of-posix-condition-variables.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
 
   </article>
 </section>
@@ -102,6 +117,15 @@ Thread one will then lock the mutex and once it's done with its work, it will un
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 </body>
 </html>

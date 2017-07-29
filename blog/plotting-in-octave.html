@@ -49,7 +49,7 @@ supposed to model a logical AND operation. The function is based on the
 sigmoid function.</p>
 <p></p>
 The sigmoid function looks like this:</p>
-<p><center><img alt="Google sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-google.png" /></center></p>
+<p><center><img alt="Google sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-google.png"></center></p>
 <p></p>
 Computing the sigmoid function in Octave can be seen
 <a href="https://gist.github.com/3205075" title="Sidmoid">here</a>.</p>
@@ -71,13 +71,28 @@ I got curious about how this function looks like for values between zero
 and one and wrote this <a href="https://gist.github.com/3205016">short Octave
 program</a> to plot the output. And here
 it is. Pretty neat, I'd say.</p>
-<p><center><img alt="Octave sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-octave.png" /></center></p>
+<p><center><img alt="Octave sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-octave.png"></center></p>
 <p></p>
 It's easy to see that the function behaves as expected at (0,0), (0,1)
 and (1,0) and (1,1) and that for values in between its computed values
 are somewhere in between as well.</p>
 </p>
     </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'plotting-in-octave.html';
+        var disqus_url = 'http://pminkov.github.io/blog/plotting-in-octave.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
 
   </article>
 </section>
@@ -109,6 +124,15 @@ are somewhere in between as well.</p>
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 </body>
 </html>

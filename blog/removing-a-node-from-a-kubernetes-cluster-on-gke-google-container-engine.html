@@ -70,8 +70,8 @@ gke-jcluster-default-pool-9cc4e660-grp
 <p>Let's check my instances:</p>
 <div class="highlight"><pre><span></span>$ gcloud compute instances list
 NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
-gke-jcluster-default-pool-9cc4e660-rx9p  us-central1-b  n1-standard-1               10.128.0.2   104.198.174.222  RUNNING
-gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               10.128.0.4   104.197.237.135  RUNNING
+gke-jcluster-default-pool-9cc4e660-rx9p  us-central1-b  n1-standard-1               <span class="m">10</span>.128.0.2   <span class="m">104</span>.198.174.222  RUNNING
+gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               <span class="m">10</span>.128.0.4   <span class="m">104</span>.197.237.135  RUNNING
 </pre></div>
 
 
@@ -83,14 +83,14 @@ Updated <span class="o">[</span>https://www.googleapis.com/compute/v1/projects/m
 baseInstanceName: gke-jcluster-default-pool-9cc4e660
 creationTimestamp: <span class="s1">&#39;2017-03-25T02:52:22.040-07:00&#39;</span>
 currentActions:
-  abandoning: 0
-  creating: 0
-  creatingWithoutRetries: 0
-  deleting: 1
-  none: 1
-  recreating: 0
-  refreshing: 0
-  restarting: 0
+  abandoning: <span class="m">0</span>
+  creating: <span class="m">0</span>
+  creatingWithoutRetries: <span class="m">0</span>
+  deleting: <span class="m">1</span>
+  none: <span class="m">1</span>
+  recreating: <span class="m">0</span>
+  refreshing: <span class="m">0</span>
+  restarting: <span class="m">0</span>
 fingerprint: <span class="nv">kUg7ggCEudY</span><span class="o">=</span>
 id: <span class="s1">&#39;6475008099735012154&#39;</span>
 instanceGroup: gke-jcluster-default-pool-9cc4e660-grp
@@ -98,12 +98,12 @@ instanceTemplate: gke-jcluster-default-pool-9cc4e660
 kind: compute#instanceGroupManager
 name: gke-jcluster-default-pool-9cc4e660-grp
 selfLink: https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp
-targetSize: 1
+targetSize: <span class="m">1</span>
 zone: us-central1-b
 $ gcloud compute instance-groups managed wait-until-stable <span class="nv">$GROUP_ID</span>
-Waiting <span class="k">for</span> group to become stable, current operations: deleting: 1
+Waiting <span class="k">for</span> group to become stable, current operations: deleting: <span class="m">1</span>
 ...
-Waiting <span class="k">for</span> group to become stable, current operations: deleting: 1
+Waiting <span class="k">for</span> group to become stable, current operations: deleting: <span class="m">1</span>
 Group is stable
 </pre></div>
 
@@ -114,12 +114,27 @@ gcloud compute instanceNAME                                      STATUS    AGE
 gke-jcluster-default-pool-9cc4e660-xr4z   Ready     2d
 $ gcloud compute instances list
 NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
-gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               10.128.0.4   104.197.237.135  RUNNING
+gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               <span class="m">10</span>.128.0.4   <span class="m">104</span>.197.237.135  RUNNING
 </pre></div>
 
 
 <p>So that's it. Regardless of whether you need to delete individual nodes, it's interesting to take a look at how you can do that.</p>
     </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html';
+        var disqus_url = 'http://pminkov.github.io/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
 
   </article>
 </section>
@@ -151,6 +166,15 @@ gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1           
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 </body>
 </html>

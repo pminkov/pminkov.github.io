@@ -65,6 +65,21 @@ in <a href="http://pminkov.github.io/blog/category/misc.html">Misc</a>
 <h3>You have to be meticulous in checking return codes of standard library functions.</h3>
 <p>Most of the functions in the C standard library return something that indicates the success or failure of the function. Unlike languages that have exceptions, if you don't check the return values, it's entirely possible that your code will continue to execute and ignore some errors. Since often times you'll find yourself thinking "I doubt this can fail", writing good C code requires an extra level of discipline.</p>
     </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'thoughts-on-c-programming.html';
+        var disqus_url = 'http://pminkov.github.io/blog/thoughts-on-c-programming.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
 
   </article>
 </section>
@@ -96,6 +111,15 @@ in <a href="http://pminkov.github.io/blog/category/misc.html">Misc</a>
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 </body>
 </html>

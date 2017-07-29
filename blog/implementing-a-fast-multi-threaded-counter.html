@@ -153,6 +153,21 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 
 <p>Much better! This counter, just like the first one, is thread safe. It's not as accurate, but the inaccuracy is small (at most 128 * number of threads) and we can use the flush function if we want accurate counts.</p>
     </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'implementing-a-fast-multi-threaded-counter.html';
+        var disqus_url = 'http://pminkov.github.io/blog/implementing-a-fast-multi-threaded-counter.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
 
   </article>
 </section>
@@ -184,6 +199,15 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 </body>
 </html>

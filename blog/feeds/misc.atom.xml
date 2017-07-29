@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/misc.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-04-24T21:10:00-07:00</updated><entry><title>Visualizing algorithms with Jupyter notebooks</title><link href="http://pminkov.github.io/blog/visualizing-algorithms-with-jupyter-notebooks.html" rel="alternate"></link><published>2017-04-24T21:10:00-07:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-04-24:blog/visualizing-algorithms-with-jupyter-notebooks.html</id><summary type="html">&lt;p&gt;Last couple of days I was looking into some old implementation of k-means clustering that I wrote. At that time I didn't know how to use matplotlib and to display the clusters that were generated and I was printing commands that I was plugging into R. Since then, I've learned how to use Jupyter, so I sat down and imported the code into a Jupyter notebook that's visualizing the algorithm.&lt;/p&gt;
-&lt;p&gt;Here's the &lt;a href="http://nbviewer.jupyter.org/github/pminkov/notebooks/blob/master/k-means%20clustering.ipynb"&gt;Jupyter notebook&lt;/a&gt;. Overall, I quite enjoy how this format mixes the results of code execution with Markdown segments.&lt;/p&gt;</summary></entry><entry><title>Thoughts on C programming.</title><link href="http://pminkov.github.io/blog/thoughts-on-c-programming.html" rel="alternate"></link><published>2017-01-01T17:58:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-01:blog/thoughts-on-c-programming.html</id><summary type="html">&lt;p&gt;I recently wrote a &lt;a href="https://github.com/pminkov/webserver"&gt;webserver&lt;/a&gt; in C and wanted to share my thoughts on writing code in C. This was practically my first somewhat substantial C project. I've had two jobs in which I was writing C++, but I never programmed in C.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog - Misc</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/misc.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-04-24T21:10:00-07:00</updated><entry><title>Visualizing algorithms with Jupyter notebooks</title><link href="http://pminkov.github.io/blog/visualizing-algorithms-with-jupyter-notebooks.html" rel="alternate"></link><published>2017-04-24T21:10:00-07:00</published><updated>2017-04-24T21:10:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-04-24:/blog/visualizing-algorithms-with-jupyter-notebooks.html</id><summary type="html">&lt;p&gt;Last couple of days I was looking into some old implementation of k-means clustering that I wrote. At that time I didn't know how to use matplotlib and to display the clusters that were generated and I was printing commands that I was plugging into R. Since then, I've learned …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Last couple of days I was looking into some old implementation of k-means clustering that I wrote. At that time I didn't know how to use matplotlib and to display the clusters that were generated and I was printing commands that I was plugging into R. Since then, I've learned how to use Jupyter, so I sat down and imported the code into a Jupyter notebook that's visualizing the algorithm.&lt;/p&gt;
+&lt;p&gt;Here's the &lt;a href="http://nbviewer.jupyter.org/github/pminkov/notebooks/blob/master/k-means%20clustering.ipynb"&gt;Jupyter notebook&lt;/a&gt;. Overall, I quite enjoy how this format mixes the results of code execution with Markdown segments.&lt;/p&gt;</content></entry><entry><title>Thoughts on C programming.</title><link href="http://pminkov.github.io/blog/thoughts-on-c-programming.html" rel="alternate"></link><published>2017-01-01T17:58:00-08:00</published><updated>2017-01-01T17:58:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-01:/blog/thoughts-on-c-programming.html</id><summary type="html">&lt;p&gt;I recently wrote a &lt;a href="https://github.com/pminkov/webserver"&gt;webserver&lt;/a&gt; in C and wanted to share my thoughts on writing code in C. This was practically my first somewhat substantial C project. I've had two jobs in which I was writing C++, but I never programmed in C.&lt;/p&gt;
+&lt;p&gt;So, in no particular order, here are …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I recently wrote a &lt;a href="https://github.com/pminkov/webserver"&gt;webserver&lt;/a&gt; in C and wanted to share my thoughts on writing code in C. This was practically my first somewhat substantial C project. I've had two jobs in which I was writing C++, but I never programmed in C.&lt;/p&gt;
 &lt;p&gt;So, in no particular order, here are my thoughts on C.
 &lt;br&gt;
 &lt;br&gt;
@@ -23,7 +24,23 @@
 &lt;br&gt;
 &lt;br&gt;&lt;/p&gt;
 &lt;h3&gt;You have to be meticulous in checking return codes of standard library functions.&lt;/h3&gt;
-&lt;p&gt;Most of the functions in the C standard library return something that indicates the success or failure of the function. Unlike languages that have exceptions, if you don't check the return values, it's entirely possible that your code will continue to execute and ignore some errors. Since often times you'll find yourself thinking "I doubt this can fail", writing good C code requires an extra level of discipline.&lt;/p&gt;</summary></entry><entry><title>Scala scopes.</title><link href="http://pminkov.github.io/blog/scala-scopes.html" rel="alternate"></link><published>2012-04-27T23:26:00-07:00</published><author><name>softwarecomments</name></author><id>tag:pminkov.github.io,2012-04-27:blog/scala-scopes.html</id><summary type="html">&lt;p&gt;After some programming with Scala, there are a couple of language
+&lt;p&gt;Most of the functions in the C standard library return something that indicates the success or failure of the function. Unlike languages that have exceptions, if you don't check the return values, it's entirely possible that your code will continue to execute and ignore some errors. Since often times you'll find yourself thinking "I doubt this can fail", writing good C code requires an extra level of discipline.&lt;/p&gt;</content></entry><entry><title>Scala scopes.</title><link href="http://pminkov.github.io/blog/scala-scopes.html" rel="alternate"></link><published>2012-04-27T23:26:00-07:00</published><updated>2012-04-27T23:26:00-07:00</updated><author><name>softwarecomments</name></author><id>tag:pminkov.github.io,2012-04-27:/blog/scala-scopes.html</id><summary type="html">&lt;p&gt;After some programming with Scala, there are a couple of language
+features which I really like. One of them is scopes that can evaluate to
+a value. How does that look like:&lt;/p&gt;
+&lt;p&gt;
+&lt;script src="https://gist.github.com/2516506.js" type="text/javascript"&gt;&lt;![CDATA[// &lt;![CDATA[&lt;/p&gt;
+
+&lt;p&gt;// &lt;![CDATA[&lt;/p&gt;
+
+&lt;p&gt; &lt;/p&gt;
+
+&lt;p&gt;// ]]]]]]&gt;&lt;![CDATA[&gt;&lt;![CDATA[&gt;&lt;/p&gt;
+
+&lt;p&gt;// ]]]]&gt;&lt;![CDATA[&gt;]]&gt;&lt;/script&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+Ignore the obvious inefficiencies …</summary><content type="html">&lt;p&gt;After some programming with Scala, there are a couple of language
 features which I really like. One of them is scopes that can evaluate to
 a value. How does that look like:&lt;/p&gt;
 &lt;p&gt;
@@ -63,7 +80,14 @@ This inner scope is like a lighweight function. The benefits are:&lt;/p&gt;
 long functions, with a lot of scopes like this one inside of them. If
 that's avoided, this language feature leads to easier to understand
 code.&lt;/p&gt;
-&lt;/p&gt;</summary></entry><entry><title>Fun problem with Scala.</title><link href="http://pminkov.github.io/blog/fun-problem-with-scala.html" rel="alternate"></link><published>2012-03-06T23:28:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2012-03-06:blog/fun-problem-with-scala.html</id><summary type="html">&lt;p&gt;Here's a fun problem to solve with Scala.&lt;/p&gt;
+&lt;/p&gt;</content></entry><entry><title>Fun problem with Scala.</title><link href="http://pminkov.github.io/blog/fun-problem-with-scala.html" rel="alternate"></link><published>2012-03-06T23:28:00-08:00</published><updated>2012-03-06T23:28:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2012-03-06:/blog/fun-problem-with-scala.html</id><summary type="html">&lt;p&gt;Here's a fun problem to solve with Scala.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+Given N lists, dedupe them with the following rules. Go through the
+first list, dedupe it. Go through every consecutive list and only leave
+items which are not in a previous list and also take care of removing
+duplicates.&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
+The challenge here …</summary><content type="html">&lt;p&gt;Here's a fun problem to solve with Scala.&lt;/p&gt;
 &lt;p&gt;&lt;/p&gt;
 Given N lists, dedupe them with the following rules. Go through the
 first list, dedupe it. Go through every consecutive list and only leave
@@ -88,4 +112,4 @@ comparison. My C++ might be a bit rusty, but the result is longer.&lt;/p&gt;
 &lt;p&gt;
 &lt;script src="https://gist.github.com/1991674.js" type="text/javascript"&gt;&amp;lt;![CDATA[// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt;// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt;// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt;// &amp;lt;![CDATA[&lt;/p&gt;&lt;p&gt; &lt;/p&gt;&lt;p&gt;// ]]]]]]]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&lt;/p&gt;&lt;p&gt;// ]]]]]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&lt;/p&gt;&lt;p&gt;// ]]]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;&amp;lt;![CDATA[&amp;gt;&lt;/p&gt;&lt;p&gt;// ]]]]&amp;gt;&amp;lt;![CDATA[&amp;gt;]]&amp;gt;&lt;/script&gt;
 &lt;/p&gt;
-&lt;/p&gt;&lt;/p&gt;</summary></entry></feed>
+&lt;/p&gt;&lt;/p&gt;</content></entry></feed>

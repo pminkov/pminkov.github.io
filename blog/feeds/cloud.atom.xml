@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/cloud.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-03-30T16:17:00-07:00</updated><entry><title>Removing a node from a Kubernetes cluster on GKE (Google Container Engine)</title><link href="http://pminkov.github.io/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html" rel="alternate"></link><published>2017-03-30T16:17:00-07:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-30:blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html</id><summary type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped me understand more about the GCE structures behind a Kubernetes cluster.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog - Cloud</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/cloud.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-03-30T16:17:00-07:00</updated><entry><title>Removing a node from a Kubernetes cluster on GKE (Google Container Engine)</title><link href="http://pminkov.github.io/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html" rel="alternate"></link><published>2017-03-30T16:17:00-07:00</published><updated>2017-03-30T16:17:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-30:/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html</id><summary type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped me understand more about the GCE structures behind a Kubernetes cluster.&lt;/p&gt;
 &lt;p&gt;So let's start. The first thing you need to do is:&lt;/p&gt;
 &lt;h3&gt;Drain your node&lt;/h3&gt;
 &lt;p&gt;Let's look at my nodes:&lt;/p&gt;
@@ -29,8 +29,8 @@ gke-jcluster-default-pool-9cc4e660-grp
 &lt;p&gt;Let's check my instances:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud compute instances list
 NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
-gke-jcluster-default-pool-9cc4e660-rx9p  us-central1-b  n1-standard-1               10.128.0.2   104.198.174.222  RUNNING
-gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               10.128.0.4   104.197.237.135  RUNNING
+gke-jcluster-default-pool-9cc4e660-rx9p  us-central1-b  n1-standard-1               &lt;span class="m"&gt;10&lt;/span&gt;.128.0.2   &lt;span class="m"&gt;104&lt;/span&gt;.198.174.222  RUNNING
+gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               &lt;span class="m"&gt;10&lt;/span&gt;.128.0.4   &lt;span class="m"&gt;104&lt;/span&gt;.197.237.135  RUNNING
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -42,14 +42,14 @@ Updated &lt;span class="o"&gt;[&lt;/span&gt;https://www.googleapis.com/compute/v
 baseInstanceName: gke-jcluster-default-pool-9cc4e660
 creationTimestamp: &lt;span class="s1"&gt;&amp;#39;2017-03-25T02:52:22.040-07:00&amp;#39;&lt;/span&gt;
 currentActions:
-  abandoning: 0
-  creating: 0
-  creatingWithoutRetries: 0
-  deleting: 1
-  none: 1
-  recreating: 0
-  refreshing: 0
-  restarting: 0
+  abandoning: &lt;span class="m"&gt;0&lt;/span&gt;
+  creating: &lt;span class="m"&gt;0&lt;/span&gt;
+  creatingWithoutRetries: &lt;span class="m"&gt;0&lt;/span&gt;
+  deleting: &lt;span class="m"&gt;1&lt;/span&gt;
+  none: &lt;span class="m"&gt;1&lt;/span&gt;
+  recreating: &lt;span class="m"&gt;0&lt;/span&gt;
+  refreshing: &lt;span class="m"&gt;0&lt;/span&gt;
+  restarting: &lt;span class="m"&gt;0&lt;/span&gt;
 fingerprint: &lt;span class="nv"&gt;kUg7ggCEudY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
 id: &lt;span class="s1"&gt;&amp;#39;6475008099735012154&amp;#39;&lt;/span&gt;
 instanceGroup: gke-jcluster-default-pool-9cc4e660-grp
@@ -57,12 +57,12 @@ instanceTemplate: gke-jcluster-default-pool-9cc4e660
 kind: compute#instanceGroupManager
 name: gke-jcluster-default-pool-9cc4e660-grp
 selfLink: https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp
-targetSize: 1
+targetSize: &lt;span class="m"&gt;1&lt;/span&gt;
 zone: us-central1-b
 $ gcloud compute instance-groups managed wait-until-stable &lt;span class="nv"&gt;$GROUP_ID&lt;/span&gt;
-Waiting &lt;span class="k"&gt;for&lt;/span&gt; group to become stable, current operations: deleting: 1
+Waiting &lt;span class="k"&gt;for&lt;/span&gt; group to become stable, current operations: deleting: &lt;span class="m"&gt;1&lt;/span&gt;
 ...
-Waiting &lt;span class="k"&gt;for&lt;/span&gt; group to become stable, current operations: deleting: 1
+Waiting &lt;span class="k"&gt;for&lt;/span&gt; group to become stable, current operations: deleting: &lt;span class="m"&gt;1&lt;/span&gt;
 Group is stable
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -73,11 +73,13 @@ gcloud compute instanceNAME                                      STATUS    AGE
 gke-jcluster-default-pool-9cc4e660-xr4z   Ready     2d
 $ gcloud compute instances list
 NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
-gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               10.128.0.4   104.197.237.135  RUNNING
+gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               &lt;span class="m"&gt;10&lt;/span&gt;.128.0.4   &lt;span class="m"&gt;104&lt;/span&gt;.197.237.135  RUNNING
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;So that's it. Regardless of whether you need to delete individual nodes, it's interesting to take a look at how you can do that.&lt;/p&gt;</summary></entry><entry><title>Starting with Kubernetes on Google Container Engine</title><link href="http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html" rel="alternate"></link><published>2017-03-07T12:42:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-07:blog/starting-with-kubernetes-on-google-container-engine.html</id><summary type="html">&lt;p&gt;This is a tutorial of how to run a simple Kubernetes app on &lt;a href="https://cloud.google.com/container-engine/"&gt;GKE&lt;/a&gt; (Google Container Engine).&lt;/p&gt;
+&lt;p&gt;So that's it. Regardless of whether you need to delete individual nodes, it's interesting to take a look at how you can do that.&lt;/p&gt;</content></entry><entry><title>Starting with Kubernetes on Google Container Engine</title><link href="http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html" rel="alternate"></link><published>2017-03-07T12:42:00-08:00</published><updated>2017-03-07T12:42:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-07:/blog/starting-with-kubernetes-on-google-container-engine.html</id><summary type="html">&lt;p&gt;This is a tutorial of how to run a simple Kubernetes app on &lt;a href="https://cloud.google.com/container-engine/"&gt;GKE&lt;/a&gt; (Google Container Engine).&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://kubernetes.io/"&gt;Kubernetes&lt;/a&gt; is a container orchestration software that started at Google. Right now it's an open source project maintained by &lt;a href="https://www.cncf.io/"&gt;Cloud Native Computing Foundation&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;So what's Kubernetes all about? Roughly, it's about managing a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is a tutorial of how to run a simple Kubernetes app on &lt;a href="https://cloud.google.com/container-engine/"&gt;GKE&lt;/a&gt; (Google Container Engine).&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://kubernetes.io/"&gt;Kubernetes&lt;/a&gt; is a container orchestration software that started at Google. Right now it's an open source project maintained by &lt;a href="https://www.cncf.io/"&gt;Cloud Native Computing Foundation&lt;/a&gt;. &lt;/p&gt;
 &lt;p&gt;So what's Kubernetes all about? Roughly, it's about managing a cluster (a set of machines) on which we have containers running. &lt;/p&gt;
 &lt;h3&gt;Why containers?&lt;/h3&gt;
@@ -153,7 +155,7 @@ Your active configuration is: &lt;span class="o"&gt;[&lt;/span&gt;mykube&lt;span
 &lt;p&gt;We also need a Dockerfile:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat ./Dockerfile 
 FROM node:4
-EXPOSE 8080
+EXPOSE &lt;span class="m"&gt;8080&lt;/span&gt;
 COPY server.js .
 CMD node server.js
 &lt;/pre&gt;&lt;/div&gt;
@@ -162,16 +164,16 @@ CMD node server.js
 &lt;p&gt;In order to run a container on GKE, we need to upload it to &lt;a href="https://cloud.google.com/container-registry/"&gt;Google Container Registry&lt;/a&gt;. Let's do it:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PROJECT_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;mykube-160819
 $ docker build -t gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver .
-Sending build context to Docker daemon 3.584 kB
-Step 1/4 : FROM node:4
+Sending build context to Docker daemon &lt;span class="m"&gt;3&lt;/span&gt;.584 kB
+Step &lt;span class="m"&gt;1&lt;/span&gt;/4 : FROM node:4
  ---&amp;gt; d7efee1f035d
-Step 2/4 : EXPOSE 8080
+Step &lt;span class="m"&gt;2&lt;/span&gt;/4 : EXPOSE &lt;span class="m"&gt;8080&lt;/span&gt;
  ---&amp;gt; Using cache
  ---&amp;gt; 147e7888542d
-Step 3/4 : COPY server.js .
+Step &lt;span class="m"&gt;3&lt;/span&gt;/4 : COPY server.js .
  ---&amp;gt; Using cache
  ---&amp;gt; b610e7975d20
-Step 4/4 : CMD node server.js
+Step &lt;span class="m"&gt;4&lt;/span&gt;/4 : CMD node server.js
  ---&amp;gt; Using cache
  ---&amp;gt; 4e15133cdab2
 Successfully built 4e15133cdab2
@@ -188,19 +190,19 @@ a1fbf6fa923f: Mounted from hikube-160719/myserver
 100396c46221: Mounted from hikube-160719/myserver 
 7b4b54c74241: Mounted from hikube-160719/myserver 
 d17d48b2382a: Mounted from hikube-160719/myserver 
-latest: digest: sha256:4ad68f056e870938823f6c9555355c149cf7c42a213d7243d915f1a4bcfb9cb1 size: 2213
+latest: digest: sha256:4ad68f056e870938823f6c9555355c149cf7c42a213d7243d915f1a4bcfb9cb1 size: &lt;span class="m"&gt;2213&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;If you go to the Google Cloud Console and open the Google Container Registry, you'll see the container uploaded:&lt;/p&gt;
-&lt;p&gt;&lt;center&gt;&lt;img alt="Google Container Registry" src="http://pminkov.github.io/blog/images/k8s-intro/k1-registry.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Google Container Registry" src="http://pminkov.github.io/blog/images/k8s-intro/k1-registry.png"&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;p&gt;Now let's create a cluster that we'll be deploying our server to:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud container clusters create example-cluster
 Creating cluster example-cluster...done.                                                                                                                                               
 Created &lt;span class="o"&gt;[&lt;/span&gt;https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster&lt;span class="o"&gt;]&lt;/span&gt;.
 kubeconfig entry generated &lt;span class="k"&gt;for&lt;/span&gt; example-cluster.
 NAME             ZONE           MASTER_VERSION  MASTER_IP       MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
-example-cluster  us-central1-b  1.5.3           104.198.190.52  n1-standard-1  1.5.3         &lt;span class="m"&gt;3&lt;/span&gt;          RUNNING
+example-cluster  us-central1-b  &lt;span class="m"&gt;1&lt;/span&gt;.5.3           &lt;span class="m"&gt;104&lt;/span&gt;.198.190.52  n1-standard-1  &lt;span class="m"&gt;1&lt;/span&gt;.5.3         &lt;span class="m"&gt;3&lt;/span&gt;          RUNNING
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -218,7 +220,7 @@ No resources found.
 
 
 &lt;p&gt;Now let's start out server finally:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl run myserver --image&lt;span class="o"&gt;=&lt;/span&gt;gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver --port&lt;span class="o"&gt;=&lt;/span&gt;8080
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl run myserver --image&lt;span class="o"&gt;=&lt;/span&gt;gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver --port&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;8080&lt;/span&gt;
 deployment &lt;span class="s2"&gt;&amp;quot;myserver&amp;quot;&lt;/span&gt; created
 &lt;/pre&gt;&lt;/div&gt;
 
@@ -226,14 +228,14 @@ deployment &lt;span class="s2"&gt;&amp;quot;myserver&amp;quot;&lt;/span&gt; crea
 &lt;p&gt;We have created a deployment that contains a pod. Let's see what pods we have now:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods
 NAME                        READY     STATUS              RESTARTS   AGE
-myserver-3430466764-04b36   0/1       ContainerCreating   &lt;span class="m"&gt;0&lt;/span&gt;          17s
+myserver-3430466764-04b36   &lt;span class="m"&gt;0&lt;/span&gt;/1       ContainerCreating   &lt;span class="m"&gt;0&lt;/span&gt;          17s
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Nice, our container is getting spinned. We wait for a bit and we see:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods
 NAME                        READY     STATUS    RESTARTS   AGE
-myserver-3430466764-04b36   1/1       Running   &lt;span class="m"&gt;0&lt;/span&gt;          58s
+myserver-3430466764-04b36   &lt;span class="m"&gt;1&lt;/span&gt;/1       Running   &lt;span class="m"&gt;0&lt;/span&gt;          58s
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -246,31 +248,31 @@ service &lt;span class="s2"&gt;&amp;quot;myserver&amp;quot;&lt;/span&gt; exposed
 &lt;p&gt;This will also take some time:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get service myserver
 NAME       CLUSTER-IP   EXTERNAL-IP   PORT&lt;span class="o"&gt;(&lt;/span&gt;S&lt;span class="o"&gt;)&lt;/span&gt;          AGE
-myserver   10.3.247.6   &amp;lt;pending&amp;gt;     8080:31574/TCP   34s
+myserver   &lt;span class="m"&gt;10&lt;/span&gt;.3.247.6   &amp;lt;pending&amp;gt;     &lt;span class="m"&gt;8080&lt;/span&gt;:31574/TCP   34s
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Aaand, it's done:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get service myserver
 NAME       CLUSTER-IP   EXTERNAL-IP      PORT&lt;span class="o"&gt;(&lt;/span&gt;S&lt;span class="o"&gt;)&lt;/span&gt;          AGE
-myserver   10.3.247.6   104.155.177.47   8080:31574/TCP   1m
+myserver   &lt;span class="m"&gt;10&lt;/span&gt;.3.247.6   &lt;span class="m"&gt;104&lt;/span&gt;.155.177.47   &lt;span class="m"&gt;8080&lt;/span&gt;:31574/TCP   1m
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;If we go to &lt;code&gt;http://104.155.177.47:8080/&lt;/code&gt;, we'll see:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Returning element at index 6110645: 116527640
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Returning element at index &lt;span class="m"&gt;6110645&lt;/span&gt;: &lt;span class="m"&gt;116527640&lt;/span&gt;
 Hello World!
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Now, the tedious part is over. Let's have some fun. We can monitor our cluster through the Kubernetes dashboard. For a reason unclear to me, this dashboard is not available on the Google website. You have to run a proxy to do it. Like this:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl proxy
-Starting to serve on 127.0.0.1:8001
+Starting to serve on &lt;span class="m"&gt;127&lt;/span&gt;.0.0.1:8001
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;We can see the dashboard at &lt;code&gt;localhost:8001/ui&lt;/code&gt;. It looks like this:&lt;/p&gt;
-&lt;p&gt;&lt;center&gt;&lt;img alt="Kubernetes Dashboard" src="http://pminkov.github.io/blog/images/k8s-intro/k2-dashboard.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Kubernetes Dashboard" src="http://pminkov.github.io/blog/images/k8s-intro/k2-dashboard.png"&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;p&gt;This dashboard is a lot of fun. You can dig into everything available in it. You can probably see everything it shows through kubectl as well, but it's easier to do it by using an UI.&lt;/p&gt;
 &lt;p&gt;Here's something else that's fun. Your cluster doesn't run on thin air. It runs on Google Compute Engine instances (I believe this is equivalent to AWS' EC2). In your cloud console, you can navigate to your instances and you can even SSH to an instance from the web UI (I wow-ed the first time I did this, much easier than setting up ssh access on AWS).&lt;/p&gt;
 &lt;p&gt;Our cluster has three nodes.&lt;/p&gt;
@@ -285,12 +287,12 @@ gke-example-cluster-default-pool-2567fc65-n0cp   Ready     21m
 &lt;p&gt;These are three GCE instances. Where is our pod running at?&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods -o wide
 NAME                        READY     STATUS    RESTARTS   AGE       IP         NODE
-myserver-3430466764-04b36   1/1       Running   &lt;span class="m"&gt;0&lt;/span&gt;          18m       10.0.1.5   gke-example-cluster-default-pool-2567fc65-g7lc
+myserver-3430466764-04b36   &lt;span class="m"&gt;1&lt;/span&gt;/1       Running   &lt;span class="m"&gt;0&lt;/span&gt;          18m       &lt;span class="m"&gt;10&lt;/span&gt;.0.1.5   gke-example-cluster-default-pool-2567fc65-g7lc
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;It's running on &lt;code&gt;gke-example-cluster-default-pool-2567fc65-g7lc&lt;/code&gt;. Now I can navigate to the web page for this instance and ssh to it. Here's a screenshot of how that looks like:&lt;/p&gt;
-&lt;p&gt;&lt;center&gt;&lt;img alt="Compute Engine SSH" src="http://pminkov.github.io/blog/images/k8s-intro/k3-compute-engine.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Compute Engine SSH" src="http://pminkov.github.io/blog/images/k8s-intro/k3-compute-engine.png"&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;p&gt;I ran &lt;code&gt;ps aux --sort '%mem'&lt;/code&gt; to see which process takes most memory. Since my server uses a lot of memory, it's at the top. It's using 179MB of resident memory.&lt;/p&gt;
 &lt;p&gt;It's pretty nice that you're able to nagivate from a high level system like Kubernetes all the way down to ssh-ing to a machine that runs your containers. When you're ssh-ed you can execute &lt;code&gt;docker ps&lt;/code&gt; to see what containers are running, run &lt;code&gt;top&lt;/code&gt; to see what's going on on the machine and do all of the other systems debugging tasks that you can think of.&lt;/p&gt;
 &lt;p&gt;And finally, let's delete our cluster:&lt;/p&gt;
@@ -305,7 +307,7 @@ Deleted &lt;span class="o"&gt;[&lt;/span&gt;https://container.googleapis.com/v1/
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;That's all for today - enjoy.&lt;/p&gt;</summary></entry><entry><title>How to shut down and restore an Elastic Beanstalk environment.</title><link href="http://pminkov.github.io/blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html" rel="alternate"></link><published>2017-01-30T12:07:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-30:blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html</id><summary type="html">&lt;p&gt;Let's say you're running an &lt;a href="https://aws.amazon.com/elasticbeanstalk/"&gt;Elastic Beanstalk&lt;/a&gt; application. You might want to stop it so that you're not paying money for it. There's one way to do this by running commands. You can use &lt;code&gt;eb terminate&lt;/code&gt; and &lt;code&gt;eb restore&lt;/code&gt;, but if you terminate a setup with a database and you restore it, the contents of the database won't be restored. You can also only restore an environment that has been terminated within the last 6 weeks.&lt;/p&gt;
+&lt;p&gt;That's all for today - enjoy.&lt;/p&gt;</content></entry><entry><title>How to shut down and restore an Elastic Beanstalk environment.</title><link href="http://pminkov.github.io/blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html" rel="alternate"></link><published>2017-01-30T12:07:00-08:00</published><updated>2017-01-30T12:07:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-30:/blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html</id><summary type="html">&lt;p&gt;Let's say you're running an &lt;a href="https://aws.amazon.com/elasticbeanstalk/"&gt;Elastic Beanstalk&lt;/a&gt; application. You might want to stop it so that you're not paying money for it. There's one way to do this by running commands. You can use &lt;code&gt;eb terminate&lt;/code&gt; and &lt;code&gt;eb restore&lt;/code&gt;, but if you terminate a setup with a database and you …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Let's say you're running an &lt;a href="https://aws.amazon.com/elasticbeanstalk/"&gt;Elastic Beanstalk&lt;/a&gt; application. You might want to stop it so that you're not paying money for it. There's one way to do this by running commands. You can use &lt;code&gt;eb terminate&lt;/code&gt; and &lt;code&gt;eb restore&lt;/code&gt;, but if you terminate a setup with a database and you restore it, the contents of the database won't be restored. You can also only restore an environment that has been terminated within the last 6 weeks.&lt;/p&gt;
 &lt;p&gt;Let's see how we can terminate and restore without the 6 weeks restriction and let's also see how does the database backup and restore look like.&lt;/p&gt;
 &lt;p&gt;The first thing that you have to do is to save your environment, which pretty much consists of:&lt;/p&gt;
 &lt;ul&gt;
@@ -358,7 +360,7 @@ aws rds create-db-snapshot &lt;span class="se"&gt;\&lt;/span&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Create environment. It&amp;#39;s important to specify a cname, so that we don&amp;#39;t have to&lt;/span&gt;
 &lt;span class="c1"&gt;# change our DNS config. This takes a lot of time, so I bump the timeout.&lt;/span&gt;
 &lt;span class="c1"&gt;# This command will print the name of your new database instance.&lt;/span&gt;
-&lt;span class="nb"&gt;time&lt;/span&gt; eb create neatlinks-dev --cfg &lt;span class="nv"&gt;$EB_CONFIG&lt;/span&gt; --cname &lt;span class="nv"&gt;$EB_CNAME&lt;/span&gt; --timeout 30
+&lt;span class="nb"&gt;time&lt;/span&gt; eb create neatlinks-dev --cfg &lt;span class="nv"&gt;$EB_CONFIG&lt;/span&gt; --cname &lt;span class="nv"&gt;$EB_CNAME&lt;/span&gt; --timeout &lt;span class="m"&gt;30&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Get this id from the printed output of &amp;quot;eb create&amp;quot;.&lt;/span&gt;
 &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_NEW_DB&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;aa1q3no37rzd407&amp;quot;&lt;/span&gt;
@@ -376,7 +378,7 @@ aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-instance-available --db-inst
 
 
 &lt;p&gt;Your production setup is ready now! Your application probably won't work though, because your DB endpoint is different. Edit your source code or your own configuration files so that your application connects to the new database. Once done, call &lt;code&gt;eb deploy&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;That's it. Your application should be running now. You can use this procedure to rename your Elastic Beanstalk application and environment as well, which is a feature that's missing from the &lt;code&gt;eb&lt;/code&gt; CLI app.&lt;/p&gt;</summary></entry><entry><title>The Cloud Infrastructure Landscape</title><link href="http://pminkov.github.io/blog/the-cloud-infrastructure-landscape.html" rel="alternate"></link><published>2017-01-15T12:10:00-08:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-15:blog/the-cloud-infrastructure-landscape.html</id><summary type="html">&lt;p&gt;I'm taking a &lt;a href="https://www.edx.org/course/introduction-cloud-infrastructure-linuxfoundationx-lfs151-x"&gt;Cloud Infrastructure&lt;/a&gt; class on EdX and I have found it to be a really nice overview of the cloud space. It's missing anything related to Hadoop and data analytics, but it describes probably all the tools related to running applications in the cloud. Of course, since the class describes so many tools, it can't do so in depth, but you can pick whatever is interesting to you and learn more about it.&lt;/p&gt;
+&lt;p&gt;That's it. Your application should be running now. You can use this procedure to rename your Elastic Beanstalk application and environment as well, which is a feature that's missing from the &lt;code&gt;eb&lt;/code&gt; CLI app.&lt;/p&gt;</content></entry><entry><title>The Cloud Infrastructure Landscape</title><link href="http://pminkov.github.io/blog/the-cloud-infrastructure-landscape.html" rel="alternate"></link><published>2017-01-15T12:10:00-08:00</published><updated>2017-01-15T12:10:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-15:/blog/the-cloud-infrastructure-landscape.html</id><summary type="html">&lt;p&gt;I'm taking a &lt;a href="https://www.edx.org/course/introduction-cloud-infrastructure-linuxfoundationx-lfs151-x"&gt;Cloud Infrastructure&lt;/a&gt; class on EdX and I have found it to be a really nice overview of the cloud space. It's missing anything related to Hadoop and data analytics, but it describes probably all the tools related to running applications in the cloud. Of course, since the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I'm taking a &lt;a href="https://www.edx.org/course/introduction-cloud-infrastructure-linuxfoundationx-lfs151-x"&gt;Cloud Infrastructure&lt;/a&gt; class on EdX and I have found it to be a really nice overview of the cloud space. It's missing anything related to Hadoop and data analytics, but it describes probably all the tools related to running applications in the cloud. Of course, since the class describes so many tools, it can't do so in depth, but you can pick whatever is interesting to you and learn more about it.&lt;/p&gt;
 &lt;p&gt;Here's a list of all the tools described in it, which list I might use as a future reference for myself. I'd say that knowing a bit about such a big amount of products definitely helps when you're trying to come up with a cloud infrastructure for a project.&lt;/p&gt;
 &lt;p&gt;So, big list, based on the course contents:&lt;/p&gt;
 &lt;h3&gt;Virtualization&lt;/h3&gt;
@@ -445,7 +447,7 @@ aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-instance-available --db-inst
 &lt;p&gt;&lt;a href="https://www.sysdig.com/"&gt;Sysdig&lt;/a&gt;&lt;br&gt;
 &lt;a href="https://github.com/google/cadvisor"&gt;cAdvisor&lt;/a&gt;&lt;br&gt;
 &lt;a href="http://www.fluentd.org/"&gt;Fluentd&lt;/a&gt;&lt;br&gt;
-&lt;a href="https://www.datadoghq.com/"&gt;Datadog&lt;/a&gt;&lt;br&gt;&lt;/p&gt;</summary></entry><entry><title>How much does it cost to run a Django app on AWS using Elastic Beanstalk?</title><link href="http://pminkov.github.io/blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html" rel="alternate"></link><published>2016-04-20T13:56:00-07:00</published><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-04-20:blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html</id><summary type="html">&lt;p&gt;I've been running a Django app on &lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html"&gt;Elastic Beanstalk&lt;/a&gt; for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.&lt;/p&gt;
+&lt;a href="https://www.datadoghq.com/"&gt;Datadog&lt;/a&gt;&lt;br&gt;&lt;/p&gt;</content></entry><entry><title>How much does it cost to run a Django app on AWS using Elastic Beanstalk?</title><link href="http://pminkov.github.io/blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html" rel="alternate"></link><published>2016-04-20T13:56:00-07:00</published><updated>2016-04-20T13:56:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-04-20:/blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html</id><summary type="html">&lt;p&gt;I've been running a Django app on &lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html"&gt;Elastic Beanstalk&lt;/a&gt; for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I've been running a Django app on &lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html"&gt;Elastic Beanstalk&lt;/a&gt; for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.&lt;/p&gt;
 &lt;p&gt;Let's first describe what my setup is. Elastic Beanstalk is AWS's PaaS offering. I use a MySQL database running on RDS, a load balancer, a single EC2 instance and I have a DNS setup on Route 53. And that's more or less what I'm paying for. My bill was &lt;strong&gt;$42.58&lt;/strong&gt; last month. Breaking it down, here are the three major components it has:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;EC2&lt;/strong&gt;&lt;/li&gt;
@@ -473,4 +475,4 @@ aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-instance-available --db-inst
 &lt;p&gt;&lt;strong&gt;How can I bring these costs down?&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;It's possible to do all of this with a single EC2 instance and avoid paying for load balancing and RDS. What I get from these components right now is convenience and scalability. I don't really need scalability, since I don't operate at scale and might not come to that point. Convenience can be traded for the learning experience of settings up things manually. AWS has an &lt;a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html"&gt;article&lt;/a&gt; on how to install a LAMP setup on EC2. It doesn't look too complicated. Supposedly my bill will be around $10 per month for my 1GB RAM t2.micro machine.&lt;/p&gt;
 &lt;p&gt;Another option would be to use &lt;a href="https://www.digitalocean.com/pricing/"&gt;Digital Ocean&lt;/a&gt;. They're basically offering something similar to EC2 instances, but I haven't looked too much in detail. Digital Ocean is an IaaS provider, you need to do some manual setup. Their cost is pretty similar. An offering with 1GB of RAM costs $10 per month too. That's a very rough comparison, but it seems like we're in the same ballpark if we're not pushing the limits on disk space or bandwidth.&lt;/p&gt;
-&lt;p&gt;It should also be possibe to continue to use Elastic Beanstalk, but run a MySQL server directly on the EC2 instance. Here's a long &lt;a href="http://d0.awsstatic.com/whitepapers/rdbms-in-the-cloud-sql-server-on-aws.pdf"&gt;white paper&lt;/a&gt; that talks about this.&lt;/p&gt;</summary><category term="AWS"></category><category term="Elastic Beanstalk"></category><category term="Python"></category><category term="Django"></category></entry></feed>
+&lt;p&gt;It should also be possibe to continue to use Elastic Beanstalk, but run a MySQL server directly on the EC2 instance. Here's a long &lt;a href="http://d0.awsstatic.com/whitepapers/rdbms-in-the-cloud-sql-server-on-aws.pdf"&gt;white paper&lt;/a&gt; that talks about this.&lt;/p&gt;</content><category term="AWS"></category><category term="Elastic Beanstalk"></category><category term="Python"></category><category term="Django"></category></entry></feed>

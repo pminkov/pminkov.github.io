@@ -70,6 +70,21 @@ in <a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a>
 <p>Another option would be to use <a href="https://www.digitalocean.com/pricing/">Digital Ocean</a>. They're basically offering something similar to EC2 instances, but I haven't looked too much in detail. Digital Ocean is an IaaS provider, you need to do some manual setup. Their cost is pretty similar. An offering with 1GB of RAM costs $10 per month too. That's a very rough comparison, but it seems like we're in the same ballpark if we're not pushing the limits on disk space or bandwidth.</p>
 <p>It should also be possibe to continue to use Elastic Beanstalk, but run a MySQL server directly on the EC2 instance. Here's a long <a href="http://d0.awsstatic.com/whitepapers/rdbms-in-the-cloud-sql-server-on-aws.pdf">white paper</a> that talks about this.</p>
     </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html';
+        var disqus_url = 'http://pminkov.github.io/blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
 
   </article>
 </section>
@@ -101,6 +116,15 @@ in <a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a>
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 </body>
 </html>

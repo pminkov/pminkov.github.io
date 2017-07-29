@@ -43,15 +43,15 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
       <p>I decided that I'll dig down into <a href="https://en.wikipedia.org/wiki/Init">init systems</a> in Linux and learn more about them. I'm running Ubuntu 16.04, so this might look different on other distributions.</p>
 <p>The init system in Linux is mainly responsible for starting essential service processes, mounting file systems and possibly other tasks. The main init systems are systemd, System V init and Upstart. Ubuntu uses systemd.</p>
 <p>The init system starts after the Kernel starts its first user space process - init. Indeed, let's see what's running with PID 1:</p>
-<div class="highlight"><pre><span></span>$ ps 1
+<div class="highlight"><pre><span></span>$ ps <span class="m">1</span>
   PID TTY      STAT   TIME COMMAND
-    <span class="m">1</span> ?        Ss     0:04 /sbin/init splash
+    <span class="m">1</span> ?        Ss     <span class="m">0</span>:04 /sbin/init splash
 </pre></div>
 
 
 <p>It's <code>/sbin/init</code>. Let's see what this file is:</p>
 <div class="highlight"><pre><span></span>$ ls -l /sbin/init
-lrwxrwxrwx <span class="m">1</span> root root <span class="m">20</span> Sep <span class="m">28</span> 18:40 /sbin/init -&gt; /lib/systemd/systemd
+lrwxrwxrwx <span class="m">1</span> root root <span class="m">20</span> Sep <span class="m">28</span> <span class="m">18</span>:40 /sbin/init -&gt; /lib/systemd/systemd
 </pre></div>
 
 
@@ -78,24 +78,24 @@ ssh.service                                                                     
 <div class="highlight"><pre><span></span>$ systemctl status ssh
 ● ssh.service - OpenBSD Secure Shell server
    Loaded: loaded <span class="o">(</span>/lib/systemd/system/ssh.service<span class="p">;</span> enabled<span class="p">;</span> vendor preset: enabled<span class="o">)</span>
-   Active: active <span class="o">(</span>running<span class="o">)</span> since Thu 2017-02-09 19:27:57 PST<span class="p">;</span> <span class="m">4</span> days ago
+   Active: active <span class="o">(</span>running<span class="o">)</span> since Thu <span class="m">2017</span>-02-09 <span class="m">19</span>:27:57 PST<span class="p">;</span> <span class="m">4</span> days ago
  Main PID: <span class="m">786</span> <span class="o">(</span>sshd<span class="o">)</span>
-    Tasks: 1
-   Memory: 6.4M
+    Tasks: <span class="m">1</span>
+   Memory: <span class="m">6</span>.4M
       CPU: 199ms
    CGroup: /system.slice/ssh.service
            └─786 /usr/sbin/sshd -D
 
-Feb <span class="m">12</span> 18:23:50 virtbox sshd<span class="o">[</span>5791<span class="o">]</span>: Accepted password <span class="k">for</span> petko from 192.168.1.86 port <span class="m">57805</span> ssh2
-Feb <span class="m">12</span> 18:23:50 virtbox sshd<span class="o">[</span>5791<span class="o">]</span>: pam_unix<span class="o">(</span>sshd:session<span class="o">)</span>: session opened <span class="k">for</span> user petko by <span class="o">(</span><span class="nv">uid</span><span class="o">=</span>0<span class="o">)</span>
+Feb <span class="m">12</span> <span class="m">18</span>:23:50 virtbox sshd<span class="o">[</span><span class="m">5791</span><span class="o">]</span>: Accepted password <span class="k">for</span> petko from <span class="m">192</span>.168.1.86 port <span class="m">57805</span> ssh2
+Feb <span class="m">12</span> <span class="m">18</span>:23:50 virtbox sshd<span class="o">[</span><span class="m">5791</span><span class="o">]</span>: pam_unix<span class="o">(</span>sshd:session<span class="o">)</span>: session opened <span class="k">for</span> user petko by <span class="o">(</span><span class="nv">uid</span><span class="o">=</span><span class="m">0</span><span class="o">)</span>
 ...
 </pre></div>
 
 
 <p>So here it is. The ssh service is running as process 786. We can see that this process is listening on port 22:</p>
-<div class="highlight"><pre><span></span>$ sudo netstat -tulpn <span class="p">|</span> grep 786
-tcp        <span class="m">0</span>      <span class="m">0</span> 0.0.0.0:22              0.0.0.0:*               LISTEN      786/sshd        
-tcp6       <span class="m">0</span>      <span class="m">0</span> :::22                   :::*                    LISTEN      786/sshd 
+<div class="highlight"><pre><span></span>$ sudo netstat -tulpn <span class="p">|</span> grep <span class="m">786</span>
+tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>.0.0.0:22              <span class="m">0</span>.0.0.0:*               LISTEN      <span class="m">786</span>/sshd        
+tcp6       <span class="m">0</span>      <span class="m">0</span> :::22                   :::*                    LISTEN      <span class="m">786</span>/sshd 
 </pre></div>
 
 
@@ -113,7 +113,7 @@ tcp6       <span class="m">0</span>      <span class="m">0</span> :::22         
 <span class="nv">ExecReload</span><span class="o">=</span>/bin/kill -HUP <span class="nv">$MAINPID</span>
 <span class="nv">KillMode</span><span class="o">=</span>process
 <span class="nv">Restart</span><span class="o">=</span>on-failure
-<span class="nv">RestartPreventExitStatus</span><span class="o">=</span>255
+<span class="nv">RestartPreventExitStatus</span><span class="o">=</span><span class="m">255</span>
 <span class="nv">Type</span><span class="o">=</span>notify
 
 <span class="o">[</span>Install<span class="o">]</span>
@@ -136,21 +136,21 @@ apache2.service                                                                 
    Loaded: loaded <span class="o">(</span>/etc/init.d/apache2<span class="p">;</span> bad<span class="p">;</span> vendor preset: enabled<span class="o">)</span>
   Drop-In: /lib/systemd/system/apache2.service.d
            └─apache2-systemd.conf
-   Active: active <span class="o">(</span>running<span class="o">)</span> since Mon 2017-02-13 12:49:55 PST<span class="p">;</span> 8h ago
-     Docs: man:systemd-sysv-generator<span class="o">(</span>8<span class="o">)</span>
-    Tasks: 55
-   Memory: 6.5M
-      CPU: 17.042s
+   Active: active <span class="o">(</span>running<span class="o">)</span> since Mon <span class="m">2017</span>-02-13 <span class="m">12</span>:49:55 PST<span class="p">;</span> 8h ago
+     Docs: man:systemd-sysv-generator<span class="o">(</span><span class="m">8</span><span class="o">)</span>
+    Tasks: <span class="m">55</span>
+   Memory: <span class="m">6</span>.5M
+      CPU: <span class="m">17</span>.042s
    CGroup: /system.slice/apache2.service
            ├─9097 /usr/sbin/apache2 -k start
            ├─9100 /usr/sbin/apache2 -k start
            └─9101 /usr/sbin/apache2 -k start
 
-Feb <span class="m">13</span> 12:49:54 virtbox systemd<span class="o">[</span>1<span class="o">]</span>: Starting LSB: Apache2 web server...
-Feb <span class="m">13</span> 12:49:54 virtbox apache2<span class="o">[</span>9071<span class="o">]</span>:  * Starting Apache httpd web server apache2
-Feb <span class="m">13</span> 12:49:54 virtbox apache2<span class="o">[</span>9071<span class="o">]</span>: AH00558: apache2: Could not reliably determine the server<span class="s1">&#39;s fully qualified domain name, using 127.0.1.1. Set the &#39;</span>ServerName<span class="err">&#39;</span> directive globall
-Feb <span class="m">13</span> 12:49:55 virtbox apache2<span class="o">[</span>9071<span class="o">]</span>:  *
-Feb <span class="m">13</span> 12:49:55 virtbox systemd<span class="o">[</span>1<span class="o">]</span>: Started LSB: Apache2 web server.
+Feb <span class="m">13</span> <span class="m">12</span>:49:54 virtbox systemd<span class="o">[</span><span class="m">1</span><span class="o">]</span>: Starting LSB: Apache2 web server...
+Feb <span class="m">13</span> <span class="m">12</span>:49:54 virtbox apache2<span class="o">[</span><span class="m">9071</span><span class="o">]</span>:  * Starting Apache httpd web server apache2
+Feb <span class="m">13</span> <span class="m">12</span>:49:54 virtbox apache2<span class="o">[</span><span class="m">9071</span><span class="o">]</span>: AH00558: apache2: Could not reliably determine the server<span class="s1">&#39;s fully qualified domain name, using 127.0.1.1. Set the &#39;</span>ServerName<span class="err">&#39;</span> directive globall
+Feb <span class="m">13</span> <span class="m">12</span>:49:55 virtbox apache2<span class="o">[</span><span class="m">9071</span><span class="o">]</span>:  *
+Feb <span class="m">13</span> <span class="m">12</span>:49:55 virtbox systemd<span class="o">[</span><span class="m">1</span><span class="o">]</span>: Started LSB: Apache2 web server.
 </pre></div>
 
 
@@ -160,7 +160,7 @@ Feb <span class="m">13</span> 12:49:55 virtbox systemd<span class="o">[</span>1<
 <span class="c1"># Automatically generated by systemd-sysv-generator</span>
 
 <span class="o">[</span>Unit<span class="o">]</span>
-<span class="nv">Documentation</span><span class="o">=</span>man:systemd-sysv-generator<span class="o">(</span>8<span class="o">)</span>
+<span class="nv">Documentation</span><span class="o">=</span>man:systemd-sysv-generator<span class="o">(</span><span class="m">8</span><span class="o">)</span>
 <span class="nv">SourcePath</span><span class="o">=</span>/etc/init.d/apache2
 <span class="nv">Description</span><span class="o">=</span>LSB: Apache2 web server
 <span class="nv">Before</span><span class="o">=</span>multi-user.target
@@ -213,13 +213,28 @@ $ systemctl show sshd.service
 
 <p>And one last cool command:</p>
 <div class="highlight"><pre><span></span>$ systemd-analyze
-Startup finished in 3.989s <span class="o">(</span>kernel<span class="o">)</span> + 7.673s <span class="o">(</span>userspace<span class="o">)</span> <span class="o">=</span> 11.663s
+Startup finished in <span class="m">3</span>.989s <span class="o">(</span>kernel<span class="o">)</span> + <span class="m">7</span>.673s <span class="o">(</span>userspace<span class="o">)</span> <span class="o">=</span> <span class="m">11</span>.663s
 </pre></div>
 
 
 <p>This command prints the time it took to startup our system.</p>
 <p>So that's all for today. There's definitely more to explore in systemd land - the syntax of unit files, how systemd executes them and so on. I'll leave that for some other time.</p>
     </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'the-linux-init-system.html';
+        var disqus_url = 'http://pminkov.github.io/blog/the-linux-init-system.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
 
   </article>
 </section>
@@ -251,6 +266,15 @@ Startup finished in 3.989s <span class="o">(</span>kernel<span class="o">)</span
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 </body>
 </html>

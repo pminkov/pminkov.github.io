@@ -116,7 +116,7 @@ Your active configuration is: <span class="o">[</span>mykube<span class="o">]</s
 <p>We also need a Dockerfile:</p>
 <div class="highlight"><pre><span></span>$ cat ./Dockerfile 
 FROM node:4
-EXPOSE 8080
+EXPOSE <span class="m">8080</span>
 COPY server.js .
 CMD node server.js
 </pre></div>
@@ -125,16 +125,16 @@ CMD node server.js
 <p>In order to run a container on GKE, we need to upload it to <a href="https://cloud.google.com/container-registry/">Google Container Registry</a>. Let's do it:</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PROJECT_ID</span><span class="o">=</span>mykube-160819
 $ docker build -t gcr.io/<span class="nv">$PROJECT_ID</span>/myserver .
-Sending build context to Docker daemon 3.584 kB
-Step 1/4 : FROM node:4
+Sending build context to Docker daemon <span class="m">3</span>.584 kB
+Step <span class="m">1</span>/4 : FROM node:4
  ---&gt; d7efee1f035d
-Step 2/4 : EXPOSE 8080
+Step <span class="m">2</span>/4 : EXPOSE <span class="m">8080</span>
  ---&gt; Using cache
  ---&gt; 147e7888542d
-Step 3/4 : COPY server.js .
+Step <span class="m">3</span>/4 : COPY server.js .
  ---&gt; Using cache
  ---&gt; b610e7975d20
-Step 4/4 : CMD node server.js
+Step <span class="m">4</span>/4 : CMD node server.js
  ---&gt; Using cache
  ---&gt; 4e15133cdab2
 Successfully built 4e15133cdab2
@@ -151,19 +151,19 @@ a1fbf6fa923f: Mounted from hikube-160719/myserver
 100396c46221: Mounted from hikube-160719/myserver 
 7b4b54c74241: Mounted from hikube-160719/myserver 
 d17d48b2382a: Mounted from hikube-160719/myserver 
-latest: digest: sha256:4ad68f056e870938823f6c9555355c149cf7c42a213d7243d915f1a4bcfb9cb1 size: 2213
+latest: digest: sha256:4ad68f056e870938823f6c9555355c149cf7c42a213d7243d915f1a4bcfb9cb1 size: <span class="m">2213</span>
 </pre></div>
 
 
 <p>If you go to the Google Cloud Console and open the Google Container Registry, you'll see the container uploaded:</p>
-<p><center><img alt="Google Container Registry" src="http://pminkov.github.io/blog/images/k8s-intro/k1-registry.png" /></center></p>
+<p><center><img alt="Google Container Registry" src="http://pminkov.github.io/blog/images/k8s-intro/k1-registry.png"></center></p>
 <p>Now let's create a cluster that we'll be deploying our server to:</p>
 <div class="highlight"><pre><span></span>$ gcloud container clusters create example-cluster
 Creating cluster example-cluster...done.                                                                                                                                               
 Created <span class="o">[</span>https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster<span class="o">]</span>.
 kubeconfig entry generated <span class="k">for</span> example-cluster.
 NAME             ZONE           MASTER_VERSION  MASTER_IP       MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
-example-cluster  us-central1-b  1.5.3           104.198.190.52  n1-standard-1  1.5.3         <span class="m">3</span>          RUNNING
+example-cluster  us-central1-b  <span class="m">1</span>.5.3           <span class="m">104</span>.198.190.52  n1-standard-1  <span class="m">1</span>.5.3         <span class="m">3</span>          RUNNING
 </pre></div>
 
 
@@ -181,7 +181,7 @@ No resources found.
 
 
 <p>Now let's start out server finally:</p>
-<div class="highlight"><pre><span></span>$ kubectl run myserver --image<span class="o">=</span>gcr.io/<span class="nv">$PROJECT_ID</span>/myserver --port<span class="o">=</span>8080
+<div class="highlight"><pre><span></span>$ kubectl run myserver --image<span class="o">=</span>gcr.io/<span class="nv">$PROJECT_ID</span>/myserver --port<span class="o">=</span><span class="m">8080</span>
 deployment <span class="s2">&quot;myserver&quot;</span> created
 </pre></div>
 
@@ -189,14 +189,14 @@ deployment <span class="s2">&quot;myserver&quot;</span> created
 <p>We have created a deployment that contains a pod. Let's see what pods we have now:</p>
 <div class="highlight"><pre><span></span>$ kubectl get pods
 NAME                        READY     STATUS              RESTARTS   AGE
-myserver-3430466764-04b36   0/1       ContainerCreating   <span class="m">0</span>          17s
+myserver-3430466764-04b36   <span class="m">0</span>/1       ContainerCreating   <span class="m">0</span>          17s
 </pre></div>
 
 
 <p>Nice, our container is getting spinned. We wait for a bit and we see:</p>
 <div class="highlight"><pre><span></span>$ kubectl get pods
 NAME                        READY     STATUS    RESTARTS   AGE
-myserver-3430466764-04b36   1/1       Running   <span class="m">0</span>          58s
+myserver-3430466764-04b36   <span class="m">1</span>/1       Running   <span class="m">0</span>          58s
 </pre></div>
 
 
@@ -209,31 +209,31 @@ service <span class="s2">&quot;myserver&quot;</span> exposed
 <p>This will also take some time:</p>
 <div class="highlight"><pre><span></span>$ kubectl get service myserver
 NAME       CLUSTER-IP   EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>          AGE
-myserver   10.3.247.6   &lt;pending&gt;     8080:31574/TCP   34s
+myserver   <span class="m">10</span>.3.247.6   &lt;pending&gt;     <span class="m">8080</span>:31574/TCP   34s
 </pre></div>
 
 
 <p>Aaand, it's done:</p>
 <div class="highlight"><pre><span></span>$ kubectl get service myserver
 NAME       CLUSTER-IP   EXTERNAL-IP      PORT<span class="o">(</span>S<span class="o">)</span>          AGE
-myserver   10.3.247.6   104.155.177.47   8080:31574/TCP   1m
+myserver   <span class="m">10</span>.3.247.6   <span class="m">104</span>.155.177.47   <span class="m">8080</span>:31574/TCP   1m
 </pre></div>
 
 
 <p>If we go to <code>http://104.155.177.47:8080/</code>, we'll see:</p>
-<div class="highlight"><pre><span></span>Returning element at index 6110645: 116527640
+<div class="highlight"><pre><span></span>Returning element at index <span class="m">6110645</span>: <span class="m">116527640</span>
 Hello World!
 </pre></div>
 
 
 <p>Now, the tedious part is over. Let's have some fun. We can monitor our cluster through the Kubernetes dashboard. For a reason unclear to me, this dashboard is not available on the Google website. You have to run a proxy to do it. Like this:</p>
 <div class="highlight"><pre><span></span>$ kubectl proxy
-Starting to serve on 127.0.0.1:8001
+Starting to serve on <span class="m">127</span>.0.0.1:8001
 </pre></div>
 
 
 <p>We can see the dashboard at <code>localhost:8001/ui</code>. It looks like this:</p>
-<p><center><img alt="Kubernetes Dashboard" src="http://pminkov.github.io/blog/images/k8s-intro/k2-dashboard.png" /></center></p>
+<p><center><img alt="Kubernetes Dashboard" src="http://pminkov.github.io/blog/images/k8s-intro/k2-dashboard.png"></center></p>
 <p>This dashboard is a lot of fun. You can dig into everything available in it. You can probably see everything it shows through kubectl as well, but it's easier to do it by using an UI.</p>
 <p>Here's something else that's fun. Your cluster doesn't run on thin air. It runs on Google Compute Engine instances (I believe this is equivalent to AWS' EC2). In your cloud console, you can navigate to your instances and you can even SSH to an instance from the web UI (I wow-ed the first time I did this, much easier than setting up ssh access on AWS).</p>
 <p>Our cluster has three nodes.</p>
@@ -248,12 +248,12 @@ gke-example-cluster-default-pool-2567fc65-n0cp   Ready     21m
 <p>These are three GCE instances. Where is our pod running at?</p>
 <div class="highlight"><pre><span></span>$ kubectl get pods -o wide
 NAME                        READY     STATUS    RESTARTS   AGE       IP         NODE
-myserver-3430466764-04b36   1/1       Running   <span class="m">0</span>          18m       10.0.1.5   gke-example-cluster-default-pool-2567fc65-g7lc
+myserver-3430466764-04b36   <span class="m">1</span>/1       Running   <span class="m">0</span>          18m       <span class="m">10</span>.0.1.5   gke-example-cluster-default-pool-2567fc65-g7lc
 </pre></div>
 
 
 <p>It's running on <code>gke-example-cluster-default-pool-2567fc65-g7lc</code>. Now I can navigate to the web page for this instance and ssh to it. Here's a screenshot of how that looks like:</p>
-<p><center><img alt="Compute Engine SSH" src="http://pminkov.github.io/blog/images/k8s-intro/k3-compute-engine.png" /></center></p>
+<p><center><img alt="Compute Engine SSH" src="http://pminkov.github.io/blog/images/k8s-intro/k3-compute-engine.png"></center></p>
 <p>I ran <code>ps aux --sort '%mem'</code> to see which process takes most memory. Since my server uses a lot of memory, it's at the top. It's using 179MB of resident memory.</p>
 <p>It's pretty nice that you're able to nagivate from a high level system like Kubernetes all the way down to ssh-ing to a machine that runs your containers. When you're ssh-ed you can execute <code>docker ps</code> to see what containers are running, run <code>top</code> to see what's going on on the machine and do all of the other systems debugging tasks that you can think of.</p>
 <p>And finally, let's delete our cluster:</p>
@@ -270,6 +270,21 @@ Deleted <span class="o">[</span>https://container.googleapis.com/v1/projects/myk
 
 <p>That's all for today - enjoy.</p>
     </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'starting-with-kubernetes-on-google-container-engine.html';
+        var disqus_url = 'http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
 
   </article>
 </section>
@@ -301,6 +316,15 @@ Deleted <span class="o">[</span>https://container.googleapis.com/v1/projects/myk
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 </body>
 </html>

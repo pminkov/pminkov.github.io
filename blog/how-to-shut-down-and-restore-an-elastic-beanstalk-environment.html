@@ -93,7 +93,7 @@ aws rds create-db-snapshot <span class="se">\</span>
 <div class="highlight"><pre><span></span><span class="c1"># Create environment. It&#39;s important to specify a cname, so that we don&#39;t have to</span>
 <span class="c1"># change our DNS config. This takes a lot of time, so I bump the timeout.</span>
 <span class="c1"># This command will print the name of your new database instance.</span>
-<span class="nb">time</span> eb create neatlinks-dev --cfg <span class="nv">$EB_CONFIG</span> --cname <span class="nv">$EB_CNAME</span> --timeout 30
+<span class="nb">time</span> eb create neatlinks-dev --cfg <span class="nv">$EB_CONFIG</span> --cname <span class="nv">$EB_CNAME</span> --timeout <span class="m">30</span>
 
 <span class="c1"># Get this id from the printed output of &quot;eb create&quot;.</span>
 <span class="nb">export</span> <span class="nv">EB_NEW_DB</span><span class="o">=</span><span class="s2">&quot;aa1q3no37rzd407&quot;</span>
@@ -113,6 +113,21 @@ aws rds <span class="nb">wait</span> db-instance-available --db-instance-identif
 <p>Your production setup is ready now! Your application probably won't work though, because your DB endpoint is different. Edit your source code or your own configuration files so that your application connects to the new database. Once done, call <code>eb deploy</code>.</p>
 <p>That's it. Your application should be running now. You can use this procedure to rename your Elastic Beanstalk application and environment as well, which is a feature that's missing from the <code>eb</code> CLI app.</p>
     </div><!-- /.entry-content -->
+    <div class="comments">
+      <h2>Comments !</h2>
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html';
+        var disqus_url = 'http://pminkov.github.io/blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
 
   </article>
 </section>
@@ -144,6 +159,15 @@ aws rds <span class="nb">wait</span> db-instance-available --db-instance-identif
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 </body>
 </html>
