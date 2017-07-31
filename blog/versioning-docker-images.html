@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Versioning Docker Images</title>
+        <link rel="stylesheet" href="http://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li class="active"><a href="http://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://pminkov.github.io/blog/versioning-docker-images.html" rel="bookmark"
+           title="Permalink to Versioning Docker Images">Versioning Docker Images</a></h1>
+    </header>
+
+    <div class="entry-content">
+<div class="post-info">
+        <abbr class="published" title="2017-07-30T21:57:00-07:00">
+                Published: Sun 30 July 2017
+in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
+        </abbr>
+
+</div><!-- /.post-info -->    </div>
+    <div>
+      <p>If you're running Docker containers in the cloud, you're probably uploading them into a registry. If you're using Google Cloud, that would be <a href="https://cloud.google.com/container-registry/">gcr.io </a>(Google Container Registry).</p>
+<p>As you're iterating on your application, you'll need to push new Docker images to the registry. A natural questions that comes is how to version these images? You don't want to overwrite images using the same tag and it's cumbersome to keep track of increasing version numbers. A good versioning scheme is to use a <a href="https://blog.thoughtram.io/git/2014/11/18/the-anatomy-of-a-git-commit.html">git commit hash</a>. So your image name might looks like this: <code>gcr.io/kubeproject-172120/simple:88d38d9</code>. If you take your git repository at this hash, you'll find the files that produced this exact image.</p>
+<p>This sounds simple to implement. You get the last commit's hash, build the image using the hash as a tag and push it to the registry. There's one big inconvinience to this scheme though - you have to commit each change if you want to use a new hash (and you do, you don't want to overwrite your production image) and when you're iterating on an image, that gets tiresome quickly. One possible solution would be to commit "debug" images. These images might be tagged with something like this <code>88d38d9-debug</code>. This is an image produced by taking the git repo at the <code>88d38d9</code> hash and making some modifications. You'll know not to include these images in your production files and it's ok to overwrite them as you're iterating.</p>
+<p>So let's look at how all of this can be implemented. Let's say you're putting all your images in one directory. The contents of this directory might look like this:</p>
+<div class="highlight"><pre><span></span>$ tree
+.
+├── build-image.sh
+└── simple
+    ├── app.py
+    ├── Dockerfile
+    └── requirements.txt
+
+<span class="m">1</span> directory, <span class="m">4</span> files
+</pre></div>
+
+
+<p>The <code>build-image.sh</code> script builds the Docker image and pushes it to <code>gcr.io</code>.</p>
+<p>The script itself looks like this:</p>
+<div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+  <span class="nb">echo</span> <span class="s2">&quot;Usage: </span><span class="nv">$0</span><span class="s2"> &lt;image_dir&gt; [--debug]&quot;</span>
+  <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nv">IMAGE_NAME</span><span class="o">=</span><span class="nv">$1</span>
+
+<span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span> <span class="o">==</span> <span class="s2">&quot;--debug&quot;</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+  <span class="c1"># If we&#39;re debugging, we can push code that&#39;s not committed.</span>
+  <span class="nv">APPEND</span><span class="o">=</span><span class="s2">&quot;-debug&quot;</span>
+<span class="k">else</span>
+  <span class="nv">IMAGE_PATH</span><span class="o">=</span>/<span class="nv">$IMAGE_NAME</span>/
+
+  <span class="k">if</span> git status . --porcelain <span class="p">|</span> grep <span class="nv">$IMAGE_PATH</span> &gt; /dev/null<span class="p">;</span> <span class="k">then</span>
+    <span class="nb">echo</span> <span class="s2">&quot;You have uncommited changes to your Docker image. Please commit them&quot;</span>
+    <span class="nb">echo</span> <span class="s2">&quot;before building and populating. This helps ensure that all docker images&quot;</span>
+    <span class="nb">echo</span> <span class="s2">&quot;are traceable back to a git commit.&quot;</span>
+    <span class="nb">echo</span>
+    <span class="nb">echo</span> <span class="s2">&quot;Or if you&#39;re just building a debug image, use the --debug flag.&quot;</span>
+    <span class="nb">exit</span> <span class="m">1</span>
+  <span class="k">fi</span>
+<span class="k">fi</span>
+
+<span class="c1"># Set image tag.</span>
+<span class="nv">GIT_REV</span><span class="o">=</span><span class="k">$(</span>git log -n <span class="m">1</span> --pretty<span class="o">=</span>format:%h -- ./<span class="nv">$IMAGE_NAME</span>/<span class="k">)</span>
+
+<span class="k">if</span> <span class="o">[</span> ! <span class="nv">$GIT_REV</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+  <span class="nb">echo</span> <span class="s2">&quot;You&#39;re trying to build an image that has never been committed.&quot;</span> <span class="se">\</span>
+    <span class="s2">&quot;You need to commit at least one version.&quot;</span>
+  <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nv">TAG</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$GIT_REV</span><span class="s2">&quot;&quot;</span><span class="nv">$APPEND</span><span class="s2">&quot;</span>
+
+<span class="c1"># Set image repo.</span>
+<span class="nv">PROJECT_ID</span><span class="o">=</span><span class="k">$(</span>gcloud config get-value project <span class="m">2</span>&gt;/dev/null<span class="k">)</span>
+<span class="nv">DOCKER_REPO</span><span class="o">=</span><span class="s2">&quot;gcr.io/</span><span class="nv">$PROJECT_ID</span><span class="s2">&quot;</span>
+
+<span class="c1"># Full image name.</span>
+<span class="nv">IMAGE_SPEC</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$DOCKER_REPO</span><span class="s2">/</span><span class="nv">$IMAGE_NAME</span><span class="s2">:</span><span class="nv">$TAG</span><span class="s2">&quot;</span>
+
+<span class="nb">cd</span> <span class="nv">$IMAGE_NAME</span>
+
+<span class="k">if</span> <span class="o">[</span> ! -f <span class="nv">$DOCKERFILE</span> <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+  <span class="nb">echo</span> <span class="s2">&quot;No such file: </span><span class="nv">$IMAGE_NAME</span><span class="s2">/</span><span class="nv">$DOCKERFILE</span><span class="s2">&quot;</span>
+  <span class="nb">exit</span> <span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nb">echo</span> <span class="nv">$IMAGE_SPEC</span>
+
+docker build -t <span class="nv">$IMAGE_SPEC</span> .
+gcloud docker -- push <span class="nv">$IMAGE_SPEC</span>
+
+<span class="nb">echo</span> <span class="s2">&quot;Pushed </span><span class="nv">$IMAGE_SPEC</span><span class="s2">&quot;</span>
+</pre></div>
+
+
+<p>One thing to pay attention to is that the hash that we're using is the hash of the last commit to the directory that contains the container files. This way, if you want to push a production ready image (non-debug), you can only commit the files inside this directory and if you're still working on others outside of it, you can continue doing so.</p>
+<p>Let's run the <code>build-image.sh</code> script:</p>
+<div class="highlight"><pre><span></span>$ ./build-image.sh simple
+gcr.io/kubehub-172120/simple:12430ce
+Sending build context to Docker daemon <span class="m">4</span>.096 kB
+Step <span class="m">1</span>/9 : FROM ubuntu:latest
+ ---&gt; 14f60031763d
+Step <span class="m">2</span>/9 : MAINTAINER Petko Minkov <span class="s2">&quot;pminkov@gmail.com&quot;</span>
+ ---&gt; Using cache
+ ---&gt; 5a371036a9e3
+Step <span class="m">3</span>/9 : RUN apt-get update -y
+ ---&gt; Using cache
+ ---&gt; 8992277faa20
+Step <span class="m">4</span>/9 : RUN apt-get install -y python-pip python-dev build-essential
+ ---&gt; Using cache
+ ---&gt; 9c0937facaf0
+Step <span class="m">5</span>/9 : COPY . /app
+ ---&gt; Using cache
+ ---&gt; dd9f289c1f55
+Step <span class="m">6</span>/9 : WORKDIR /app
+ ---&gt; Using cache
+ ---&gt; d93c62ac371a
+Step <span class="m">7</span>/9 : RUN pip install --upgrade pip
+ ---&gt; Using cache
+ ---&gt; cb2f0a65c93f
+Step <span class="m">8</span>/9 : RUN pip install -r requirements.txt
+ ---&gt; Using cache
+ ---&gt; d8fd659127d9
+Step <span class="m">9</span>/9 : CMD python app.py
+ ---&gt; Using cache
+ ---&gt; 8493c8ad1a01
+Successfully built 8493c8ad1a01
+The push refers to a repository <span class="o">[</span>gcr.io/kubehub-172120/simple<span class="o">]</span>
+dacb974e8350: Layer already exists 
+6c4d57527510: Layer already exists 
+5348dff0fc19: Layer already exists 
+738da70fc9f8: Layer already exists 
+f665434eb0ee: Layer already exists 
+26b126eb8632: Layer already exists 
+220d34b5f6c9: Layer already exists 
+8a5132998025: Layer already exists 
+aca233ed29c3: Layer already exists 
+e5d2f035d7a4: Layer already exists 
+12430ce: digest: sha256:51cd80db604d1ffa5230289c1f3fe40d19b3b8dc2afb0a0c003713360b07d2c6 size: <span class="m">2411</span>
+Pushed gcr.io/kubehub-172120/simple:12430ce
+</pre></div>
+
+
+<p>Great, now the image is pushed. But I always like to use a "trust but verify" policy, so let's see how can we dig into what's going on at the registry.</p>
+<p>My image's name is this <code>gcr.io/kubehub-172120/simple</code>. Here's how I see the tags I have uploaded to <code>gcr.io</code>:</p>
+<div class="highlight"><pre><span></span>$ gcloud beta container images list-tags gcr.io/kubehub-172120/simple
+DIGEST        TAGS                   TIMESTAMP
+9b424f849df2  88d38d9-debug,e8bc006  <span class="m">2017</span>-07-30T23:03:14
+51cd80db604d  12430ce                <span class="m">2017</span>-07-30T23:06:42
+</pre></div>
+
+
+<p>If you want to inspect the contents of the image, you can just run a shell, like this:</p>
+<div class="highlight"><pre><span></span>$ gcloud docker -- run -i -t gcr.io/kubehub-172120/simple:12430ce /bin/bash
+root@27cfb042d947:/app# ls
+Dockerfile  app.py  requirements.txt
+root@27cfb042d947:/app# 
+</pre></div>
+
+
+<p>I've used this workflow when working with a Kubernetes deployment and it worked well for me. Hope it's useful for someone else too. Enjoy.</p>
+    </div><!-- /.entry-content -->
+    <div class="comments">
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'versioning-docker-images.html';
+        var disqus_url = 'http://pminkov.github.io/blog/versioning-docker-images.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <!--
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                  Blah blha blah
+                </address>
+        </footer>
+        -->
+        <!-- /#contentinfo -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-243631-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>
