@@ -1,5 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-04-24T21:10:00-07:00</updated><entry><title>Visualizing algorithms with Jupyter notebooks</title><link href="http://pminkov.github.io/blog/visualizing-algorithms-with-jupyter-notebooks.html" rel="alternate"></link><published>2017-04-24T21:10:00-07:00</published><updated>2017-04-24T21:10:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-04-24:/blog/visualizing-algorithms-with-jupyter-notebooks.html</id><summary type="html">&lt;p&gt;Last couple of days I was looking into some old implementation of k-means clustering that I wrote. At that time I didn't know how to use matplotlib and to display the clusters that were generated and I was printing commands that I was plugging into R. Since then, I've learned …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Last couple of days I was looking into some old implementation of k-means clustering that I wrote. At that time I didn't know how to use matplotlib and to display the clusters that were generated and I was printing commands that I was plugging into R. Since then, I've learned how to use Jupyter, so I sat down and imported the code into a Jupyter notebook that's visualizing the algorithm.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/all.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-07-30T21:57:00-07:00</updated><entry><title>Versioning Docker Images</title><link href="http://pminkov.github.io/blog/versioning-docker-images.html" rel="alternate"></link><published>2017-07-30T21:57:00-07:00</published><updated>2017-07-30T21:57:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-07-30:/blog/versioning-docker-images.html</id><summary type="html">&lt;p&gt;If you're running Docker containers in the cloud, you're probably uploading them into a registry. If you're using Google Cloud, that would be &lt;a href="https://cloud.google.com/container-registry/"&gt;gcr.io &lt;/a&gt;(Google Container Registry).&lt;/p&gt;
+&lt;p&gt;As you're iterating on your application, you'll need to push new Docker images to the registry. A natural questions that comes is …&lt;/p&gt;</summary><content type="html">&lt;p&gt;If you're running Docker containers in the cloud, you're probably uploading them into a registry. If you're using Google Cloud, that would be &lt;a href="https://cloud.google.com/container-registry/"&gt;gcr.io &lt;/a&gt;(Google Container Registry).&lt;/p&gt;
+&lt;p&gt;As you're iterating on your application, you'll need to push new Docker images to the registry. A natural questions that comes is how to version these images? You don't want to overwrite images using the same tag and it's cumbersome to keep track of increasing version numbers. A good versioning scheme is to use a &lt;a href="https://blog.thoughtram.io/git/2014/11/18/the-anatomy-of-a-git-commit.html"&gt;git commit hash&lt;/a&gt;. So your image name might looks like this: &lt;code&gt;gcr.io/kubeproject-172120/simple:88d38d9&lt;/code&gt;. If you take your git repository at this hash, you'll find the files that produced this exact image.&lt;/p&gt;
+&lt;p&gt;This sounds simple to implement. You get the last commit's hash, build the image using the hash as a tag and push it to the registry. There's one big inconvinience to this scheme though - you have to commit each change if you want to use a new hash (and you do, you don't want to overwrite your production image) and when you're iterating on an image, that gets tiresome quickly. One possible solution would be to commit "debug" images. These images might be tagged with something like this &lt;code&gt;88d38d9-debug&lt;/code&gt;. This is an image produced by taking the git repo at the &lt;code&gt;88d38d9&lt;/code&gt; hash and making some modifications. You'll know not to include these images in your production files and it's ok to overwrite them as you're iterating.&lt;/p&gt;
+&lt;p&gt;So let's look at how all of this can be implemented. Let's say you're putting all your images in one directory. The contents of this directory might look like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ tree
+.
+├── build-image.sh
+└── simple
+    ├── app.py
+    ├── Dockerfile
+    └── requirements.txt
+
+&lt;span class="m"&gt;1&lt;/span&gt; directory, &lt;span class="m"&gt;4&lt;/span&gt; files
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;build-image.sh&lt;/code&gt; script builds the Docker image and pushes it to &lt;code&gt;gcr.io&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The script itself looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Usage: &lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt; &amp;lt;image_dir&amp;gt; [--debug]&amp;quot;&lt;/span&gt;
+  &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nv"&gt;IMAGE_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;--debug&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+  &lt;span class="c1"&gt;# If we&amp;#39;re debugging, we can push code that&amp;#39;s not committed.&lt;/span&gt;
+  &lt;span class="nv"&gt;APPEND&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-debug&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+  &lt;span class="nv"&gt;IMAGE_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;/
+
+  &lt;span class="k"&gt;if&lt;/span&gt; git status . --porcelain &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="nv"&gt;$IMAGE_PATH&lt;/span&gt; &amp;gt; /dev/null&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;You have uncommited changes to your Docker image. Please commit them&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;before building and populating. This helps ensure that all docker images&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;are traceable back to a git commit.&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt;
+    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Or if you&amp;#39;re just building a debug image, use the --debug flag.&amp;quot;&lt;/span&gt;
+    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+  &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Set image tag.&lt;/span&gt;
+&lt;span class="nv"&gt;GIT_REV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;git log -n &lt;span class="m"&gt;1&lt;/span&gt; --pretty&lt;span class="o"&gt;=&lt;/span&gt;format:%h -- ./&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;/&lt;span class="k"&gt;)&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; ! &lt;span class="nv"&gt;$GIT_REV&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;You&amp;#39;re trying to build an image that has never been committed.&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;You need to commit at least one version.&amp;quot;&lt;/span&gt;
+  &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nv"&gt;TAG&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$GIT_REV&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$APPEND&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Set image repo.&lt;/span&gt;
+&lt;span class="nv"&gt;PROJECT_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;gcloud config get-value project &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;/dev/null&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;DOCKER_REPO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;gcr.io/&lt;/span&gt;&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# Full image name.&lt;/span&gt;
+&lt;span class="nv"&gt;IMAGE_SPEC&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$DOCKER_REPO&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;&lt;span class="s2"&gt;:&lt;/span&gt;&lt;span class="nv"&gt;$TAG&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; ! -f &lt;span class="nv"&gt;$DOCKERFILE&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;No such file: &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$DOCKERFILE&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+  &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;
+
+docker build -t &lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt; .
+gcloud docker -- push &lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Pushed &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;One thing to pay attention to is that the hash that we're using is the hash of the last commit to the directory that contains the container files. This way, if you want to push a production ready image (non-debug), you can only commit the files inside this directory and if you're still working on others outside of it, you can continue doing so.&lt;/p&gt;
+&lt;p&gt;Let's run the &lt;code&gt;build-image.sh&lt;/code&gt; script:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./build-image.sh simple
+gcr.io/kubehub-172120/simple:12430ce
+Sending build context to Docker daemon &lt;span class="m"&gt;4&lt;/span&gt;.096 kB
+Step &lt;span class="m"&gt;1&lt;/span&gt;/9 : FROM ubuntu:latest
+ ---&amp;gt; 14f60031763d
+Step &lt;span class="m"&gt;2&lt;/span&gt;/9 : MAINTAINER Petko Minkov &lt;span class="s2"&gt;&amp;quot;pminkov@gmail.com&amp;quot;&lt;/span&gt;
+ ---&amp;gt; Using cache
+ ---&amp;gt; 5a371036a9e3
+Step &lt;span class="m"&gt;3&lt;/span&gt;/9 : RUN apt-get update -y
+ ---&amp;gt; Using cache
+ ---&amp;gt; 8992277faa20
+Step &lt;span class="m"&gt;4&lt;/span&gt;/9 : RUN apt-get install -y python-pip python-dev build-essential
+ ---&amp;gt; Using cache
+ ---&amp;gt; 9c0937facaf0
+Step &lt;span class="m"&gt;5&lt;/span&gt;/9 : COPY . /app
+ ---&amp;gt; Using cache
+ ---&amp;gt; dd9f289c1f55
+Step &lt;span class="m"&gt;6&lt;/span&gt;/9 : WORKDIR /app
+ ---&amp;gt; Using cache
+ ---&amp;gt; d93c62ac371a
+Step &lt;span class="m"&gt;7&lt;/span&gt;/9 : RUN pip install --upgrade pip
+ ---&amp;gt; Using cache
+ ---&amp;gt; cb2f0a65c93f
+Step &lt;span class="m"&gt;8&lt;/span&gt;/9 : RUN pip install -r requirements.txt
+ ---&amp;gt; Using cache
+ ---&amp;gt; d8fd659127d9
+Step &lt;span class="m"&gt;9&lt;/span&gt;/9 : CMD python app.py
+ ---&amp;gt; Using cache
+ ---&amp;gt; 8493c8ad1a01
+Successfully built 8493c8ad1a01
+The push refers to a repository &lt;span class="o"&gt;[&lt;/span&gt;gcr.io/kubehub-172120/simple&lt;span class="o"&gt;]&lt;/span&gt;
+dacb974e8350: Layer already exists 
+6c4d57527510: Layer already exists 
+5348dff0fc19: Layer already exists 
+738da70fc9f8: Layer already exists 
+f665434eb0ee: Layer already exists 
+26b126eb8632: Layer already exists 
+220d34b5f6c9: Layer already exists 
+8a5132998025: Layer already exists 
+aca233ed29c3: Layer already exists 
+e5d2f035d7a4: Layer already exists 
+12430ce: digest: sha256:51cd80db604d1ffa5230289c1f3fe40d19b3b8dc2afb0a0c003713360b07d2c6 size: &lt;span class="m"&gt;2411&lt;/span&gt;
+Pushed gcr.io/kubehub-172120/simple:12430ce
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Great, now the image is pushed. But I always like to use a "trust but verify" policy, so let's see how can we dig into what's going on at the registry.&lt;/p&gt;
+&lt;p&gt;My image's name is this &lt;code&gt;gcr.io/kubehub-172120/simple&lt;/code&gt;. Here's how I see the tags I have uploaded to &lt;code&gt;gcr.io&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud beta container images list-tags gcr.io/kubehub-172120/simple
+DIGEST        TAGS                   TIMESTAMP
+9b424f849df2  88d38d9-debug,e8bc006  &lt;span class="m"&gt;2017&lt;/span&gt;-07-30T23:03:14
+51cd80db604d  12430ce                &lt;span class="m"&gt;2017&lt;/span&gt;-07-30T23:06:42
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;If you want to inspect the contents of the image, you can just run a shell, like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud docker -- run -i -t gcr.io/kubehub-172120/simple:12430ce /bin/bash
+root@27cfb042d947:/app# ls
+Dockerfile  app.py  requirements.txt
+root@27cfb042d947:/app# 
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;I've used this workflow when working with a Kubernetes deployment and it worked well for me. Hope it's useful for someone else too. Enjoy.&lt;/p&gt;</content></entry><entry><title>Visualizing algorithms with Jupyter notebooks</title><link href="http://pminkov.github.io/blog/visualizing-algorithms-with-jupyter-notebooks.html" rel="alternate"></link><published>2017-04-24T21:10:00-07:00</published><updated>2017-04-24T21:10:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-04-24:/blog/visualizing-algorithms-with-jupyter-notebooks.html</id><summary type="html">&lt;p&gt;Last couple of days I was looking into some old implementation of k-means clustering that I wrote. At that time I didn't know how to use matplotlib and to display the clusters that were generated and I was printing commands that I was plugging into R. Since then, I've learned …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Last couple of days I was looking into some old implementation of k-means clustering that I wrote. At that time I didn't know how to use matplotlib and to display the clusters that were generated and I was printing commands that I was plugging into R. Since then, I've learned how to use Jupyter, so I sat down and imported the code into a Jupyter notebook that's visualizing the algorithm.&lt;/p&gt;
 &lt;p&gt;Here's the &lt;a href="http://nbviewer.jupyter.org/github/pminkov/notebooks/blob/master/k-means%20clustering.ipynb"&gt;Jupyter notebook&lt;/a&gt;. Overall, I quite enjoy how this format mixes the results of code execution with Markdown segments.&lt;/p&gt;</content></entry><entry><title>Removing a node from a Kubernetes cluster on GKE (Google Container Engine)</title><link href="http://pminkov.github.io/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html" rel="alternate"></link><published>2017-03-30T16:17:00-07:00</published><updated>2017-03-30T16:17:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-30:/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html</id><summary type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped me understand more about the GCE structures behind a Kubernetes cluster.&lt;/p&gt;
 &lt;p&gt;So let's start. The first thing you need to do is:&lt;/p&gt;
 &lt;h3&gt;Drain your node&lt;/h3&gt;
