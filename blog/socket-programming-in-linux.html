@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Socket Programming in Linux</title>
+        <link rel="stylesheet" href="http://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="http://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li class="active"><a href="http://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li><a href="http://pminkov.github.io/blog/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="http://pminkov.github.io/blog/socket-programming-in-linux.html" rel="bookmark"
+           title="Permalink to Socket Programming in Linux">Socket Programming in Linux</a></h1>
+    </header>
+
+    <div class="entry-content">
+<div class="post-info">
+        <div class="published" title="2017-08-02T12:10:00-07:00">
+                Published: Wed 02 August 2017
+in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
+        </div>
+
+</div><!-- /.post-info -->    </div>
+    <div>
+      <p>Some time last year I wanted to learn more about network programming and multi threading and wrote a <a href="https://github.com/pminkov/webserver/">webserver</a> in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote <a href="https://github.com/pminkov/webserver/blob/master/client.c">a client</a> too. It's now time to write a bit about how all of this works.</p>
+<p>Programming sockets in Linux is similar to all system programming in C. It's easy to make errors, so you have to be careful. It's difficult to comprehend the complexity and intricacy if you're just copying and pasting code from Stack Overflow. <a href="http://man7.org/tlpi/">The Linux Programming Interface</a> is a book that has several chapters dedicated to socket programming and it describes it very well, as well as throwing in a lot of information about how networks work and an excellent concise description of the TCP protocol. I highly recommend that book and I might write more about it in the future.</p>
+<p>So let's talk a bit about how to write a webserver and a client for it in C.</p>
+<p>Let's start with the server. The full code is in <a href="https://github.com/pminkov/webserver/blob/master/server.c">server.c</a>, but I'll summarize the imporatnt points:</p>
+<ul>
+<li>Create a socket with <code>socket()</code>. The code looks like  this:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">sockfd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</pre></div>
+
+
+<p><code>SOCK_STREAM</code> means that we're creating a stream socket (TCP socket).</p>
+<ul>
+<li>Bind the socket to an address. The key lines are:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">:</span> <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serv_addr</span><span class="p">;</span>
+<span class="mi">2</span><span class="o">:</span> <span class="kt">uint16_t</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">8000</span><span class="p">;</span>
+<span class="p">...</span>
+<span class="mi">3</span><span class="o">:</span> <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+<span class="mi">4</span><span class="o">:</span> <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">port</span><span class="p">);</span>
+<span class="mi">5</span><span class="o">:</span> <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+<span class="p">...</span>
+<span class="mi">6</span><span class="o">:</span> <span class="n">bind</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">serv_addr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">serv_addr</span><span class="p">))</span>
+</pre></div>
+
+
+<p>We're creating an address <code>serv_addr</code> and binding it to the socket we created above. Note that we use <code>INADDR_ANY</code> as the IP address on which the socket is listening. This is the so-called IPv4 wildcard address. It binds your server to all interfaces available on your machine. That's more useful for me than binding to <code>INADDR_LOOPBACK</code> (127.0.0.1), because I'm running my code in a VM and accessing the server from my MacBook. Run <code>ifconfig</code> on your box to see the network interfaces that are available on it.</p>
+<ul>
+<li>Great, we have a socket and it's assigned to an address. This socket can now be used as as passive socket (it's listening for connections) or an active socket (it's used to connect to a peer socket). We want a passive socket. We mark it as a passive socket by calling the <code>listen</code> function. The code looks like this:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">listen</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="n">SOMAXCONN</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="n">error</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t listen&quot;</span><span class="p">);</span>
+</pre></div>
+
+
+<ul>
+<li>The socket is now ready to accept connections. This can happen in a loop that looks like this:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">client_addr</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">cli_len</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">client_addr</span><span class="p">);</span>
+
+<span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">newsockfd</span> <span class="o">=</span> <span class="n">accept</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">client_addr</span><span class="p">,</span> 
+        <span class="p">(</span><span class="kt">socklen_t</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">cli_len</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">newsockfd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="n">error</span><span class="p">(</span><span class="s">&quot;Error on accept&quot;</span><span class="p">);</span>
+    <span class="c1">// newsockfd is a file descriptor. </span>
+    <span class="c1">// Handle the connection by reading from and writing to this descriptor.</span>
+    <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>The <code>accept</code> function blocks until a connection request is received and creates a new socket when that happens. After that, it's your call how you'll handle this socket. You can fork a new process, create a new thread or in my case I have a thred pool of pre-forked threads which just pull these sockets from a queue and do what's necessary to handle a web server request.</p>
+<p>That's the server. Now let's look at the client. Full code is in <a href="https://github.com/pminkov/webserver/blob/master/client.c">client.c</a>. It's a pretty simple client that connects to localhost (127.0.0.1). So you can't use it if the server is running remotely.</p>
+<p>You start by creating a socket with <code>socket()</code> and then calling <code>connect()</code> and passing the address to which you want to connect:</p>
+<div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">sockfd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">sockfd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">error</span><span class="p">(</span><span class="s">&quot;socket&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">uint16_t</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">8000</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serv_addr</span><span class="p">;</span>
+<span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
+<span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">port</span><span class="p">);</span>
+<span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_LOOPBACK</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">connect</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">serv_addr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr_in</span><span class="p">))</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">error</span><span class="p">(</span><span class="s">&quot;connect&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>If the connection is successful, you can just send your request to the server using the <code>write()</code> system call and read the response with the <code>read()</code> call.</p>
+<p>So that's a simple web server and a client. The code still has a lot of bugs (the client will buffer overflow if I pass a request string longer than 512 chars, I'm not closing the connection explicitly, etc.), but it gets the job done.</p>
+<p>A final interesting thing to do is to run Wireshark and see what packets are going between the client and the server. To do this, I started the server on my Virtual box Ubuntu (192.168.1.135) and ran <code>curl</code> from my MacBook (192.168.1.86). Here's what I saw in Wireshark:</p>
+<p><center><img alt="Wireshark" src="http://pminkov.github.io/blog/images/wireshark.png"></center></p>
+<p>You can see the three way TCP handshake in the beginning (<code>SYN</code> followed by <code>SYN,ACK</code> followed by <code>ACK</code>) and everything else in between. It's definitely something interesting to try out.</p>
+    </div><!-- /.entry-content -->
+    <div class="comments">
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'socket-programming-in-linux.html';
+        var disqus_url = 'http://pminkov.github.io/blog/socket-programming-in-linux.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <!--
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                  Blah blha blah
+                </address>
+        </footer>
+        -->
+        <!-- /#contentinfo -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-243631-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>
