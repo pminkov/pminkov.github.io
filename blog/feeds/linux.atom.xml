@@ -1,5 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog - Linux</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/linux.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-08-02T12:10:00-07:00</updated><entry><title>Socket Programming in Linux</title><link href="http://pminkov.github.io/blog/socket-programming-in-linux.html" rel="alternate"></link><published>2017-08-02T12:10:00-07:00</published><updated>2017-08-02T12:10:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-08-02:/blog/socket-programming-in-linux.html</id><summary type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's now time to write a bit about how all of this works.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog - Linux</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/linux.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2017-08-09T17:30:00-07:00</updated><entry><title>Simple guide to SSH</title><link href="http://pminkov.github.io/blog/simple-guide-to-ssh.html" rel="alternate"></link><published>2017-08-09T17:30:00-07:00</published><updated>2017-08-09T17:30:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-08-09:/blog/simple-guide-to-ssh.html</id><summary type="html">&lt;p&gt;Today I was debugging some SSH connectivity problem and I learned some new things about SSH, which I wanted to summarize as a simple guide to SSH.&lt;/p&gt;
+&lt;h3&gt;What is SSH for?&lt;/h3&gt;
+&lt;p&gt;SSH is used to communicate securely between a client and a server. Some examples that most people are familiar …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Today I was debugging some SSH connectivity problem and I learned some new things about SSH, which I wanted to summarize as a simple guide to SSH.&lt;/p&gt;
+&lt;h3&gt;What is SSH for?&lt;/h3&gt;
+&lt;p&gt;SSH is used to communicate securely between a client and a server. Some examples that most people are familiar with are SSH-ing to a remote server or using GitHub.&lt;/p&gt;
+&lt;h3&gt;What components are involved?&lt;/h3&gt;
+&lt;p&gt;To establish an SSH connection you need a &lt;strong&gt;private key&lt;/strong&gt; and a &lt;strong&gt;public key&lt;/strong&gt;. You keep the private key in a safe place (usually in &lt;code&gt;~/.ssh/&lt;/code&gt;) and upload the public key to any server that you want to securely connect to. Encryption with a private key and a public key is called &lt;a href="https://en.wikipedia.org/wiki/Public-key_cryptography"&gt;assymetric encryption&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;How do you create a key pair. Like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh-keygen -t rsa -b &lt;span class="m"&gt;4096&lt;/span&gt; -C &lt;span class="s2"&gt;&amp;quot;myemail@gmail.com&amp;quot;&lt;/span&gt;
+Generating public/private rsa key pair.
+Enter file in which to save the key &lt;span class="o"&gt;(&lt;/span&gt;/home/petko/.ssh/id_rsa&lt;span class="o"&gt;)&lt;/span&gt;: ./mykey
+Enter passphrase &lt;span class="o"&gt;(&lt;/span&gt;empty &lt;span class="k"&gt;for&lt;/span&gt; no passphrase&lt;span class="o"&gt;)&lt;/span&gt;: 
+Enter same passphrase again: 
+Your identification has been saved in ./mykey.
+Your public key has been saved in ./mykey.pub.
+The key fingerprint is:
+SHA256:0/zlEZZj0R6yM4uHVD+xJWoLOx3+TormCRcyWt3c53o myemail@gmail.com
+The key&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;s randomart image is:
++---&lt;span class="o"&gt;[&lt;/span&gt;RSA &lt;span class="m"&gt;4096&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;----+
+&lt;span class="p"&gt;|&lt;/span&gt;              .. &lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;             o.&lt;span class="o"&gt;=&lt;/span&gt;o&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;            ..Xo&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;         +.++B *.&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;        S **&lt;span class="o"&gt;=&lt;/span&gt;oB o&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;       o +o&lt;span class="o"&gt;=&lt;/span&gt;+&lt;span class="o"&gt;=&lt;/span&gt; + &lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;      . . ..o.o .&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;         o.o o..E&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;         o+ ..o. &lt;span class="p"&gt;|&lt;/span&gt;
++----&lt;span class="o"&gt;[&lt;/span&gt;SHA256&lt;span class="o"&gt;]&lt;/span&gt;-----+
+$ ls -l
+total &lt;span class="m"&gt;8&lt;/span&gt;
+-rw------- &lt;span class="m"&gt;1&lt;/span&gt; petko petko &lt;span class="m"&gt;3243&lt;/span&gt; Aug  &lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="m"&gt;16&lt;/span&gt;:24 mykey
+-rw-r--r-- &lt;span class="m"&gt;1&lt;/span&gt; petko petko  &lt;span class="m"&gt;743&lt;/span&gt; Aug  &lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="m"&gt;16&lt;/span&gt;:24 mykey.pub
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;How do the public and private key look like. They look like this (I have removed some of the output to keep you from scrolling too much):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat ./mykey
+-----BEGIN RSA PRIVATE KEY-----
+MIIJKQIBAAKCAgEA2FGlZybznkcHQG530bj+DlrY74nTh+shP1uyJA25BrkAyOz9
+xc8Tvlk3QfBcGFfQKc1OowV80XtNyXXnOeFTqlh8B8DS1Mul165wgb+pJDROvI0J
+...
+3vZfDPXo9w2XwAwN7hLimCVWdqr0JI8BmbussW4ZrJRcra1rvsLj6sip9Ry3oP+9
+PIUEPwDY/YUVRZV2De4cBdBnwTmj9RoXOW63mW6sL8lfeYjJQwQys+jVVjRi
+-----END RSA PRIVATE KEY-----
+
+$ cat ./mykey.pub 
+ssh-rsa AAAAB3NzaC ... +PAAKfQ&lt;span class="o"&gt;==&lt;/span&gt; myemail@gmail.com
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So that's it. A private key and a public key. Nothing else. Keep the private key secret, upload the public key.&lt;/p&gt;
+&lt;h3&gt;So how do the client and the server communicate with SSH?&lt;/h3&gt;
+&lt;p&gt;Great question. If you have a key pair you can encrypt a message with one of the keys and decrypt it with the other key. But that's not how data is exchanged with an SSH connection. SSH is actually using &lt;a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm"&gt;symmetric key encryption&lt;/a&gt;. The private and public keys are used to securely exchange a temporary symmetric key used to encrypt the data between two machines. The symmetric key crosses the wire in encrypted form, so an attacked can't find out what the key is.&lt;/p&gt;
+&lt;p&gt;Dig into this excellent &lt;a href="https://superuser.com/questions/383732/how-does-ssh-encryption-work"&gt;stackoverflow question&lt;/a&gt; to learn more about this.&lt;/p&gt;
+&lt;h3&gt;The ssh command.&lt;/h3&gt;
+&lt;p&gt;We now know what's involved in SSH communication. Let's look at the commands that are used. &lt;/p&gt;
+&lt;p&gt;We'll start with a clean example. I have an AWS EC2 instance on which I have installed a public key. The private key is located in my &lt;code&gt;~/.ssh/&lt;/code&gt; directory. It's called &lt;code&gt;aws-laptop&lt;/code&gt;, because I use it from my laptop.&lt;/p&gt;
+&lt;p&gt;Let's try to ssh into the instance:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;~/.ssh$ ssh ubuntu@35.165.19.203
+Permission denied &lt;span class="o"&gt;(&lt;/span&gt;publickey&lt;span class="o"&gt;)&lt;/span&gt;.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Doesn't work. Well, of course - ssh doesn't know what private key to use. We have to point to it using the &lt;code&gt;-i&lt;/code&gt; option.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;~/.ssh$ ssh -i ./aws-laptop ubuntu@35.165.19.203
+The authenticity of host &lt;span class="s1"&gt;&amp;#39;35.165.19.203 (35.165.19.203)&amp;#39;&lt;/span&gt; can&lt;span class="s1"&gt;&amp;#39;t be established.&lt;/span&gt;
+&lt;span class="s1"&gt;ECDSA key fingerprint is SHA256: 3w+LlpD/HH .......&lt;/span&gt;
+&lt;span class="s1"&gt;Are you sure you want to continue connecting (yes/no)? yes&lt;/span&gt;
+&lt;span class="s1"&gt;Enter passphrase for key &amp;#39;&lt;/span&gt;./aws-laptop&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;:  &lt;span class="o"&gt;[&lt;/span&gt;Here I entered a passphrase&lt;span class="o"&gt;]&lt;/span&gt;
+Welcome to Ubuntu &lt;span class="m"&gt;16&lt;/span&gt;.04.2 LTS &lt;span class="o"&gt;(&lt;/span&gt;GNU/Linux &lt;span class="m"&gt;4&lt;/span&gt;.4.0-1022-aws x86_64&lt;span class="o"&gt;)&lt;/span&gt;
+...
+Last login: Wed Aug  &lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="m"&gt;23&lt;/span&gt;:09:13 &lt;span class="m"&gt;2017&lt;/span&gt; from &lt;span class="m"&gt;76&lt;/span&gt;.102.141.14
+
+ubuntu@ip-172-31-13-46:~$
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Hooray, I'm in! What happened in the meantime is that the ssh command saved an entry into the &lt;code&gt;known_hosts&lt;/code&gt; file, so next time I ssh it won't ask me again to confirm the authenticity of the remote host.&lt;/p&gt;
+&lt;p&gt;However, I'll still need to point to the private key and enter the passphrase for it. Very inconvenient.&lt;/p&gt;
+&lt;h3&gt;ssh-agent&lt;/h3&gt;
+&lt;p&gt;The solution to the above problem is the &lt;code&gt;ssh-agent&lt;/code&gt; daemon. &lt;code&gt;ssh-agent&lt;/code&gt; is a program that you start when you first login and you can add private keys to it so that next time you ssh into a server, you don't have to point to them.&lt;/p&gt;
+&lt;p&gt;How does ssh-agent know which private key to use? When you run &lt;code&gt;ssh -v ubuntu@35.165.19.203&lt;/code&gt; you can see that there's a bit of back and forth where &lt;code&gt;ssh&lt;/code&gt; seems to be trying out private keys from &lt;code&gt;ssh-agent&lt;/code&gt;. So I guess that's how it's done:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;debug1: Offering RSA public key: /home/petko/.ssh/id_rsa
+debug1: Authentications that can &lt;span class="k"&gt;continue&lt;/span&gt;: publickey
+debug1: Offering RSA public key: ./aws-laptop
+debug1: Server accepts key: pkalg rsa-sha2-512 blen &lt;span class="m"&gt;279&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We can list the keys in ssh-agent with this command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh-add -l
+The agent has no identities.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;No keys. So let's add the key that we were using.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh-add ./aws-laptop
+Enter passphrase &lt;span class="k"&gt;for&lt;/span&gt; ./aws-laptop: &lt;span class="o"&gt;[&lt;/span&gt;I entered passphrase&lt;span class="o"&gt;]&lt;/span&gt;
+Identity added: ./aws-laptop &lt;span class="o"&gt;(&lt;/span&gt;./aws-laptop&lt;span class="o"&gt;)&lt;/span&gt;
+$ ssh-add -l
+&lt;span class="m"&gt;2048&lt;/span&gt; SHA256:tU++v7cfD8... ./aws-laptop &lt;span class="o"&gt;(&lt;/span&gt;RSA&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The private key is now saved! I can now ssh without pointing to it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh ubuntu@35.165.19.203
+Welcome to Ubuntu &lt;span class="m"&gt;16&lt;/span&gt;.04.2 LTS &lt;span class="o"&gt;(&lt;/span&gt;GNU/Linux &lt;span class="m"&gt;4&lt;/span&gt;.4.0-1022-aws x86_64&lt;span class="o"&gt;)&lt;/span&gt;
+...
+ubuntu@ip-172-31-13-46:~$ 
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Great.&lt;/p&gt;
+&lt;h3&gt;Manually verifying a private key&lt;/h3&gt;
+&lt;p&gt;Today I was trying again and again to connect to a remote machine using the wrong private key. I was able to connect to that machine from my laptop, but not from my Ubuntu VM.&lt;/p&gt;
+&lt;p&gt;I was running the following command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh -i ./somekey.pem  ubuntu@35.165.19.203
+Permission denied &lt;span class="o"&gt;(&lt;/span&gt;publickey&lt;span class="o"&gt;)&lt;/span&gt;.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;How did I debug this? I ssh-ed into the server from my laptop and looked up the public key in &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt;. I then generated the public key from my private key, like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh-keygen -y -f  ./somekey.pem
+ssh-rsa AAAAB3....KY1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And sure enough, the public keys were not matching. I then found the correct private key and was able to connect with it.&lt;/p&gt;
+&lt;p&gt;If you're following carefully, you'll notice that I did something here that's considered a bad practice. I reused my private key from my laptop on my VirtualBox. I should generate a new key pair and add the public key to the &lt;code&gt;authorized_keys&lt;/code&gt; file on the server.&lt;/p&gt;
+&lt;p&gt;So that's it so far. One thing that I didn't cover is how to start the ssh agent automatically. I have some commands in my &lt;code&gt;bash_profile&lt;/code&gt; to do that that I digged from Stack Overflow. Here's a &lt;a href="http://www.snailbook.com/faq/about-agent.auto.html"&gt;great description&lt;/a&gt; that can aid in starting &lt;code&gt;ssh-agent&lt;/code&gt;.&lt;/p&gt;</content></entry><entry><title>Socket Programming in Linux</title><link href="http://pminkov.github.io/blog/socket-programming-in-linux.html" rel="alternate"></link><published>2017-08-02T12:10:00-07:00</published><updated>2017-08-02T12:10:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-08-02:/blog/socket-programming-in-linux.html</id><summary type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's now time to write a bit about how all of this works.&lt;/p&gt;
 &lt;p&gt;Programming sockets in Linux is similar to all system programming in C. It's easy to make errors, so you have to be careful. It's difficult to comprehend the complexity and intricacy if you're just copying and pasting code from Stack Overflow. &lt;a href="http://man7.org/tlpi/"&gt;The Linux Programming Interface&lt;/a&gt; is a book that has several chapters dedicated to socket programming and it describes it very well, as well as throwing in a lot of information about how networks work and an excellent concise description of the TCP protocol. I highly recommend that book and I might write more about it in the future.&lt;/p&gt;
 &lt;p&gt;So let's talk a bit about how to write a webserver and a client for it in C.&lt;/p&gt;
 &lt;p&gt;Let's start with the server. The full code is in &lt;a href="https://github.com/pminkov/webserver/blob/master/server.c"&gt;server.c&lt;/a&gt;, but I'll summarize the imporatnt points:&lt;/p&gt;
