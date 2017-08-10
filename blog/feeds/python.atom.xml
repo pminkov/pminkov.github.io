@@ -2,236 +2,212 @@
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog - Python</title><link href="http://pminkov.github.io/blog/" rel="alternate"></link><link href="http://pminkov.github.io/blog/feeds/python.atom.xml" rel="self"></link><id>http://pminkov.github.io/blog/</id><updated>2016-10-31T13:56:00-07:00</updated><entry><title>Using pandas to read a table from an HTML page.</title><link href="http://pminkov.github.io/blog/using-pandas-to-read-a-table-from-an-html-page.html" rel="alternate"></link><published>2016-10-31T13:56:00-07:00</published><updated>2016-10-31T13:56:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-10-31:/blog/using-pandas-to-read-a-table-from-an-html-page.html</id><summary type="html">&lt;p&gt;Today I wanted to write a bit of simple code to try out a hypothesis I had about stock prices. I found historical data at &lt;a href="http://www.multpl.com/s-p-500-historical-prices/table/by-year"&gt;multpl.com&lt;/a&gt;. At first I thought I'd have to write my own code using Python's &lt;a href="https://docs.python.org/2/library/htmlparser.html"&gt;HTMLParser&lt;/a&gt;. As much as I like to write code, I …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Today I wanted to write a bit of simple code to try out a hypothesis I had about stock prices. I found historical data at &lt;a href="http://www.multpl.com/s-p-500-historical-prices/table/by-year"&gt;multpl.com&lt;/a&gt;. At first I thought I'd have to write my own code using Python's &lt;a href="https://docs.python.org/2/library/htmlparser.html"&gt;HTMLParser&lt;/a&gt;. As much as I like to write code, I decided to save myself some time and find something that already does this. To my surprise, &lt;a href="http://pandas.pydata.org/"&gt;pandas&lt;/a&gt;, already has a &lt;a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_html.html"&gt;function&lt;/a&gt; that reads data from HTML tables. Great. Let's see how it works.&lt;/p&gt;
 &lt;p&gt;First, I installed pandas, lxml and a bunch of other requirements in a &lt;a href="http://pminkov.github.io/why-i-always-use-virtualenv-to-try-out-new-libraries.html"&gt;virtual environment&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;To read the tables from the webpage, I used the following lines of code:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="n"&gt;tables&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pandas&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read_html&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;http://www.multpl.com/s-p-500-historical-prices/table/by-month&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;header&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="k"&gt;assert&lt;/span&gt; &lt;span class="nb"&gt;len&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;tables&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
-  &lt;span class="n"&gt;table&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;tables&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
+&lt;p&gt;&lt;code&gt;python
+  tables = pandas.read_html('http://www.multpl.com/s-p-500-historical-prices/table/by-month', header=0)
+  assert len(tables) == 1
+  table = tables[0]&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;The &lt;code&gt;header&lt;/code&gt; parameter, says that we should use the first row in a table as the dataframe's column names. Spefically for this table, one of the columns was getting a somewhat wrong name, but it was easy to fix it with this line of code:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;table&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;columns&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Price&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
+&lt;p&gt;&lt;code&gt;python
+table.columns = ['Date', 'Price']&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;There we go, we have read historical stock prices into a pandas dataframe. To iterate and print them, we can do it like this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;idx&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;table&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;iterrows&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
-   &lt;span class="n"&gt;date&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Date&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
-   &lt;span class="n"&gt;price&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;row&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Price&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
-   &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;date&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;price&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</content></entry><entry><title>What I learned from reading Dive into Python.</title><link href="http://pminkov.github.io/blog/what-i-learned-from-reading-dive-into-python.html" rel="alternate"></link><published>2016-06-15T09:57:00-07:00</published><updated>2016-06-15T09:57:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-06-15:/blog/what-i-learned-from-reading-dive-into-python.html</id><summary type="html">&lt;p&gt;I recently started reading &lt;a href="http://www.diveintopython.net/toc/index.html"&gt;Dive into Python&lt;/a&gt;. I've been meaning to fill some gaps in my Python knowledge, since I've used the language for about ten years, but feel like I have just picked whatever parts I needed to do my work and don't have a very solid base.&lt;/p&gt;
+&lt;p&gt;```python&lt;/p&gt;
+&lt;p&gt;for (idx, row) in table.iterrows():
+   date = row['Date']
+   price = row['Price']
+   print date, price
+```&lt;/p&gt;</content></entry><entry><title>What I learned from reading Dive into Python.</title><link href="http://pminkov.github.io/blog/what-i-learned-from-reading-dive-into-python.html" rel="alternate"></link><published>2016-06-15T09:57:00-07:00</published><updated>2016-06-15T09:57:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-06-15:/blog/what-i-learned-from-reading-dive-into-python.html</id><summary type="html">&lt;p&gt;I recently started reading &lt;a href="http://www.diveintopython.net/toc/index.html"&gt;Dive into Python&lt;/a&gt;. I've been meaning to fill some gaps in my Python knowledge, since I've used the language for about ten years, but feel like I have just picked whatever parts I needed to do my work and don't have a very solid base.&lt;/p&gt;
 &lt;p&gt;I'll …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I recently started reading &lt;a href="http://www.diveintopython.net/toc/index.html"&gt;Dive into Python&lt;/a&gt;. I've been meaning to fill some gaps in my Python knowledge, since I've used the language for about ten years, but feel like I have just picked whatever parts I needed to do my work and don't have a very solid base.&lt;/p&gt;
 &lt;p&gt;I'll summarize some of the new things I learned from this book:&lt;/p&gt;
-&lt;h3&gt;Chapter 2 (Your First Python Program)&lt;/h3&gt;
+&lt;h3 id="chapter-2-your-first-python-program"&gt;Chapter 2 (Your First Python Program)&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;sys.path&lt;/code&gt; contains the list of directories that Python uses to lookup module imports.&lt;/li&gt;
 &lt;li&gt;One use of the &lt;code&gt;__name__&lt;/code&gt; attribute is to write testing code. When a module is imported &lt;code&gt;__name__&lt;/code&gt; is the name of the module. When a module python file is executed from the command line &lt;code&gt;__name__&lt;/code&gt; is equal to &lt;code&gt;__main__&lt;/code&gt;. Personally this feels like a bit of a hack to me, since you can use something like say Django's unit testing platform, but it might come handy sometime.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3&gt;Chapter 3 (Native Datatypes)&lt;/h3&gt;
+&lt;h3 id="chapter-3-native-datatypes"&gt;Chapter 3 (Native Datatypes)&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;Here's a cool trick mentioned in this chapter:&lt;/li&gt;
+&lt;li&gt;Here's a cool trick mentioned in this chapter:
+&lt;code&gt;python
+(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY) = range(7)&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;MONDAY&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;TUESDAY&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;WEDNESDAY&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;THURSDAY&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;FRIDAY&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SATURDAY&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SUNDAY&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;range&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h3&gt;Chapter 4 (The Power Of Introspection):&lt;/h3&gt;
+&lt;h3 id="chapter-4-the-power-of-introspection"&gt;Chapter 4 (The Power Of Introspection):&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;Some useful functions are mentioned: &lt;code&gt;dir&lt;/code&gt; (try on a module or an object instance), &lt;code&gt;callable&lt;/code&gt;, &lt;code&gt;getattr&lt;/code&gt;, &lt;code&gt;__doc__&lt;/code&gt;.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;So you can do something interesting, like this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kr"&gt;class&lt;/span&gt; &lt;span class="nx"&gt;Sum&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-  &lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;Sums numbers&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-  &lt;span class="nx"&gt;member&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;
-
-  &lt;span class="nx"&gt;def&lt;/span&gt; &lt;span class="nx"&gt;sum2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-    &lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;Sum two numbers&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;a&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt;
-
-  &lt;span class="nx"&gt;def&lt;/span&gt; &lt;span class="nx"&gt;sum3&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;self&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-    &lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;Sum three numbers&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;a&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;c&lt;/span&gt;
-
-
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;__main__&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt;
-  &lt;span class="nx"&gt;methods&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;f&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="nx"&gt;f&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="nx"&gt;dir&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Sum&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;callable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Sum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;f&lt;/span&gt;&lt;span class="p"&gt;))]&lt;/span&gt;
-  &lt;span class="nx"&gt;docs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;\n&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;join&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;%s %s&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;f&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;Sum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;f&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;__doc__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="nx"&gt;f&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="nx"&gt;methods&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
-  &lt;span class="nx"&gt;print&lt;/span&gt; &lt;span class="nx"&gt;docs&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;And run it:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ python ./sum.py
+&lt;p&gt;So you can do something interesting, like this:
+```
+class Sum:
+  """Sums numbers"""
+  member = 3&lt;/p&gt;
+&lt;p&gt;def sum2(self, a, b):
+    """Sum two numbers"""
+    return a + b&lt;/p&gt;
+&lt;p&gt;def sum3(self, a, b, c):
+    """Sum three numbers"""
+    return a + b + c&lt;/p&gt;
+&lt;p&gt;if &lt;strong&gt;name&lt;/strong&gt; == '&lt;strong&gt;main&lt;/strong&gt;':
+  methods = [f for f in dir(Sum) if callable(getattr(Sum, f))]
+  docs = '\n'.join(["%s %s" % (f, getattr(Sum, f).&lt;strong&gt;doc&lt;/strong&gt;) for f in methods])
+  print docs
+```&lt;/p&gt;
+&lt;p&gt;And run it:
+&lt;code&gt;bash
+$ python ./sum.py
 sum2 Sum two numbers
-sum3 Sum three numbers
-&lt;/pre&gt;&lt;/div&gt;
-
-
+sum3 Sum three numbers&lt;/code&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;The "and-or trick"&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;is_mammal&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;use_rpc&lt;/span&gt; &lt;span class="ow"&gt;and&lt;/span&gt; &lt;span class="n"&gt;remote_check_is_mammal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;animal&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;or&lt;/span&gt; &lt;span class="n"&gt;DEFAULT_IS_MAMMAL&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
+&lt;p&gt;&lt;code&gt;python
+is_mammal = use_rpc and remote_check_is_mammal(animal) or DEFAULT_IS_MAMMAL&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;That's like &lt;code&gt;?:&lt;/code&gt; in C++. I think I did well with creating a good example here :).&lt;/p&gt;
-&lt;h3&gt;Chapter 5 (Objects and Object-Orientation)&lt;/h3&gt;
+&lt;h3 id="chapter-5-objects-and-object-orientation"&gt;Chapter 5 (Objects and Object-Orientation)&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;var1 is var2&lt;/code&gt; checks for object identity. Here's a good &lt;a href="http://stackoverflow.com/questions/13650293/understanding-pythons-is-operator"&gt;stackoverflow&lt;/a&gt; article that gives examples.&lt;/li&gt;
 &lt;li&gt;You can change a class variable using &lt;code&gt;self.__class__.variable_name = new_value&lt;/code&gt;.&lt;/li&gt;
 &lt;li&gt;You can create your own dictionary by inheriting from &lt;code&gt;UserDict&lt;/code&gt;.&lt;/li&gt;
 &lt;li&gt;If you call &lt;code&gt;x["hello"] = 3&lt;/code&gt;, this calls the &lt;code&gt;__setitem__&lt;/code&gt; method. There are other similar methods, like &lt;code&gt;__getitem__&lt;/code&gt;, etc.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3&gt;Chapter 6 (Exceptions and file handling)&lt;/h3&gt;
+&lt;h3 id="chapter-6-exceptions-and-file-handling"&gt;Chapter 6 (Exceptions and file handling)&lt;/h3&gt;
 &lt;ul&gt;
-&lt;li&gt;You can use &lt;code&gt;else&lt;/code&gt; in exceptions code. Like this:&lt;/li&gt;
+&lt;li&gt;You can use &lt;code&gt;else&lt;/code&gt; in exceptions code. Like this:
+```python
+class RPC:
+  def remote_call(self):
+    pass&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;RPC&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;remote_call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="bp"&gt;self&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-    &lt;span class="k"&gt;pass&lt;/span&gt;
-
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;find_function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-  &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-    &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;RPC&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;AttributeError&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;No such function.&amp;#39;&lt;/span&gt;
-  &lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Function was found.&amp;#39;&lt;/span&gt;
-  &lt;span class="k"&gt;finally&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-    &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Enough lookups.&amp;#39;&lt;/span&gt;
-    &lt;span class="k"&gt;print&lt;/span&gt;
-
-&lt;span class="n"&gt;find_function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;func&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;find_function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;remote_call&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Output:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;python ./ex.py 
-No such &lt;span class="k"&gt;function&lt;/span&gt;.
+&lt;p&gt;def find_function(name):
+  try:
+    a = getattr(RPC, name)
+  except AttributeError:
+    print 'No such function.'
+  else:
+    print 'Function was found.'
+  finally:
+    print 'Enough lookups.'
+    print&lt;/p&gt;
+&lt;p&gt;find_function('func')
+find_function('remote_call')
+```&lt;/p&gt;
+&lt;p&gt;Output:
+```bash
+python ./ex.py 
+No such function.
+Enough lookups.&lt;/p&gt;
+&lt;p&gt;Function was found.
 Enough lookups.
-
-Function was found.
-Enough lookups.
-&lt;/pre&gt;&lt;/div&gt;
-
-
+```&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;When you open a file, you have a variety of functions and attributes on the file object, like &lt;code&gt;seek&lt;/code&gt;, &lt;code&gt;read&lt;/code&gt;, &lt;code&gt;mode&lt;/code&gt;, &lt;code&gt;name&lt;/code&gt;. For example, to see how big a file is you can just call &lt;code&gt;f.seek(0, 2)&lt;/code&gt; to seek until the end and then &lt;code&gt;f.tell()&lt;/code&gt; to output the number of bytes.&lt;/li&gt;
 &lt;li&gt;A class' module is accessible by calling &lt;code&gt;ClassName.__module__&lt;/code&gt;. All imported modules are in the &lt;code&gt;sys.modules&lt;/code&gt; dictionary. Example:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;sum&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;Sum&lt;/span&gt;
-&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;sys&lt;/span&gt;
-&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;modules&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Sum&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="vm"&gt;__module__&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
-&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;module&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;sum&amp;#39;&lt;/span&gt; &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;sum.py&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
-&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;getattr&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;modules&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Sum&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="vm"&gt;__module__&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;Sum&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;sum&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Sum&lt;/span&gt; &lt;span class="n"&gt;at&lt;/span&gt; &lt;span class="mh"&gt;0x109535a10&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h3&gt;Chapter 7 (Regular Expressions)&lt;/h3&gt;
+&lt;p&gt;```python&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;from sum import Sum
+import sys
+sys.modules[Sum.&lt;strong&gt;module&lt;/strong&gt;]
+&lt;module 'sum' from 'sum.py'&gt;
+getattr(sys.modules[Sum.&lt;strong&gt;module&lt;/strong&gt;], 'Sum')
+&lt;class sum.Sum at 0x109535a10&gt;
+```&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;h3 id="chapter-7-regular-expressions"&gt;Chapter 7 (Regular Expressions)&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;\\b&lt;/code&gt; matches a word boundary. This can be so useful.&lt;/li&gt;
 &lt;li&gt;Verbose regular expressions. Again, very useful. Example:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;re&lt;/span&gt;
-
-&lt;span class="n"&gt;raw_regex&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sa"&gt;r&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-&lt;span class="s2"&gt;  (\d{3})&lt;/span&gt;
-&lt;span class="s2"&gt;  \D*&lt;/span&gt;
-&lt;span class="s2"&gt;  (\d{3})&lt;/span&gt;
-&lt;span class="s2"&gt;  \D*&lt;/span&gt;
-&lt;span class="s2"&gt;  (\d{4})&lt;/span&gt;
-&lt;span class="s2"&gt;&amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-
-&lt;span class="n"&gt;examples&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
-  &lt;span class="s2"&gt;&amp;quot;4153125633&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-  &lt;span class="s2"&gt;&amp;quot;415-312-5633&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-  &lt;span class="s2"&gt;&amp;quot;415 312 5633&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-  &lt;span class="s2"&gt;&amp;quot;work 415 312 5633&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-  &lt;span class="s2"&gt;&amp;quot;(415) - 312 - 5633&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-  &lt;span class="s2"&gt;&amp;quot;1 415 312 5633&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="p"&gt;]&lt;/span&gt;
-
-&lt;span class="n"&gt;phone_re&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;compile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;raw_regex&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VERBOSE&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;example&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;examples&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
-  &lt;span class="n"&gt;groups&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;phone_re&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;search&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;example&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;groups&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-  &lt;span class="k"&gt;assert&lt;/span&gt; &lt;span class="n"&gt;groups&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;415&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;312&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;5633&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</content></entry><entry><title>Why I always use virtualenv to try out new libraries.</title><link href="http://pminkov.github.io/blog/why-i-always-use-virtualenv-to-try-out-new-libraries.html" rel="alternate"></link><published>2016-05-24T18:14:00-07:00</published><updated>2016-05-24T18:14:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-05-24:/blog/why-i-always-use-virtualenv-to-try-out-new-libraries.html</id><summary type="html">&lt;p&gt;One thing that I always do with virtualenv is to install new Python libraries in a new virtualenv before I install them into the one I'm currently working with.&lt;/p&gt;
+&lt;p&gt;```python
+import re&lt;/p&gt;
+&lt;p&gt;raw_regex = r"""
+  (\d{3})
+  \D&lt;em&gt;
+  (\d{3})
+  \D&lt;/em&gt;
+  (\d{4})
+"""&lt;/p&gt;
+&lt;p&gt;examples = [
+  "4153125633",
+  "415-312-5633",
+  "415 312 5633",
+  "work 415 312 5633",
+  "(415) - 312 - 5633",
+  "1 415 312 5633",
+]&lt;/p&gt;
+&lt;p&gt;phone_re = re.compile(raw_regex, re.VERBOSE)&lt;/p&gt;
+&lt;p&gt;for example in examples:
+  groups = phone_re.search(example).groups()
+  assert groups == ('415', '312', '5633')
+```&lt;/p&gt;</content></entry><entry><title>Why I always use virtualenv to try out new libraries.</title><link href="http://pminkov.github.io/blog/why-i-always-use-virtualenv-to-try-out-new-libraries.html" rel="alternate"></link><published>2016-05-24T18:14:00-07:00</published><updated>2016-05-24T18:14:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-05-24:/blog/why-i-always-use-virtualenv-to-try-out-new-libraries.html</id><summary type="html">&lt;p&gt;One thing that I always do with virtualenv is to install new Python libraries in a new virtualenv before I install them into the one I'm currently working with.&lt;/p&gt;
 &lt;p&gt;Here's how I do this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ virtualenv venv
+&lt;p&gt;```
+$ virtualenv venv
 New python executable in /Users/petko/work/post/venv/bin/python
-Installing setuptools, pip …&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;One thing that I always do with virtualenv is to install new Python libraries in a new virtualenv before I install them into the one I'm currently working with.&lt;/p&gt;
+Installing setuptools, pip …&lt;/p&gt;</summary><content type="html">&lt;p&gt;One thing that I always do with virtualenv is to install new Python libraries in a new virtualenv before I install them into the one I'm currently working with.&lt;/p&gt;
 &lt;p&gt;Here's how I do this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ virtualenv venv
+&lt;p&gt;```
+$ virtualenv venv
 New python executable in /Users/petko/work/post/venv/bin/python
-Installing setuptools, pip, wheel...done.
-
-$ . ./venv/bin/activate
-&lt;span class="o"&gt;(&lt;/span&gt;venv&lt;span class="o"&gt;)&lt;/span&gt; 
-
-$ pip install cryptography
-... lengthy install log ...
-
-$ pip install pipdeptree &lt;span class="c1"&gt;# Awesome tool, more in a bit.&lt;/span&gt;
-
-$ pipdeptree
+Installing setuptools, pip, wheel...done.&lt;/p&gt;
+&lt;p&gt;$ . ./venv/bin/activate
+(venv) &lt;/p&gt;
+&lt;p&gt;$ pip install cryptography
+... lengthy install log ...&lt;/p&gt;
+&lt;p&gt;$ pip install pipdeptree # Awesome tool, more in a bit.&lt;/p&gt;
+&lt;p&gt;$ pipdeptree
 Warning!!! Possibly conflicting dependencies found:
-* &lt;span class="nv"&gt;cryptography&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;.3.2
- - setuptools &lt;span class="o"&gt;[&lt;/span&gt;required: &amp;gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;11&lt;/span&gt;.3, installed: &amp;lt;unknown&amp;gt;&lt;span class="o"&gt;]&lt;/span&gt;
-------------------------------------------------------------------------
-&lt;span class="nv"&gt;wheel&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;.26.0
-&lt;span class="nv"&gt;wsgiref&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;.1.2
-&lt;span class="nv"&gt;cryptography&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;.3.2
-  - setuptools &lt;span class="o"&gt;[&lt;/span&gt;required: &amp;gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;11&lt;/span&gt;.3&lt;span class="o"&gt;]&lt;/span&gt;
-  - enum34 &lt;span class="o"&gt;[&lt;/span&gt;installed: &lt;span class="m"&gt;1&lt;/span&gt;.1.6&lt;span class="o"&gt;]&lt;/span&gt;
-  - ipaddress &lt;span class="o"&gt;[&lt;/span&gt;installed: &lt;span class="m"&gt;1&lt;/span&gt;.0.16&lt;span class="o"&gt;]&lt;/span&gt;
-  - pyasn1 &lt;span class="o"&gt;[&lt;/span&gt;required: &amp;gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;.1.8, installed: &lt;span class="m"&gt;0&lt;/span&gt;.1.9&lt;span class="o"&gt;]&lt;/span&gt;
-  - six &lt;span class="o"&gt;[&lt;/span&gt;required: &amp;gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;.4.1, installed: &lt;span class="m"&gt;1&lt;/span&gt;.10.0&lt;span class="o"&gt;]&lt;/span&gt;
-  - idna &lt;span class="o"&gt;[&lt;/span&gt;required: &amp;gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;.0, installed: &lt;span class="m"&gt;2&lt;/span&gt;.1&lt;span class="o"&gt;]&lt;/span&gt;
-  - cffi &lt;span class="o"&gt;[&lt;/span&gt;required: &amp;gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;.4.1, installed: &lt;span class="m"&gt;1&lt;/span&gt;.6.0&lt;span class="o"&gt;]&lt;/span&gt;
-    - pycparser &lt;span class="o"&gt;[&lt;/span&gt;installed: &lt;span class="m"&gt;2&lt;/span&gt;.14&lt;span class="o"&gt;]&lt;/span&gt;
-&lt;span class="o"&gt;(&lt;/span&gt;venv&lt;span class="o"&gt;)&lt;/span&gt; 
-&lt;/pre&gt;&lt;/div&gt;
-
-
+* cryptography==1.3.2
+ - setuptools [required: &amp;gt;=11.3, installed: &lt;unknown&gt;]&lt;/p&gt;
+&lt;hr /&gt;
+&lt;p&gt;wheel==0.26.0
+wsgiref==0.1.2
+cryptography==1.3.2
+  - setuptools [required: &amp;gt;=11.3]
+  - enum34 [installed: 1.1.6]
+  - ipaddress [installed: 1.0.16]
+  - pyasn1 [required: &amp;gt;=0.1.8, installed: 0.1.9]
+  - six [required: &amp;gt;=1.4.1, installed: 1.10.0]
+  - idna [required: &amp;gt;=2.0, installed: 2.1]
+  - cffi [required: &amp;gt;=1.4.1, installed: 1.6.0]
+    - pycparser [installed: 2.14]
+(venv) 
+```&lt;/p&gt;
 &lt;p&gt;That's it! Now I can experiment with a new library without worrying that it'll pollute my work virtualenv. Another thing that I do is using pipdeptree to see the dependencies that a new library will bring with it. If a library brings in too many dependencies, I'll be thinking twice about my need to use it, or I'll look for alternatives.&lt;/p&gt;</content></entry><entry><title>Type checking in Python?</title><link href="http://pminkov.github.io/blog/type-checking-in-python.html" rel="alternate"></link><published>2016-05-18T10:39:00-07:00</published><updated>2016-05-18T10:39:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-05-18:/blog/type-checking-in-python.html</id><summary type="html">&lt;p&gt;Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
 One that I use in my projects is the following:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;T&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-  &lt;span class="k"&gt;assert&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;(&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;) &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt; != &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;Here's an …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
+&lt;p&gt;&lt;code&gt;python
+def T(val, t):
+  assert type(val) == t, '(%s) %s != %s' % (str(val), type(val), t)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Here's …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
 One that I use in my projects is the following:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;T&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-  &lt;span class="k"&gt;assert&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;(&lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;) &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt; != &lt;/span&gt;&lt;span class="si"&gt;%s&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;str&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="nb"&gt;type&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;val&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
+&lt;p&gt;&lt;code&gt;python
+def T(val, t):
+  assert type(val) == t, '(%s) %s != %s' % (str(val), type(val), t)&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;Here's an example of how to use this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-  &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="n"&gt;T&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;int&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
+&lt;p&gt;&lt;code&gt;python
+def sum(a, b):
+  T(a, int)
+  T(b, int)
+  return a + b&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;Let's say that you call the function incorrectly, like this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;hello&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;
-&lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nb"&gt;sum&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;You'll get the following exception:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;gt;&amp;gt;&amp;gt; sum(a, b)
+&lt;p&gt;&lt;code&gt;python
+a = "hello"
+b = 5
+s = sum(a, b)&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;You'll get the following exception:
+```&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;sum(a, b)
 Traceback (most recent call last):
-  File &amp;quot;&amp;lt;stdin&amp;gt;&amp;quot;, line 1, in &amp;lt;module&amp;gt;
-  File &amp;quot;&amp;lt;stdin&amp;gt;&amp;quot;, line 2, in sum
-  File &amp;quot;&amp;lt;stdin&amp;gt;&amp;quot;, line 2, in T
-AssertionError: (hello) &amp;lt;type &amp;#39;str&amp;#39;&amp;gt; != &amp;lt;type &amp;#39;int&amp;#39;&amp;gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+  File "&lt;stdin&gt;", line 2, in sum
+  File "&lt;stdin&gt;", line 2, in T
+AssertionError: (hello) &lt;type 'str'&gt; != &lt;type 'int'&gt;
+```&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
 &lt;p&gt;So that's it - pretty simple. I use the &lt;code&gt;T&lt;/code&gt; function every once in a while, to guard against type errors.&lt;/p&gt;</content></entry></feed>

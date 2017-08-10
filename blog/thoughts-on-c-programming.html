@@ -45,24 +45,24 @@ in <a href="http://pminkov.github.io/blog/category/misc.html">Misc</a>
 <br>
 <br>
 <br></p>
-<h3>The language is simple.</h3>
+<h3 id="the-language-is-simple">The language is simple.</h3>
 <p>C is a pretty simple language. Unlike complicated languages like Scala, C has a very limited set of language features. There's a good side to that - you can start faster with C and I appreciate the simplicity coming from working with a more limited language. On the other hand, you have to write more code to do certain things.
 <br>
 <br>
 <br></p>
-<h3>Lack of object oriented programming makes writing code more difficult.</h3>
+<h3 id="lack-of-object-oriented-programming-makes-writing-code-more-difficult">Lack of object oriented programming makes writing code more difficult.</h3>
 <p>It's difficult to organize code when you don't have classes. It seems like your option is to just put pieces of code in separate files if you want to do that. But then, function names will still have to be different. So you end up with a lot of functions containing the name of the type they're supposed to operate on, like maybe <code>add_to_tree</code> and then <code>remove_from_tree</code> instead of simple <code>add</code> and <code>remove</code> methods on a <code>Tree</code> class.
 <br>
 <br>
 <br></p>
-<h3>Not knowing the size of arrays and strings in advance is difficult.</h3>
+<h3 id="not-knowing-the-size-of-arrays-and-strings-in-advance-is-difficult">Not knowing the size of arrays and strings in advance is difficult.</h3>
 <p>Unlike C++, C doesn't have its STL library, so if you're allocating arrays or strings, you often have to know their size in advance. Imagine running a process with <code>popen</code> and having to store its output to a string. You can't know the size of the output in advance, so you have to allocate a buffer of a certain size, expecting it to be big enough in all cases. That's of course impossible, so you'll need to code your own variable size string.</p>
 <p>C library functions are also not immune to this problem. For example, the <code>getcwd</code> is a function that gets the current working directory. It receives a buffer of a certain size and writes the directory name to it. If the buffer is smaller than the directory name, the function will return NULL.</p>
 <p>Luckily, in a lot of cases, you'd know the size of the data in advance, but writing code that has to do with strings and arrays is still more difficult than just using a STL <code>vector</code> or a <code>stack</code>.
 <br>
 <br>
 <br></p>
-<h3>You have to be meticulous in checking return codes of standard library functions.</h3>
+<h3 id="you-have-to-be-meticulous-in-checking-return-codes-of-standard-library-functions">You have to be meticulous in checking return codes of standard library functions.</h3>
 <p>Most of the functions in the C standard library return something that indicates the success or failure of the function. Unlike languages that have exceptions, if you don't check the return values, it's entirely possible that your code will continue to execute and ignore some errors. Since often times you'll find yourself thinking "I doubt this can fail", writing good C code requires an extra level of discipline.</p>
     </div><!-- /.entry-content -->
     <div class="comments">

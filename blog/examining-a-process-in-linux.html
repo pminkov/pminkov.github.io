@@ -42,174 +42,156 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
     <div>
       <p>I've been thinking about writing a blog post about Linux tools and commands related to processes. Let's take a look at some of them.</p>
 <p>The process that we'll be looking at is a <a href="https://github.com/pminkov/webserver">webserver</a> that I wrote some time ago to practice my C and write some code that does network related work. This webserver runs a <a href="https://github.com/pminkov/threadpool">threadpool</a> where N threads are waiting for server requests that they're going to execute.</p>
-<p>So let's start the server:</p>
-<div class="highlight"><pre><span></span>$ ./server
-Running on port: <span class="m">8000</span>
-</pre></div>
-
-
+<p>So let's start the server:
+<code>bash
+$ ./server
+Running on port: 8000</code></p>
 <p>Great. So which process is this server running as? We can use the <code>pidof</code> command to find that out. Its output looks like this:</p>
-<div class="highlight"><pre><span></span>$ pidof server
-<span class="m">8876</span>
-</pre></div>
-
-
+<p><code>bash
+$ pidof server
+8876</code></p>
 <p>If we had other processes which were running an executable with that name, we'd see more process ids, but since we only have one, we see one process id.</p>
 <p>What next? Let's see how the process is layed out in memory. To do this, we can use the <code>pmap</code> command. Its output looks like this:</p>
-<div class="highlight"><pre><span></span>$ sudo pmap -p <span class="m">8876</span>
-<span class="m">8876</span>:   ./server
-<span class="m">0000000000400000</span>     16K r-x-- /home/petko/work/github/webserver/server
-<span class="m">0000000000603000</span>      4K r---- /home/petko/work/github/webserver/server
-<span class="m">0000000000604000</span>      4K rw--- /home/petko/work/github/webserver/server
-000000000110f000    132K rw---   <span class="o">[</span> anon <span class="o">]</span>
-00007fd5ca731000      4K -----   <span class="o">[</span> anon <span class="o">]</span>
-00007fd5ca732000   8192K rw---   <span class="o">[</span> anon <span class="o">]</span>
-00007fd5caf32000      4K -----   <span class="o">[</span> anon <span class="o">]</span>
-00007fd5caf33000   8192K rw---   <span class="o">[</span> anon <span class="o">]</span>
-00007fd5cb733000      4K -----   <span class="o">[</span> anon <span class="o">]</span>
-00007fd5cb734000   8192K rw---   <span class="o">[</span> anon <span class="o">]</span>
-00007fd5cbf34000      4K -----   <span class="o">[</span> anon <span class="o">]</span>
-00007fd5cbf35000   8192K rw---   <span class="o">[</span> anon <span class="o">]</span>
+<p><code>bash
+$ sudo pmap -p 8876
+8876:   ./server
+0000000000400000     16K r-x-- /home/petko/work/github/webserver/server
+0000000000603000      4K r---- /home/petko/work/github/webserver/server
+0000000000604000      4K rw--- /home/petko/work/github/webserver/server
+000000000110f000    132K rw---   [ anon ]
+00007fd5ca731000      4K -----   [ anon ]
+00007fd5ca732000   8192K rw---   [ anon ]
+00007fd5caf32000      4K -----   [ anon ]
+00007fd5caf33000   8192K rw---   [ anon ]
+00007fd5cb733000      4K -----   [ anon ]
+00007fd5cb734000   8192K rw---   [ anon ]
+00007fd5cbf34000      4K -----   [ anon ]
+00007fd5cbf35000   8192K rw---   [ anon ]
 00007fd5cc735000   1792K r-x-- /lib/x86_64-linux-gnu/libc-2.23.so
 00007fd5cc8f5000   2044K ----- /lib/x86_64-linux-gnu/libc-2.23.so
 00007fd5ccaf4000     16K r---- /lib/x86_64-linux-gnu/libc-2.23.so
 00007fd5ccaf8000      8K rw--- /lib/x86_64-linux-gnu/libc-2.23.so
-00007fd5ccafa000     16K rw---   <span class="o">[</span> anon <span class="o">]</span>
+00007fd5ccafa000     16K rw---   [ anon ]
 00007fd5ccafe000     96K r-x-- /lib/x86_64-linux-gnu/libpthread-2.23.so
 00007fd5ccb16000   2044K ----- /lib/x86_64-linux-gnu/libpthread-2.23.so
 00007fd5ccd15000      4K r---- /lib/x86_64-linux-gnu/libpthread-2.23.so
 00007fd5ccd16000      4K rw--- /lib/x86_64-linux-gnu/libpthread-2.23.so
-00007fd5ccd17000     16K rw---   <span class="o">[</span> anon <span class="o">]</span>
+00007fd5ccd17000     16K rw---   [ anon ]
 00007fd5ccd1b000    152K r-x-- /lib/x86_64-linux-gnu/ld-2.23.so
-00007fd5ccf22000     12K rw---   <span class="o">[</span> anon <span class="o">]</span>
-00007fd5ccf3e000      8K rw---   <span class="o">[</span> anon <span class="o">]</span>
+00007fd5ccf22000     12K rw---   [ anon ]
+00007fd5ccf3e000      8K rw---   [ anon ]
 00007fd5ccf40000      4K r---- /lib/x86_64-linux-gnu/ld-2.23.so
 00007fd5ccf41000      4K rw--- /lib/x86_64-linux-gnu/ld-2.23.so
-00007fd5ccf42000      4K rw---   <span class="o">[</span> anon <span class="o">]</span>
-00007ffca0861000    132K rw---   <span class="o">[</span> stack <span class="o">]</span>
-00007ffca09eb000      8K r----   <span class="o">[</span> anon <span class="o">]</span>
-00007ffca09ed000      8K r-x--   <span class="o">[</span> anon <span class="o">]</span>
-ffffffffff600000      4K r-x--   <span class="o">[</span> anon <span class="o">]</span>
-total            39316K
-</pre></div>
-
-
+00007fd5ccf42000      4K rw---   [ anon ]
+00007ffca0861000    132K rw---   [ stack ]
+00007ffca09eb000      8K r----   [ anon ]
+00007ffca09ed000      8K r-x--   [ anon ]
+ffffffffff600000      4K r-x--   [ anon ]
+total            39316K</code></p>
 <p>What you see here are virtual memory addresses. For example, let's take a look at this line:</p>
 <p><code>00007fd5cc735000   1792K r-x-- /lib/x86_64-linux-gnu/libc-2.23.so</code></p>
 <p>This is the code for <code>libc</code>, which is the C standard library. This code is shared between processes that need it. We can see the <code>x</code> flag, which means that this is executable memory. The size if roughly the same as the size of this <code>so</code> file. This library is memory mapped into a region starting at address <code>00007fd5cc735000</code>, but in physical memory it's only stored in one place. To learn more about memory in Linux, here's a <a href="https://techtalk.intersec.com/2013/07/memory-part-1-memory-types/">great post</a> going into detail about it.</p>
 <p>Another interesting command is <code>lsof</code>. <code>lsof</code> stands for "list of open files". Let's see its output:</p>
-<div class="highlight"><pre><span></span>$ sudo lsof -p <span class="m">8876</span>
+<p><code>bash
+$ sudo lsof -p 8876
 COMMAND  PID  USER   FD   TYPE DEVICE SIZE/OFF    NODE NAME
-server  <span class="m">8876</span> petko  cwd    DIR    <span class="m">8</span>,1     <span class="m">4096</span>  <span class="m">262299</span> /home/petko/work/github/webserver
-server  <span class="m">8876</span> petko  rtd    DIR    <span class="m">8</span>,1     <span class="m">4096</span>       <span class="m">2</span> /
-server  <span class="m">8876</span> petko  txt    REG    <span class="m">8</span>,1    <span class="m">25536</span>  <span class="m">306491</span> /home/petko/work/github/webserver/server
-server  <span class="m">8876</span> petko  mem    REG    <span class="m">8</span>,1  <span class="m">1864888</span> <span class="m">1184834</span> /lib/x86_64-linux-gnu/libc-2.23.so
-server  <span class="m">8876</span> petko  mem    REG    <span class="m">8</span>,1   <span class="m">138744</span> <span class="m">1184980</span> /lib/x86_64-linux-gnu/libpthread-2.23.so
-server  <span class="m">8876</span> petko  mem    REG    <span class="m">8</span>,1   <span class="m">162632</span> <span class="m">1184806</span> /lib/x86_64-linux-gnu/ld-2.23.so
-server  <span class="m">8876</span> petko    0u   CHR  <span class="m">136</span>,9      0t0      <span class="m">12</span> /dev/pts/9
-server  <span class="m">8876</span> petko    1u   CHR  <span class="m">136</span>,9      0t0      <span class="m">12</span> /dev/pts/9
-server  <span class="m">8876</span> petko    2u   CHR  <span class="m">136</span>,9      0t0      <span class="m">12</span> /dev/pts/9
-server  <span class="m">8876</span> petko    3u  IPv4  <span class="m">81993</span>      0t0     TCP *:8000 <span class="o">(</span>LISTEN<span class="o">)</span>
-</pre></div>
-
-
+server  8876 petko  cwd    DIR    8,1     4096  262299 /home/petko/work/github/webserver
+server  8876 petko  rtd    DIR    8,1     4096       2 /
+server  8876 petko  txt    REG    8,1    25536  306491 /home/petko/work/github/webserver/server
+server  8876 petko  mem    REG    8,1  1864888 1184834 /lib/x86_64-linux-gnu/libc-2.23.so
+server  8876 petko  mem    REG    8,1   138744 1184980 /lib/x86_64-linux-gnu/libpthread-2.23.so
+server  8876 petko  mem    REG    8,1   162632 1184806 /lib/x86_64-linux-gnu/ld-2.23.so
+server  8876 petko    0u   CHR  136,9      0t0      12 /dev/pts/9
+server  8876 petko    1u   CHR  136,9      0t0      12 /dev/pts/9
+server  8876 petko    2u   CHR  136,9      0t0      12 /dev/pts/9
+server  8876 petko    3u  IPv4  81993      0t0     TCP *:8000 (LISTEN)</code></p>
 <p>As you can see, we have file descriptors 0,1 and 2, which are stdin, stdout and stderr. They are linked to the terminal in which the process is running in. You can write to that terminal btw. Just type <code>echo "hello world" &gt; /dev/pts/9</code> and you'll see that text in the terminal where your webserver is running. File descriptor number 3 is our socket which accepts connections.</p>
-<p>Another interesting way to inspect processes is the ps command. Its basic output looks like this:</p>
-<div class="highlight"><pre><span></span>$ ps --pid <span class="m">8876</span>
+<p>Another interesting way to inspect processes is the ps command. Its basic output looks like this:
+<code>bash
+$ ps --pid 8876
   PID TTY          TIME CMD
- <span class="m">8876</span> pts/9    <span class="m">00</span>:00:00 server
-</pre></div>
-
-
+ 8876 pts/9    00:00:00 server</code></p>
 <p>This is simple. We can also show the threads inside a process, like this:</p>
-<div class="highlight"><pre><span></span>$ ps  m --pid <span class="m">8876</span> -o pid,tid,cmd
+<p><code>bash
+$ ps  m --pid 8876 -o pid,tid,cmd
   PID   TID CMD
- <span class="m">8876</span>     - ./server
-    -  <span class="m">8876</span> -
-    -  <span class="m">8877</span> -
-    -  <span class="m">8878</span> -
-    -  <span class="m">8879</span> -
-    -  <span class="m">8880</span> -
-</pre></div>
-
-
-<p>We have five threads here. One is our main thread and the other four are the threadpool threads. The <code>m</code> option tells ps to show the threads of a process. The <code>-o</code> option specifies fields to output. We can even get fancy and output the addresses of the threads' stack pointers and instruction pointers, like this:</p>
-<div class="highlight"><pre><span></span>$ ps  m --pid <span class="m">8876</span> -o pid,tid,cmd,esp,eip
+ 8876     - ./server
+    -  8876 -
+    -  8877 -
+    -  8878 -
+    -  8879 -
+    -  8880 -</code></p>
+<p>We have five threads here. One is our main thread and the other four are the threadpool threads. The <code>m</code> option tells ps to show the threads of a process. The <code>-o</code> option specifies fields to output. We can even get fancy and output the addresses of the threads' stack pointers and instruction pointers, like this:
+<code>bash
+$ ps  m --pid 8876 -o pid,tid,cmd,esp,eip
   PID   TID CMD                              ESP      EIP
- <span class="m">8876</span>     - ./server                           -        -
-    -  <span class="m">8876</span> -                           a0880b70 ccb0e7ad
-    -  <span class="m">8877</span> -                           cc733ec0 ccb0b3a0
-    -  <span class="m">8878</span> -                           cbf32ec0 ccb0b3a0
-    -  <span class="m">8879</span> -                           cb731ec0 ccb0b3a0
-    -  <span class="m">8880</span> -                           caf30ec0 ccb0b3a0
-</pre></div>
-
-
+ 8876     - ./server                           -        -
+    -  8876 -                           a0880b70 ccb0e7ad
+    -  8877 -                           cc733ec0 ccb0b3a0
+    -  8878 -                           cbf32ec0 ccb0b3a0
+    -  8879 -                           cb731ec0 ccb0b3a0
+    -  8880 -                           caf30ec0 ccb0b3a0</code></p>
 <p>So all the threads are at the same instruction, but they have different stack pointers, which makes sense. If I execute something on one of the threads, both the <code>ESP</code> and <code>EIP</code> can possibly change.</p>
 <p>A lot of data about processes lives in the <code>proc</code> filesytem, located in <code>/proc</code>. For each running process, there's a subdirectory of <code>/proc</code> named after the process id. For example, for our process <code>8876</code>, there's a <code>status</code> file which lists various information about the process. Let's look at it:</p>
-<div class="highlight"><pre><span></span>$ cat /proc/8876/status
+<p><code>bash
+$ cat /proc/8876/status
 Name:   server
-State:  S <span class="o">(</span>sleeping<span class="o">)</span>
-Tgid:   <span class="m">8876</span>
-Ngid:   <span class="m">0</span>
-Pid:    <span class="m">8876</span>
-PPid:   <span class="m">2604</span>
-TracerPid:      <span class="m">0</span>
-Uid:    <span class="m">1000</span>    <span class="m">1000</span>    <span class="m">1000</span>    <span class="m">1000</span>
-Gid:    <span class="m">1000</span>    <span class="m">1000</span>    <span class="m">1000</span>    <span class="m">1000</span>
-FDSize: <span class="m">256</span>
-Groups: <span class="m">4</span> <span class="m">24</span> <span class="m">27</span> <span class="m">30</span> <span class="m">46</span> <span class="m">113</span> <span class="m">128</span> <span class="m">999</span> <span class="m">1000</span> 
-NStgid: <span class="m">8876</span>
-NSpid:  <span class="m">8876</span>
-NSpgid: <span class="m">8876</span>
-NSsid:  <span class="m">2604</span>
-VmPeak:    <span class="m">39316</span> kB
-VmSize:    <span class="m">39316</span> kB
-VmLck:         <span class="m">0</span> kB
-VmPin:         <span class="m">0</span> kB
-VmHWM:       <span class="m">800</span> kB
-VmRSS:       <span class="m">800</span> kB
-VmData:    <span class="m">32988</span> kB
-VmStk:       <span class="m">136</span> kB
-VmExe:        <span class="m">16</span> kB
-VmLib:      <span class="m">2040</span> kB
-VmPTE:        <span class="m">48</span> kB
-VmPMD:        <span class="m">12</span> kB
-VmSwap:        <span class="m">0</span> kB
-HugetlbPages:          <span class="m">0</span> kB
-Threads:        <span class="m">5</span>
-SigQ:   <span class="m">0</span>/7848
-SigPnd: <span class="m">0000000000000000</span>
-ShdPnd: <span class="m">0000000000000000</span>
-SigBlk: <span class="m">0000000000000000</span>
-SigIgn: <span class="m">0000000000000000</span>
-SigCgt: <span class="m">0000000180000000</span>
-CapInh: <span class="m">0000000000000000</span>
-CapPrm: <span class="m">0000000000000000</span>
-CapEff: <span class="m">0000000000000000</span>
+State:  S (sleeping)
+Tgid:   8876
+Ngid:   0
+Pid:    8876
+PPid:   2604
+TracerPid:      0
+Uid:    1000    1000    1000    1000
+Gid:    1000    1000    1000    1000
+FDSize: 256
+Groups: 4 24 27 30 46 113 128 999 1000 
+NStgid: 8876
+NSpid:  8876
+NSpgid: 8876
+NSsid:  2604
+VmPeak:    39316 kB
+VmSize:    39316 kB
+VmLck:         0 kB
+VmPin:         0 kB
+VmHWM:       800 kB
+VmRSS:       800 kB
+VmData:    32988 kB
+VmStk:       136 kB
+VmExe:        16 kB
+VmLib:      2040 kB
+VmPTE:        48 kB
+VmPMD:        12 kB
+VmSwap:        0 kB
+HugetlbPages:          0 kB
+Threads:        5
+SigQ:   0/7848
+SigPnd: 0000000000000000
+ShdPnd: 0000000000000000
+SigBlk: 0000000000000000
+SigIgn: 0000000000000000
+SigCgt: 0000000180000000
+CapInh: 0000000000000000
+CapPrm: 0000000000000000
+CapEff: 0000000000000000
 CapBnd: 0000003fffffffff
-CapAmb: <span class="m">0000000000000000</span>
-Seccomp:        <span class="m">0</span>
-Cpus_allowed:   <span class="m">1</span>
-Cpus_allowed_list:      <span class="m">0</span>
-Mems_allowed:   <span class="m">00000000</span>,00000001
-Mems_allowed_list:      <span class="m">0</span>
-voluntary_ctxt_switches:        <span class="m">3</span>
-nonvoluntary_ctxt_switches:     <span class="m">2</span>
-</pre></div>
-
-
+CapAmb: 0000000000000000
+Seccomp:        0
+Cpus_allowed:   1
+Cpus_allowed_list:      0
+Mems_allowed:   00000000,00000001
+Mems_allowed_list:      0
+voluntary_ctxt_switches:        3
+nonvoluntary_ctxt_switches:     2</code></p>
 <p>There's a lot of data in here, but remember how we used <code>ps</code> to count the number of threads in this process. That's also available here on the line saying <code>Threads:    5</code>.</p>
 <p>Our last command is <code>pidstat</code>. <code>pidstat</code> shows statistics about a running process, which can be updated at a regular time interval. A possible invocation can be:</p>
-<div class="highlight"><pre><span></span>$ pidstat -p <span class="m">8876</span> <span class="m">1</span>
-Linux <span class="m">4</span>.4.0-64-generic <span class="o">(</span>virtbox<span class="o">)</span>        <span class="m">03</span>/01/2017      _x86_64_        <span class="o">(</span><span class="m">1</span> CPU<span class="o">)</span>
-
-<span class="m">12</span>:22:00 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
-<span class="m">12</span>:22:01 PM  <span class="m">1000</span>      <span class="m">8876</span>    <span class="m">0</span>.00    <span class="m">0</span>.00    <span class="m">0</span>.00    <span class="m">0</span>.00     <span class="m">0</span>  server
-<span class="m">12</span>:22:02 PM  <span class="m">1000</span>      <span class="m">8876</span>    <span class="m">0</span>.00    <span class="m">0</span>.00    <span class="m">0</span>.00    <span class="m">0</span>.00     <span class="m">0</span>  server
-</pre></div>
-
-
+<p>```bash
+$ pidstat -p 8876 1
+Linux 4.4.0-64-generic (virtbox)        03/01/2017      <em>x86_64</em>        (1 CPU)</p>
+<p>12:22:00 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
+12:22:01 PM  1000      8876    0.00    0.00    0.00    0.00     0  server
+12:22:02 PM  1000      8876    0.00    0.00    0.00    0.00     0  server
+```</p>
 <p>Our server is not doing anything right now, so you see a lot of zeroes.</p>
 <p>There are many other interesting commands that you can look to figure out what processes are doing. <code>strace</code> shows system calls run by a process. <code>ltrace</code> shows dynamic library calls. <code>tcpdump</code> can be used to show traffic going in and out of a process.</p>
 <p>So, that's all for today. Happy running of processes.</p>

@@ -42,82 +42,71 @@ in <a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a>
     <div>
       <p>In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped me understand more about the GCE structures behind a Kubernetes cluster.</p>
 <p>So let's start. The first thing you need to do is:</p>
-<h3>Drain your node</h3>
+<h3 id="drain-your-node">Drain your node</h3>
 <p>Let's look at my nodes:</p>
-<div class="highlight"><pre><span></span>$ kl get nodes
+<p><code>bash
+$ kl get nodes
 NAME                                      STATUS    AGE
 gke-jcluster-default-pool-9cc4e660-rx9p   Ready     1d
-gke-jcluster-default-pool-9cc4e660-xr4z   Ready     2d
-</pre></div>
-
-
+gke-jcluster-default-pool-9cc4e660-xr4z   Ready     2d</code></p>
 <p>I want to remove rx9p. I'll first <a href="https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/">drain</a> it:</p>
-<div class="highlight"><pre><span></span>$ kl drain gke-jcluster-default-pool-9cc4e660-rx9p  --force
-node <span class="s2">&quot;gke-jcluster-default-pool-9cc4e660-rx9p&quot;</span> cordoned
-error: pods with <span class="nb">local</span> storage <span class="o">(</span>use --delete-local-data to override<span class="o">)</span>: jupyter-petko-1
-</pre></div>
-
-
+<p><code>bash
+$ kl drain gke-jcluster-default-pool-9cc4e660-rx9p  --force
+node "gke-jcluster-default-pool-9cc4e660-rx9p" cordoned
+error: pods with local storage (use --delete-local-data to override): jupyter-petko-1</code></p>
 <p>Great, the node is now drained. Next is:</p>
-<h3>Removing the GCE VM</h3>
+<h3 id="removing-the-gce-vm">Removing the GCE VM</h3>
 <p>Your Kubernetes cluster runs in an <a href="https://cloud.google.com/compute/docs/instance-groups/">instance group</a>. We'll need to know what this group is. Here's how to do it from the command line.</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">GROUP_ID</span><span class="o">=</span><span class="k">$(</span>gcloud container clusters describe jcluster --format json <span class="p">|</span> jq  --raw-output <span class="s1">&#39;.instanceGroupUrls[0]&#39;</span> <span class="p">|</span> rev <span class="p">|</span> cut -d<span class="s1">&#39;/&#39;</span> -f <span class="m">1</span> <span class="p">|</span> rev<span class="k">)</span>
-$ <span class="nb">echo</span> <span class="nv">$GROUP_ID</span>
-gke-jcluster-default-pool-9cc4e660-grp
-</pre></div>
-
-
-<p>Let's check my instances:</p>
-<div class="highlight"><pre><span></span>$ gcloud compute instances list
+<p><code>bash
+$ export GROUP_ID=$(gcloud container clusters describe jcluster --format json | jq  --raw-output '.instanceGroupUrls[0]' | rev | cut -d'/' -f 1 | rev)
+$ echo $GROUP_ID
+gke-jcluster-default-pool-9cc4e660-grp</code></p>
+<p>Let's check my instances:
+<code>bash
+$ gcloud compute instances list
 NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
-gke-jcluster-default-pool-9cc4e660-rx9p  us-central1-b  n1-standard-1               <span class="m">10</span>.128.0.2   <span class="m">104</span>.198.174.222  RUNNING
-gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               <span class="m">10</span>.128.0.4   <span class="m">104</span>.197.237.135  RUNNING
-</pre></div>
-
-
+gke-jcluster-default-pool-9cc4e660-rx9p  us-central1-b  n1-standard-1               10.128.0.2   104.198.174.222  RUNNING
+gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               10.128.0.4   104.197.237.135  RUNNING</code></p>
 <p>If I just run <code>gcloud compute instances delete</code> that won't work! That's because I have an instance group of size 2 and if I delete one of the machines, GCE will start a new one. I have to use the <code>gcloud compute  instance-groups managed delete-instances</code> command, followed by <code>gcloud compute instance-groups managed wait-until-stable</code> if I want to wait until the job is done.</p>
 <p>Let's see how that looks like:</p>
-<div class="highlight"><pre><span></span>$ gcloud compute instance-groups managed delete-instances <span class="nv">$GROUP_ID</span> --instances<span class="o">=</span>gke-jcluster-default-pool-9cc4e660-rx9p
-Updated <span class="o">[</span>https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp<span class="o">]</span>.
----
-baseInstanceName: gke-jcluster-default-pool-9cc4e660
-creationTimestamp: <span class="s1">&#39;2017-03-25T02:52:22.040-07:00&#39;</span>
+<p>```bash
+$ gcloud compute instance-groups managed delete-instances $GROUP_ID --instances=gke-jcluster-default-pool-9cc4e660-rx9p
+Updated [https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp].</p>
+<hr />
+<p>baseInstanceName: gke-jcluster-default-pool-9cc4e660
+creationTimestamp: '2017-03-25T02:52:22.040-07:00'
 currentActions:
-  abandoning: <span class="m">0</span>
-  creating: <span class="m">0</span>
-  creatingWithoutRetries: <span class="m">0</span>
-  deleting: <span class="m">1</span>
-  none: <span class="m">1</span>
-  recreating: <span class="m">0</span>
-  refreshing: <span class="m">0</span>
-  restarting: <span class="m">0</span>
-fingerprint: <span class="nv">kUg7ggCEudY</span><span class="o">=</span>
-id: <span class="s1">&#39;6475008099735012154&#39;</span>
+  abandoning: 0
+  creating: 0
+  creatingWithoutRetries: 0
+  deleting: 1
+  none: 1
+  recreating: 0
+  refreshing: 0
+  restarting: 0
+fingerprint: kUg7ggCEudY=
+id: '6475008099735012154'
 instanceGroup: gke-jcluster-default-pool-9cc4e660-grp
 instanceTemplate: gke-jcluster-default-pool-9cc4e660
 kind: compute#instanceGroupManager
 name: gke-jcluster-default-pool-9cc4e660-grp
 selfLink: https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp
-targetSize: <span class="m">1</span>
+targetSize: 1
 zone: us-central1-b
-$ gcloud compute instance-groups managed wait-until-stable <span class="nv">$GROUP_ID</span>
-Waiting <span class="k">for</span> group to become stable, current operations: deleting: <span class="m">1</span>
+$ gcloud compute instance-groups managed wait-until-stable $GROUP_ID
+Waiting for group to become stable, current operations: deleting: 1
 ...
-Waiting <span class="k">for</span> group to become stable, current operations: deleting: <span class="m">1</span>
+Waiting for group to become stable, current operations: deleting: 1
 Group is stable
-</pre></div>
-
-
+```</p>
 <p>And indeed, we only have one node left now:</p>
-<div class="highlight"><pre><span></span>$ kl get nodes
+<p><code>bash
+$ kl get nodes
 gcloud compute instanceNAME                                      STATUS    AGE
 gke-jcluster-default-pool-9cc4e660-xr4z   Ready     2d
 $ gcloud compute instances list
 NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
-gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               <span class="m">10</span>.128.0.4   <span class="m">104</span>.197.237.135  RUNNING
-</pre></div>
-
-
+gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               10.128.0.4   104.197.237.135  RUNNING</code></p>
 <p>So that's it. Regardless of whether you need to delete individual nodes, it's interesting to take a look at how you can do that.</p>
     </div><!-- /.entry-content -->
     <div class="comments">

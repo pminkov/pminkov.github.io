@@ -43,23 +43,20 @@ in <a href="http://pminkov.github.io/blog/category/python.html">Python</a>
       <p>Today I wanted to write a bit of simple code to try out a hypothesis I had about stock prices. I found historical data at <a href="http://www.multpl.com/s-p-500-historical-prices/table/by-year">multpl.com</a>. At first I thought I'd have to write my own code using Python's <a href="https://docs.python.org/2/library/htmlparser.html">HTMLParser</a>. As much as I like to write code, I decided to save myself some time and find something that already does this. To my surprise, <a href="http://pandas.pydata.org/">pandas</a>, already has a <a href="http://pandas.pydata.org/pandas-docs/stable/generated/pandas.read_html.html">function</a> that reads data from HTML tables. Great. Let's see how it works.</p>
 <p>First, I installed pandas, lxml and a bunch of other requirements in a <a href="http://pminkov.github.io/why-i-always-use-virtualenv-to-try-out-new-libraries.html">virtual environment</a>.</p>
 <p>To read the tables from the webpage, I used the following lines of code:</p>
-<div class="highlight"><pre><span></span>  <span class="n">tables</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="s1">&#39;http://www.multpl.com/s-p-500-historical-prices/table/by-month&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-  <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
-  <span class="n">table</span> <span class="o">=</span> <span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-</pre></div>
-
-
+<p><code>python
+  tables = pandas.read_html('http://www.multpl.com/s-p-500-historical-prices/table/by-month', header=0)
+  assert len(tables) == 1
+  table = tables[0]</code></p>
 <p>The <code>header</code> parameter, says that we should use the first row in a table as the dataframe's column names. Spefically for this table, one of the columns was getting a somewhat wrong name, but it was easy to fix it with this line of code:</p>
-<div class="highlight"><pre><span></span><span class="n">table</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="s1">&#39;Price&#39;</span><span class="p">]</span>
-</pre></div>
-
-
+<p><code>python
+table.columns = ['Date', 'Price']</code></p>
 <p>There we go, we have read historical stock prices into a pandas dataframe. To iterate and print them, we can do it like this:</p>
-<div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-   <span class="n">date</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Date&#39;</span><span class="p">]</span>
-   <span class="n">price</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span>
-   <span class="k">print</span> <span class="n">date</span><span class="p">,</span> <span class="n">price</span>
-</pre></div>
+<p>```python</p>
+<p>for (idx, row) in table.iterrows():
+   date = row['Date']
+   price = row['Price']
+   print date, price
+```</p>
     </div><!-- /.entry-content -->
     <div class="comments">
       <div id="disqus_thread"></div>

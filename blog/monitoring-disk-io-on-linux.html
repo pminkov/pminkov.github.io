@@ -43,50 +43,37 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
       <p>Today I wrote a little piece of code that generates a random array of numbers, stores it into disk and sorts it on disk, using bubble sort. This uses O(1) memory, but it's obviously very slow. I did this for fun mostly. The code is <a href="https://github.com/pminkov/wip/blob/master/os/disksort.c">here</a>.</p>
 <p>I wanted to know, if I'm running this code, what Linux tools are going to show an increase in disk I/O.</p>
 <p>So, I run this:</p>
-<div class="highlight"><pre><span></span>$ ./disksort <span class="m">150000</span>
-</pre></div>
-
-
+<p><code>$ ./disksort 150000</code></p>
 <p>This starts the sorting. It takes a long time to sort 150k numbers on disk, at least with that algorithm.</p>
 <p>So the first command that we can run is <code>iostat</code>. Let's see what it is outputting before I start <code>disksort</code></p>
-<div class="highlight"><pre><span></span>$ sudo iostat <span class="m">5</span> <span class="m">2</span>
-Linux <span class="m">4</span>.4.0-31-generic <span class="o">(</span>petko-VirtualBox<span class="o">)</span>       <span class="m">11</span>/16/2016      _x86_64_        <span class="o">(</span><span class="m">1</span> CPU<span class="o">)</span>
-
-avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-          <span class="m">14</span>.68    <span class="m">0</span>.19   <span class="m">38</span>.34    <span class="m">0</span>.05    <span class="m">0</span>.00   <span class="m">46</span>.73
-
-Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
-sda               <span class="m">5</span>.60        <span class="m">83</span>.17        <span class="m">63</span>.96     <span class="m">539970</span>     <span class="m">415252</span>
-
-avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-           <span class="m">3</span>.03    <span class="m">0</span>.00    <span class="m">0</span>.00    <span class="m">0</span>.00    <span class="m">0</span>.00   <span class="m">96</span>.97
-
-Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
-sda               <span class="m">0</span>.00         <span class="m">0</span>.00         <span class="m">0</span>.00          <span class="m">0</span>          <span class="m">0</span>
-</pre></div>
-
-
+<p>```
+$ sudo iostat 5 2
+Linux 4.4.0-31-generic (petko-VirtualBox)       11/16/2016      <em>x86_64</em>        (1 CPU)</p>
+<p>avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+          14.68    0.19   38.34    0.05    0.00   46.73</p>
+<p>Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               5.60        83.17        63.96     539970     415252</p>
+<p>avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           3.03    0.00    0.00    0.00    0.00   96.97</p>
+<p>Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               0.00         0.00         0.00          0          0
+```</p>
 <p>The command line invocation is a bit strange. The <code>5 2</code> part says "aggregate IO data for five seconds and show me two reports". The idea is that you can get continuous report output every five seconds. But I need only one report. The first one is a default one, which shows aggregated data for I'm not sure what period. But the second one is interesting. Notice <code>kB_read/s</code> and <code>kB_wrtn/s</code>. They're zeros. So it's all quiet. I now run <code>disksort</code> and run the same command.</p>
-<div class="highlight"><pre><span></span>$ iostat <span class="m">5</span> <span class="m">2</span>
-Linux <span class="m">4</span>.4.0-31-generic <span class="o">(</span>petko-VirtualBox<span class="o">)</span>       <span class="m">11</span>/16/2016      _x86_64_        <span class="o">(</span><span class="m">1</span> CPU<span class="o">)</span>
-
-avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-          <span class="m">15</span>.32    <span class="m">0</span>.17   <span class="m">40</span>.33    <span class="m">0</span>.05    <span class="m">0</span>.00   <span class="m">44</span>.14
-
-Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
-sda               <span class="m">5</span>.04        <span class="m">73</span>.65        <span class="m">59</span>.42     <span class="m">540254</span>     <span class="m">435868</span>
-
-avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-          <span class="m">26</span>.81    <span class="m">0</span>.00   <span class="m">73</span>.19    <span class="m">0</span>.00    <span class="m">0</span>.00    <span class="m">0</span>.00
-
-Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
-sda               <span class="m">0</span>.80         <span class="m">0</span>.00       <span class="m">157</span>.64          <span class="m">0</span>        <span class="m">588</span>
-</pre></div>
-
-
+<p>```
+$ iostat 5 2
+Linux 4.4.0-31-generic (petko-VirtualBox)       11/16/2016      <em>x86_64</em>        (1 CPU)</p>
+<p>avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+          15.32    0.17   40.33    0.05    0.00   44.14</p>
+<p>Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               5.04        73.65        59.42     540254     435868</p>
+<p>avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+          26.81    0.00   73.19    0.00    0.00    0.00</p>
+<p>Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               0.80         0.00       157.64          0        588
+```</p>
 <p>Notice how <code>kB_wrtn/s</code> spiked up. <code>kB_read</code> is zero and I assume that's because of the <a href="http://www.tldp.org/LDP/sag/html/buffer-cache.html">buffer cache</a>. After all, I'm reading the same file again and again.</p>
 <p>Another command that we can use is <code>iotop</code>. <code>iotop</code> is similar to <code>top</code>, but shows I/O stats. We'll run it using <code>iotop -oa</code>. The <code>-o</code> parameter makes it show only processes that do I/O. The <code>-a</code> flag aggregates the data during the time this command is running. So after running it for a few seconds I'm seeing this:</p>
-<div class="highlight"><pre><span></span>Total DISK READ :       0.00 B/s | Total DISK WRITE :      83.77 K/s
+<p><code>Total DISK READ :       0.00 B/s | Total DISK WRITE :      83.77 K/s
 Actual DISK READ:       0.00 B/s | Actual DISK WRITE:       0.00 B/s
   TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO&gt;    COMMAND                                                                                                                                                       
   545 be/3 root          0.00 B      4.00 K  0.00 %  0.08 % [jbd2/sda1-8]
@@ -94,10 +81,7 @@ Actual DISK READ:       0.00 B/s | Actual DISK WRITE:       0.00 B/s
  7865 be/4 root          0.00 B      0.00 B  0.00 %  0.01 % [kworker/u2:1]
  7714 be/4 petko         0.00 B   1144.00 K  0.00 %  0.00 % ./disksort 150000
  7097 be/4 root          0.00 B      0.00 B  0.00 %  0.00 % [kworker/u2:2]
- 7758 be/4 root          0.00 B      0.00 B  0.00 %  0.00 % [kworker/u2:0]
-</pre></div>
-
-
+ 7758 be/4 root          0.00 B      0.00 B  0.00 %  0.00 % [kworker/u2:0]</code></p>
 <p>Notice how <code>disksort</code> with pid of <code>7714</code> is well ahead of everything else shown.</p>
 <p>So that's it, happy debugging.</p>
     </div><!-- /.entry-content -->

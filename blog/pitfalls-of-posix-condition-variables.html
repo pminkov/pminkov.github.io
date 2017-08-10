@@ -44,27 +44,25 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 You have to write code, write out things on paper and read certain passages multiple times. That's the difference between learning and reading. Hopefully I'm learning something.</p>
 <p>So this book has a nice chapter on <a href="https://computing.llnl.gov/tutorials/pthreads/#ConditionVariables">condition variables</a>. The way condition variables operate is fairly clear, but I found two pitfalls that I had to dig deeper into in order to see what's going on.</p>
 <p>First, a crash course in how condition variables operate. I'm using shortened function names for readability. A condition variable is a variable that you can use to make a thread wait for some condition to be true. So roughly, it looks like this:</p>
-<div class="highlight"><pre><span></span>// Thread one.
+<p>```
+// Thread one.
 lock(mutex);
 wait(condition, mutex);
-unlock(mutex);
-
-// Thread two.
+unlock(mutex);</p>
+<p>// Thread two.
 lock(mutex);
 signal(condition);
 unlock(mutex);
-</pre></div>
-
-
+```</p>
 <p>Let's say that the first thing that happens here is that thread one obtains the mutex. Thread two runs and blocks on its call to <code>lock</code>. Now thread one proceeds and calls <code>wait(condition, mutex)</code>. What happens here is that mutex is unlocked and thread one goes to sleep. It's waiting for the condition to become true. Thread two is able to obtain the lock and it then signals to thread one that the condition is satisfied. Thread one obtains a lock on the mutex again and finishes its job.</p>
 <p>Now that this is out of the way, let's look at the pitfalls.</p>
-<h4>Pitfall 1</h4>
+<h4 id="pitfall-1">Pitfall 1</h4>
 <blockquote>
 <p>When a thread signals a condition, if the thread holds a lock on the mutex, a waiting thread returns from <code>wait()</code> only after the first thread unlocks the mutex.</p>
 </blockquote>
 <p>Looking at our example, intuitively it looks like when we call <code>signal()</code>, the first thread should return from wait. After all, the signal has been sent. But that's not the case. If thread two has more work to do after the signal, all of this will be done and just once <code>unlock()</code> is called, that's when thread one will return from the wait.
 Thread one will then lock the mutex and once it's done with its work, it will unlock it. This is way more logical than the mess that would happen if <code>signal()</code> makes <code>wait()</code> return immediately.</p>
-<h4>Pitfall 2</h4>
+<h4 id="pitfall-2">Pitfall 2</h4>
 <blockquote>
 <p>Calling <code>signal()</code> doesn't necessarily unblock all threads waiting on this signal.</p>
 </blockquote>

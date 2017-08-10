@@ -14,6 +14,17 @@
 @import url("typogrify.css");
 @import url(https://fonts.googleapis.com/css?family=Roboto|PT+Sans&subset=latin);
 
+
+.toc {
+  margin-top:1em;
+  margin-bottom:1em;
+}
+
+.toc li {
+  margin-top: 1px;
+  margin-bottom:0em;
+}
+
 /***** Global *****/
 /* Body */
 body {

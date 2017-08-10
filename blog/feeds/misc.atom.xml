@@ -6,24 +6,24 @@
 &lt;br&gt;
 &lt;br&gt;
 &lt;br&gt;&lt;/p&gt;
-&lt;h3&gt;The language is simple.&lt;/h3&gt;
+&lt;h3 id="the-language-is-simple"&gt;The language is simple.&lt;/h3&gt;
 &lt;p&gt;C is a pretty simple language. Unlike complicated languages like Scala, C has a very limited set of language features. There's a good side to that - you can start faster with C and I appreciate the simplicity coming from working with a more limited language. On the other hand, you have to write more code to do certain things.
 &lt;br&gt;
 &lt;br&gt;
 &lt;br&gt;&lt;/p&gt;
-&lt;h3&gt;Lack of object oriented programming makes writing code more difficult.&lt;/h3&gt;
+&lt;h3 id="lack-of-object-oriented-programming-makes-writing-code-more-difficult"&gt;Lack of object oriented programming makes writing code more difficult.&lt;/h3&gt;
 &lt;p&gt;It's difficult to organize code when you don't have classes. It seems like your option is to just put pieces of code in separate files if you want to do that. But then, function names will still have to be different. So you end up with a lot of functions containing the name of the type they're supposed to operate on, like maybe &lt;code&gt;add_to_tree&lt;/code&gt; and then &lt;code&gt;remove_from_tree&lt;/code&gt; instead of simple &lt;code&gt;add&lt;/code&gt; and &lt;code&gt;remove&lt;/code&gt; methods on a &lt;code&gt;Tree&lt;/code&gt; class.
 &lt;br&gt;
 &lt;br&gt;
 &lt;br&gt;&lt;/p&gt;
-&lt;h3&gt;Not knowing the size of arrays and strings in advance is difficult.&lt;/h3&gt;
+&lt;h3 id="not-knowing-the-size-of-arrays-and-strings-in-advance-is-difficult"&gt;Not knowing the size of arrays and strings in advance is difficult.&lt;/h3&gt;
 &lt;p&gt;Unlike C++, C doesn't have its STL library, so if you're allocating arrays or strings, you often have to know their size in advance. Imagine running a process with &lt;code&gt;popen&lt;/code&gt; and having to store its output to a string. You can't know the size of the output in advance, so you have to allocate a buffer of a certain size, expecting it to be big enough in all cases. That's of course impossible, so you'll need to code your own variable size string.&lt;/p&gt;
 &lt;p&gt;C library functions are also not immune to this problem. For example, the &lt;code&gt;getcwd&lt;/code&gt; is a function that gets the current working directory. It receives a buffer of a certain size and writes the directory name to it. If the buffer is smaller than the directory name, the function will return NULL.&lt;/p&gt;
 &lt;p&gt;Luckily, in a lot of cases, you'd know the size of the data in advance, but writing code that has to do with strings and arrays is still more difficult than just using a STL &lt;code&gt;vector&lt;/code&gt; or a &lt;code&gt;stack&lt;/code&gt;.
 &lt;br&gt;
 &lt;br&gt;
 &lt;br&gt;&lt;/p&gt;
-&lt;h3&gt;You have to be meticulous in checking return codes of standard library functions.&lt;/h3&gt;
+&lt;h3 id="you-have-to-be-meticulous-in-checking-return-codes-of-standard-library-functions"&gt;You have to be meticulous in checking return codes of standard library functions.&lt;/h3&gt;
 &lt;p&gt;Most of the functions in the C standard library return something that indicates the success or failure of the function. Unlike languages that have exceptions, if you don't check the return values, it's entirely possible that your code will continue to execute and ignore some errors. Since often times you'll find yourself thinking "I doubt this can fail", writing good C code requires an extra level of discipline.&lt;/p&gt;</content></entry><entry><title>Scala scopes.</title><link href="http://pminkov.github.io/blog/scala-scopes.html" rel="alternate"></link><published>2012-04-27T23:26:00-07:00</published><updated>2012-04-27T23:26:00-07:00</updated><author><name>softwarecomments</name></author><id>tag:pminkov.github.io,2012-04-27:/blog/scala-scopes.html</id><summary type="html">&lt;p&gt;After some programming with Scala, there are a couple of language
 features which I really like. One of them is scopes that can evaluate to
 a value. How does that look like:&lt;/p&gt;

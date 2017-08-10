@@ -43,38 +43,34 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
       <p>Some time ago I found out about <a href="https://collectd.org/">collectd</a> and I was curious to see what it does. collectd collects statistics about the machine its running on - cpu, disk, memory, processes, battery, etc. </p>
 <p>Here's how to install it on Ubuntu and visualize the data it has collected.</p>
 <p><br></p>
-<h3>Step 1: Install the collectd package.</h3>
+<h3 id="step-1-install-the-collectd-package">Step 1: Install the collectd package.</h3>
 <p>Easy, just install the package:<br></p>
 <p><code>sudo apt-get install collectd</code></p>
 <p><br></p>
-<h3>Step 2: Make sure collectd and apache are running.</h3>
-<p>If you have installed apache, you should have both collectd and apache running</p>
-<div class="highlight"><pre><span></span>$ sudo service --status-all <span class="p">|</span> egrep <span class="s2">&quot;collectd|apache2&quot;</span>
- <span class="o">[</span> + <span class="o">]</span>  apache2
- <span class="o">[</span> + <span class="o">]</span>  collectd
-</pre></div>
-
-
+<h3 id="step-2-make-sure-collectd-and-apache-are-running">Step 2: Make sure collectd and apache are running.</h3>
+<p>If you have installed apache, you should have both collectd and apache running
+<code>bash
+$ sudo service --status-all | egrep "collectd|apache2"
+ [ + ]  apache2
+ [ + ]  collectd</code></p>
 <p>If collectd is not running, run <code>sudo service collectd start</code>. For me at least, it was running after installation.</p>
 <p><br></p>
-<h3>Step 3: Install collectd's web app for generating graphs.</h3>
+<h3 id="step-3-install-collectds-web-app-for-generating-graphs">Step 3: Install collectd's web app for generating graphs.</h3>
 <p>Ok, now we have collectd running. collectd is mostly about collecting data and it allows other frontends to display it. However, it comes with a simple set of cgi scripts that can be used to see some graphs.</p>
 <p>In the <code>/usr/share/doc/collectd/examples/</code> directory, you'll find a directory named <code>collection3</code>. Copy the entire directory to <code>/var/www/html</code>:</p>
 <p><code>$ sudo cp -r ./collection3 /var/www/html</code>.</p>
 <p><br></p>
-<h3>Step 4: Enable apache to run CGI scripts.</h3>
+<h3 id="step-4-enable-apache-to-run-cgi-scripts">Step 4: Enable apache to run CGI scripts.</h3>
 <p>Great, you can now access the cgi scripts by going to this url: <code>http://localhost/collection3/bin/index.cgi</code>. However, you'll be served a text file, since apache doesn't know to run these cgi scripts. There's is a <a href="http://httpd.apache.org/docs/2.2/howto/cgi.html">simple manual</a> explaining cgi scripts in Apache.</p>
 <p>You'll have to do two things.</p>
 <p>First, you need to install the cgi module. So, go to <code>/etc/apache2/mods-enabled</code> and run this: <code>$ sudo ln -s ../mods-available/cgi.load</code>. You have now enabled the <code>cgi</code> module.</p>
 <p>Next you'll have to change <code>apache2.conf</code>, located in <code>/etc/apache2</code> (Ubuntu doesn't use <code>httpd.conf</code>).</p>
-<p>Add these lines to it:</p>
-<div class="highlight"><pre><span></span>&lt;Directory /var/www/&gt;
+<p>Add these lines to it:
+<code>text
+&lt;Directory /var/www/&gt;
         Options +ExecCGI
         AddHandler cgi-script .cgi
-&lt;/Directory&gt;
-</pre></div>
-
-
+&lt;/Directory&gt;</code></p>
 <p>And - you're done! If you go to <code>http://localhost/cgi-bin/collection3/bin/index.cgi</code>, you should see some graphs.</p>
     </div><!-- /.entry-content -->
     <div class="comments">

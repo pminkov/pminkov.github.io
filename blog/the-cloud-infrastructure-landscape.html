@@ -43,69 +43,69 @@ in <a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a>
       <p>I'm taking a <a href="https://www.edx.org/course/introduction-cloud-infrastructure-linuxfoundationx-lfs151-x">Cloud Infrastructure</a> class on EdX and I have found it to be a really nice overview of the cloud space. It's missing anything related to Hadoop and data analytics, but it describes probably all the tools related to running applications in the cloud. Of course, since the class describes so many tools, it can't do so in depth, but you can pick whatever is interesting to you and learn more about it.</p>
 <p>Here's a list of all the tools described in it, which list I might use as a future reference for myself. I'd say that knowing a bit about such a big amount of products definitely helps when you're trying to come up with a cloud infrastructure for a project.</p>
 <p>So, big list, based on the course contents:</p>
-<h3>Virtualization</h3>
+<h3 id="virtualization">Virtualization</h3>
 <p><a href="http://www.linux-kvm.org/page/Main_Page">KVM</a><br>
 <a href="https://www.virtualbox.org/wiki/VirtualBox">VirtualBox</a><br>
 <a href="https://www.vagrantup.com/">Vagrant</a><br></p>
 <p>I use VirtualBox to run Linux on Mac OS X and highly recommend it. Mac OS X is not good if you're trying to learn Linux, too many differences.</p>
-<h3>Infrastructure as a Service (IaaS)<br></h3>
+<h3 id="infrastructure-as-a-service-iaas">Infrastructure as a Service (IaaS)<br></h3>
 <p><a href="https://aws.amazon.com/ec2/">Amazon EC2</a><br>
 <a href="https://azure.microsoft.com/en-us/services/virtual-machines/?b=16.51a">Azure Virtual Machines</a><br>
 <a href="https://www.digitalocean.com/">Digital Ocean</a><br>
 <a href="https://cloud.google.com/compute/">Google Compute Engine</a><br>
 <a href="https://www.openstack.org/">OpenStack</a><br></p>
 <p>I've only tried EC2 out of these, but it's pretty simple and I like the fact that you can do so many things through the UI, it makes it easier to start with it.</p>
-<h3>Platform as a Sevice (PaaS)<br></h3>
+<h3 id="platform-as-a-sevice-paas">Platform as a Sevice (PaaS)<br></h3>
 <p><a href="https://www.cloudfoundry.org/learn/features/">Cloud Foundry</a><br>
 <a href="https://www.openshift.com/">OpenShift</a><br>
 <a href="https://www.heroku.com/">Heroku</a><br>
 <a href="https://deis.com/">Deis</a><br>
 <a href="https://aws.amazon.com/elasticbeanstalk/">AWS Elastic Beanstalk</a> (my addition)<br></p>
 <p>I've used Elastic Beanstalk and it's a good way to abstract configuration of load balancers, Apache instances and so on.</p>
-<h3>Containers</h3>
+<h3 id="containers">Containers</h3>
 <p><a href="https://linuxcontainers.org/">LXC (Linux Containers)</a><br>
 <a href="https://www.docker.com/">Docker</a><br></p>
 <p>Docker is the leader here. I'm surprised that companies like Google or VMWare haven't come up with their own solution. Maybe soon.</p>
-<h3>Micro OSes for Containers</h3>
+<h3 id="micro-oses-for-containers">Micro OSes for Containers</h3>
 <p><a href="https://www.projectatomic.io/">Atomic Host</a><br>
 <a href="https://www.coreos.com/">CoreOS</a><br>
 <a href="https://vmware.github.io/photon/">VMWare Photon</a><br>
 <a href="http://rancher.com/rancher-os/">RancherOS</a><br></p>
 <p>Pretty neat concept of building a minimal OS that's targeted towards running containers.</p>
-<h3>Container Orchestration</h3>
+<h3 id="container-orchestration">Container Orchestration</h3>
 <p><a href="https://www.docker.com/products/docker-swarm">Docker Swarm</a><br>
 <a href="https://kubernetes.io/">Kubernetes</a><br></p>
-<h3>Unikernels</h3>
+<h3 id="unikernels">Unikernels</h3>
 <p><a href="https://github.com/emc-advanced-dev/unik">Unik</a><br></p>
-<h3>Container as a Service (CaaS)<br></h3>
+<h3 id="container-as-a-service-caas">Container as a Service (CaaS)<br></h3>
 <p><a href="https://www.docker.com/products/docker-datacenter">Docker Datacenter</a><br>
 <a href="https://wiki.openstack.org/wiki/Magnum">Project Magnum on OpenStack</a><br></p>
-<h3>Software Defined Storage and Storage Management for Containers</h3>
+<h3 id="software-defined-storage-and-storage-management-for-containers">Software Defined Storage and Storage Management for Containers</h3>
 <p><a href="http://ceph.com/">Ceph</a><br>
 <a href="https://www.gluster.org/">Gluster</a><br>
 <a href="https://storpool.com/">StorPool</a> (My addition)<br> </p>
-<h3>Continuous Integration / Continuous Delivery</h3>
+<h3 id="continuous-integration-continuous-delivery">Continuous Integration / Continuous Delivery</h3>
 <p><a href="https://jenkins.io/">Jenkins</a><br>
 <a href="https://drone.io/">Drone</a><br>
 <a href="https://travis-ci.com/getting_started">Travis CI</a><br>
 <a href="https://app.shippable.com/">Shippable</a><br></p>
 <p>These are very easy to try out if you have projects on GitHub. Here's <a href="https://github.com/pminkov/webserver">one</a> on which I slapped the Drone badge.</p>
-<h3>Tools for Configuration Management</h3>
+<h3 id="tools-for-configuration-management">Tools for Configuration Management</h3>
 <p><a href="https://www.ansible.com/">Ansible</a><br>
 <a href="https://puppet.com/">Puppet</a><br>
 <a href="https://docs.saltstack.com/en/latest/">SaltStack</a><br>
 <a href="https://www.chef.io/">Chef</a><br></p>
 <p>Useful tools for running commands on multiple servers.</p>
-<h3>Build and Release Tools</h3>
+<h3 id="build-and-release-tools">Build and Release Tools</h3>
 <p><a href="https://www.terraform.io/docs/providers/">Terraform</a><br>
 <a href="https://bosh.io">BOSH</a><br></p>
-<h3>Key-Value Pair Stores</h3>
+<h3 id="key-value-pair-stores">Key-Value Pair Stores</h3>
 <p><a href="https://coreos.com/etcd/">etcd</a><br>
 <a href="https://www.consul.io/">Consul</a><br></p>
-<h3>Building Images</h3>
+<h3 id="building-images">Building Images</h3>
 <p><a href="https://www.packer.io/">Packer</a><br></p>
 <p>Pretty neat. Just describe your instance and build a VM / Amazon image / Docker container. I can see that being pretty useful when you're building AMIs for AWS. Better than building it manually and not being able to reproduce it on another platform.</p>
-<h3>Debugging, Logging, Monitoring</h3>
+<h3 id="debugging-logging-monitoring">Debugging, Logging, Monitoring</h3>
 <p><a href="https://www.sysdig.com/">Sysdig</a><br>
 <a href="https://github.com/google/cadvisor">cAdvisor</a><br>
 <a href="http://www.fluentd.org/">Fluentd</a><br>
