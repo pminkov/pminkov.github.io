@@ -49,40 +49,51 @@ in <a href="http://pminkov.github.io/blog/category/python.html">Python</a>
 </ul>
 <h3 id="chapter-3-native-datatypes">Chapter 3 (Native Datatypes)</h3>
 <ul>
-<li>Here's a cool trick mentioned in this chapter:
-<code>python
-(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY) = range(7)</code></li>
+<li>Here's a cool trick mentioned in this chapter:</li>
 </ul>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="n">MONDAY</span><span class="p">,</span> <span class="n">TUESDAY</span><span class="p">,</span> <span class="n">WEDNESDAY</span><span class="p">,</span> <span class="n">THURSDAY</span><span class="p">,</span> <span class="n">FRIDAY</span><span class="p">,</span> <span class="n">SATURDAY</span><span class="p">,</span> <span class="n">SUNDAY</span><span class="p">)</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+</pre></div>
+
+
 <h3 id="chapter-4-the-power-of-introspection">Chapter 4 (The Power Of Introspection):</h3>
 <ul>
 <li>Some useful functions are mentioned: <code>dir</code> (try on a module or an object instance), <code>callable</code>, <code>getattr</code>, <code>__doc__</code>.</li>
 </ul>
-<p>So you can do something interesting, like this:
-```
-class Sum:
-  """Sums numbers"""
-  member = 3</p>
-<p>def sum2(self, a, b):
-    """Sum two numbers"""
-    return a + b</p>
-<p>def sum3(self, a, b, c):
-    """Sum three numbers"""
-    return a + b + c</p>
-<p>if <strong>name</strong> == '<strong>main</strong>':
-  methods = [f for f in dir(Sum) if callable(getattr(Sum, f))]
-  docs = '\n'.join(["%s %s" % (f, getattr(Sum, f).<strong>doc</strong>) for f in methods])
-  print docs
-```</p>
-<p>And run it:
-<code>bash
-$ python ./sum.py
+<p>So you can do something interesting, like this:</p>
+<div class="highlight"><pre><span></span><span class="kr">class</span> <span class="nx">Sum</span><span class="o">:</span>
+  <span class="s2">&quot;&quot;&quot;Sums numbers&quot;&quot;&quot;</span>
+  <span class="nx">member</span> <span class="o">=</span> <span class="mi">3</span>
+
+  <span class="nx">def</span> <span class="nx">sum2</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span><span class="o">:</span>
+    <span class="s2">&quot;&quot;&quot;Sum two numbers&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span>
+
+  <span class="nx">def</span> <span class="nx">sum3</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span><span class="o">:</span>
+    <span class="s2">&quot;&quot;&quot;Sum three numbers&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span> <span class="o">+</span> <span class="nx">c</span>
+
+
+<span class="k">if</span> <span class="nx">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="o">:</span>
+  <span class="nx">methods</span> <span class="o">=</span> <span class="p">[</span><span class="nx">f</span> <span class="k">for</span> <span class="nx">f</span> <span class="k">in</span> <span class="nx">dir</span><span class="p">(</span><span class="nx">Sum</span><span class="p">)</span> <span class="k">if</span> <span class="nx">callable</span><span class="p">(</span><span class="nx">getattr</span><span class="p">(</span><span class="nx">Sum</span><span class="p">,</span> <span class="nx">f</span><span class="p">))]</span>
+  <span class="nx">docs</span> <span class="o">=</span> <span class="s1">&#39;\n&#39;</span><span class="p">.</span><span class="nx">join</span><span class="p">([</span><span class="s2">&quot;%s %s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">getattr</span><span class="p">(</span><span class="nx">Sum</span><span class="p">,</span> <span class="nx">f</span><span class="p">).</span><span class="nx">__doc__</span><span class="p">)</span> <span class="k">for</span> <span class="nx">f</span> <span class="k">in</span> <span class="nx">methods</span><span class="p">])</span>
+  <span class="nx">print</span> <span class="nx">docs</span>
+</pre></div>
+
+
+<p>And run it:</p>
+<div class="highlight"><pre><span></span>$ python ./sum.py
 sum2 Sum two numbers
-sum3 Sum three numbers</code></p>
+sum3 Sum three numbers
+</pre></div>
+
+
 <ul>
 <li>The "and-or trick"</li>
 </ul>
-<p><code>python
-is_mammal = use_rpc and remote_check_is_mammal(animal) or DEFAULT_IS_MAMMAL</code></p>
+<div class="highlight"><pre><span></span><span class="n">is_mammal</span> <span class="o">=</span> <span class="n">use_rpc</span> <span class="ow">and</span> <span class="n">remote_check_is_mammal</span><span class="p">(</span><span class="n">animal</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DEFAULT_IS_MAMMAL</span>
+</pre></div>
+
+
 <p>That's like <code>?:</code> in C++. I think I did well with creating a good example here :).</p>
 <h3 id="chapter-5-objects-and-object-orientation">Chapter 5 (Objects and Object-Orientation)</h3>
 <ul>
@@ -93,78 +104,81 @@ is_mammal = use_rpc and remote_check_is_mammal(animal) or DEFAULT_IS_MAMMAL</cod
 </ul>
 <h3 id="chapter-6-exceptions-and-file-handling">Chapter 6 (Exceptions and file handling)</h3>
 <ul>
-<li>You can use <code>else</code> in exceptions code. Like this:
-```python
-class RPC:
-  def remote_call(self):
-    pass</li>
+<li>You can use <code>else</code> in exceptions code. Like this:</li>
 </ul>
-<p>def find_function(name):
-  try:
-    a = getattr(RPC, name)
-  except AttributeError:
-    print 'No such function.'
-  else:
-    print 'Function was found.'
-  finally:
-    print 'Enough lookups.'
-    print</p>
-<p>find_function('func')
-find_function('remote_call')
-```</p>
-<p>Output:
-```bash
-python ./ex.py 
-No such function.
-Enough lookups.</p>
-<p>Function was found.
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RPC</span><span class="p">:</span>
+  <span class="k">def</span> <span class="nf">remote_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="nf">find_function</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">RPC</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+  <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;No such function.&#39;</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;Function was found.&#39;</span>
+  <span class="k">finally</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s1">&#39;Enough lookups.&#39;</span>
+    <span class="k">print</span>
+
+<span class="n">find_function</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">)</span>
+<span class="n">find_function</span><span class="p">(</span><span class="s1">&#39;remote_call&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Output:</p>
+<div class="highlight"><pre><span></span>python ./ex.py 
+No such <span class="k">function</span>.
 Enough lookups.
-```</p>
+
+Function was found.
+Enough lookups.
+</pre></div>
+
+
 <ul>
 <li>When you open a file, you have a variety of functions and attributes on the file object, like <code>seek</code>, <code>read</code>, <code>mode</code>, <code>name</code>. For example, to see how big a file is you can just call <code>f.seek(0, 2)</code> to seek until the end and then <code>f.tell()</code> to output the number of bytes.</li>
 <li>A class' module is accessible by calling <code>ClassName.__module__</code>. All imported modules are in the <code>sys.modules</code> dictionary. Example:</li>
 </ul>
-<p>```python</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>from sum import Sum
-import sys
-sys.modules[Sum.<strong>module</strong>]
-<module 'sum' from 'sum.py'>
-getattr(sys.modules[Sum.<strong>module</strong>], 'Sum')
-<class sum.Sum at 0x109535a10>
-```</p>
-</blockquote>
-</blockquote>
-</blockquote>
+<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">sum</span> <span class="kn">import</span> <span class="n">Sum</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">sys</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">Sum</span><span class="o">.</span><span class="vm">__module__</span><span class="p">]</span>
+<span class="o">&lt;</span><span class="n">module</span> <span class="s1">&#39;sum&#39;</span> <span class="kn">from</span> <span class="s1">&#39;sum.py&#39;</span><span class="o">&gt;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">Sum</span><span class="o">.</span><span class="vm">__module__</span><span class="p">],</span> <span class="s1">&#39;Sum&#39;</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="nc">sum</span><span class="o">.</span><span class="n">Sum</span> <span class="n">at</span> <span class="mh">0x109535a10</span><span class="o">&gt;</span>
+</pre></div>
+
+
 <h3 id="chapter-7-regular-expressions">Chapter 7 (Regular Expressions)</h3>
 <ul>
 <li><code>\\b</code> matches a word boundary. This can be so useful.</li>
 <li>Verbose regular expressions. Again, very useful. Example:</li>
 </ul>
-<p>```python
-import re</p>
-<p>raw_regex = r"""
-  (\d{3})
-  \D<em>
-  (\d{3})
-  \D</em>
-  (\d{4})
-"""</p>
-<p>examples = [
-  "4153125633",
-  "415-312-5633",
-  "415 312 5633",
-  "work 415 312 5633",
-  "(415) - 312 - 5633",
-  "1 415 312 5633",
-]</p>
-<p>phone_re = re.compile(raw_regex, re.VERBOSE)</p>
-<p>for example in examples:
-  groups = phone_re.search(example).groups()
-  assert groups == ('415', '312', '5633')
-```</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">raw_regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">  (\d{3})</span>
+<span class="s2">  \D*</span>
+<span class="s2">  (\d{3})</span>
+<span class="s2">  \D*</span>
+<span class="s2">  (\d{4})</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">examples</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s2">&quot;4153125633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;415-312-5633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;415 312 5633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;work 415 312 5633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;(415) - 312 - 5633&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;1 415 312 5633&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">phone_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">raw_regex</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">:</span>
+  <span class="n">groups</span> <span class="o">=</span> <span class="n">phone_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">example</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+  <span class="k">assert</span> <span class="n">groups</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;415&#39;</span><span class="p">,</span> <span class="s1">&#39;312&#39;</span><span class="p">,</span> <span class="s1">&#39;5633&#39;</span><span class="p">)</span>
+</pre></div>
     </div><!-- /.entry-content -->
     <div class="comments">
       <div id="disqus_thread"></div>

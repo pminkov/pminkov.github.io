@@ -41,27 +41,29 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 </div><!-- /.post-info -->    </div>
     <div>
       <p>Let's look at the following code and try to find the bug in it.</p>
-<p>```
-Thread 1:
+<div class="highlight"><pre><span></span>Thread 1:
 void init() {
   ...
   mThread = PR_CreateThread(mMain, ...)
   ...
-}</p>
-<p>Thread 2:
+}
+
+Thread 2:
 void mMain(...) {
   ...
   mState = mThread-&gt;State;
   ...
 }
-```</p>
+</pre></div>
+
+
 <p>The problem is that if thread two executes before thread one, it can access <code>mThread</code> which is not initialized. We need to make thread two wait for thread one. This is done with condition variables. But let's see how we're going to implement it.</p>
 <h3 id="solution-1-incorrect-simple-wait-and-signal">Solution 1 (Incorrect) - Simple wait and signal</h3>
 <p>Let's say that we're not giving this a lot of thought and just put a wait and signal in the code. We have this code:</p>
-<p>```
-pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;</p>
-<p>Thread 1:
+<div class="highlight"><pre><span></span>pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;
+
+Thread 1:
 void init() {
   ...
   mThread = PR_CreateThread(mMain, ...)
@@ -69,8 +71,9 @@ void init() {
   pthread_cond_signal(&amp;mtCond);
   pthread_mutex_unlock(&amp;mtLock);
   ...
-}</p>
-<p>Thread 2:
+}
+
+Thread 2:
 void mMain(...) {
   ...
   pthread_mutex_lock(&amp;mtLock);
@@ -79,14 +82,16 @@ void mMain(...) {
   mState = mThread-&gt;State;
   ...
 }
-```</p>
+</pre></div>
+
+
 <p>The problem here is that thread one can execute before thread two. In this case, thread one will signal on the condition variable, but nobody is waiting on it. Once thread two executes, it will start waiting and nobody is going to signal on the condition variable. Thus, thread two will stay in block state.</p>
 <h3 id="solution-2-correct-using-a-synchronization-variable">Solution 2 (Correct) - Using a synchronization variable.</h3>
-<p>```
-  pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
+<div class="highlight"><pre><span></span>  pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
   pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;
-  int mtInit = 0;</p>
-<p>Thread 1:
+  int mtInit = 0;
+
+  Thread 1:
   void init() {
     ...
 1   mThread = PR_CreateThread(mMain, ...)
@@ -95,8 +100,9 @@ void mMain(...) {
 4   pthread_cond_signal(&amp;mtCond);
 5   pthread_mutex_unlock(&amp;mtLock);
     ...
-  }</p>
-<p>Thread 2:
+  }
+
+  Thread 2:
   void mMain(...) {
     ...
 6   pthread_mutex_lock(&amp;mtLock);
@@ -106,11 +112,13 @@ void mMain(...) {
 10  mState = mThread-&gt;State;
     ...
   }
-```</p>
+</pre></div>
+
+
 <p>Here we have used the <code>mtInit</code> variable to prevent the bug in Solution 1 from hapenning. Let's try to reproduce the conditions that led to a bug in out first solution. Let's say thread one executes before thread two. When thread two runs, it will see that <code>mtInit</code> is 1 and it won't wait. That basically solves our problem. Let's trace things more carfully with two possible scenarios. Of course, there are other possibilities too, but with these two I have enough confidence in the correctness of the solution.</p>
-<p>```
-Scenario 1 - Thread 1 before Thread 2.</p>
-<p>Line   T1    T2   COMMENT
+<div class="highlight"><pre><span></span>Scenario 1 - Thread 1 before Thread 2.
+
+Line   T1    T2   COMMENT
        1
        2          Locked mutex
              6    Blocked, because mutex is locked.
@@ -120,22 +128,26 @@ Scenario 1 - Thread 1 before Thread 2.</p>
              6    Continues, mutex was unblocked.
              7    False, jump to line 9.
              9    Unlock mutex, done
-```</p>
+</pre></div>
+
+
 <p>So in this scenario, thread one obtains the lock first and the solution is correct.</p>
-<p>```
-Scenario 2 - Thread 2 before Thread 1.</p>
-<p>Line   T1    T2   COMMENT
+<div class="highlight"><pre><span></span>Scenario 2 - Thread 2 before Thread 1.
+
+Line   T1    T2   COMMENT
              6    Locked mutex.
              7
              8    Unlocks mutex, waiting on condition variable.
-       1    <br />
+       1      
        2          Locks mutex.
-       3    <br />
-       4          Signals, but mutex is still locked, so thread two doesn't do anything.
+       3      
+       4          Signals, but mutex is still locked, so thread two doesn&#39;t do anything.
        5          Unlocks mutex. Now thread two can continue.
              8    Returns from wait(), locks mutex.
              9    Unlocks mutex.
-```</p>
+</pre></div>
+
+
 <p>This scenario works too.</p>
 <p>There's one change that we should do though. Instead of an if statement in line 7, we should use a while. Why? Because when thread two wakes up in line 7 and obtains a lock on the mutex, it should re-verify that the condition that made it wait is not true anymore. While not a problem in this code segment, this can be a problem in other cases.</p>
     </div><!-- /.entry-content -->

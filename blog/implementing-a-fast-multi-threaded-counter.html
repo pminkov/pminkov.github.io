@@ -43,85 +43,114 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
       <p>Today I'll write a bit about implementing a simple thread safe counter and improving its speed.</p>
 <p>Implementing a basic mutli-threaded counter is a fairly easy task. Using pthreads, you just need to wrap the counter increment in a lock.</p>
 <p>The code (<a href="https://github.com/pminkov/wip/tree/master/mt-counters">github link</a>) looks like this:</p>
-<p>```</p>
-<h1 id="include-mythreadsh">include "mythreads.h"</h1>
-<p>struct counter_t {
-  int value;
-  pthread_mutex_t lock;
-};</p>
-<p>static struct counter_t counter;</p>
-<p>void init(struct counter_t *c) {
-  c-&gt;value = 0;
-  pthread_mutex_init(&amp;c-&gt;lock, NULL);
-}</p>
-<p>void increment_by(struct counter_t *c, int by) {
-  Pthread_mutex_lock(&amp;c-&gt;lock);
-  c-&gt;value += by;
-  Pthread_mutex_unlock(&amp;c-&gt;lock);
-}</p>
-<p>void increment(struct counter_t *c) {
-  increment_by(c, 1);
-}</p>
-<p>int get(struct counter_t *c) {
-  Pthread_mutex_lock(&amp;c-&gt;lock);
-  int rc = c-&gt;value;
-  Pthread_mutex_unlock(&amp;c-&gt;lock);
-  return rc;
-}
-```</p>
+<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;mythreads.h&quot;</span><span class="cp"></span>
+
+<span class="k">struct</span> <span class="n">counter_t</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">value</span><span class="p">;</span>
+  <span class="n">pthread_mutex_t</span> <span class="n">lock</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">static</span> <span class="k">struct</span> <span class="n">counter_t</span> <span class="n">counter</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="k">struct</span> <span class="n">counter_t</span> <span class="o">*</span><span class="n">c</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">c</span><span class="o">-&gt;</span><span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">increment_by</span><span class="p">(</span><span class="k">struct</span> <span class="n">counter_t</span> <span class="o">*</span><span class="n">c</span><span class="p">,</span> <span class="kt">int</span> <span class="n">by</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">Pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+  <span class="n">c</span><span class="o">-&gt;</span><span class="n">value</span> <span class="o">+=</span> <span class="n">by</span><span class="p">;</span>
+  <span class="n">Pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">increment</span><span class="p">(</span><span class="k">struct</span> <span class="n">counter_t</span> <span class="o">*</span><span class="n">c</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">increment_by</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">get</span><span class="p">(</span><span class="k">struct</span> <span class="n">counter_t</span> <span class="o">*</span><span class="n">c</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">Pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+  <span class="kt">int</span> <span class="n">rc</span> <span class="o">=</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">value</span><span class="p">;</span>
+  <span class="n">Pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">rc</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+
 <p>Nothing complicated. Let's say that we want to increment this counter 1,000,000 times. And let's do this with an increasing amount of threads, each thread incrementing the counter 1,000,000 times. I get the following timings for this exercise.</p>
-<p><code>1 thread:  0.064s real time.
+<div class="highlight"><pre><span></span>1 thread:  0.064s real time.
 2 threads: 9.930s
-4 threads: 23.971s</code></p>
+4 threads: 23.971s
+</pre></div>
+
+
 <p>This counter is really slow. Also, it doesn't scale well, since at the moment more than one thread starts to use it, it becomes so much slower. Why is this? Well, it's a bit difficult to tell without knowing how mutexes are implemented, but since we're using a single mutex that has to switch between two threads, it looks like there's a lot of overhead in this. The core operation - the increment, is also not parallel, since it can be done by only one thread at a time. But judging from the single threaded timing, this operation by itself is not the bottleneck here. So the synchronization must be.</p>
 <p>How can we improve this? We can use what's called a sloppy counter. The sloppy counter is also fairly easy to understand. Each thread has its own counter and when that counter becomes bigger than a certain value, its current value is transferred into a global counter. Here's how the code for that looks like:</p>
-<p>```</p>
-<h1 id="include">include <string.h></h1>
-<h1 id="include_1">include <stdlib.h></h1>
-<h1 id="define-mina-b-a-b-a-b">define min(a, b) ((a) &lt; (b) ? (a) : (b))</h1>
-<p>const uint64_t SLOTS_COUNT = 101;</p>
-<p>struct sloppy_counter_t {
-  int value;</p>
-<p>struct counter_t gcounter;</p>
-<p>// A hash table for per-thread counters. Since we're unlikely to run too many threads at the same time,
-  // chances for collision are low. If that's not the case, we can always use a per-counter mutex.
-  int lcounters[SLOTS_COUNT];
-};</p>
-<p>static struct sloppy_counter_t sloppy_counter;</p>
-<p>void sloppy_init(struct sloppy_counter_t *c) {
-  for (int i = 0; i &lt; SLOTS_COUNT; i++) {
-    c-&gt;lcounters[i] = 0;
-  }</p>
-<p>init(&amp;c-&gt;gcounter);
-}</p>
-<p>int slot_id(pthread_t thread_id) {
-  uint64_t ptid = 0;
-  memcpy(&amp;ptid, &amp;thread_id, min(sizeof(thread_id), sizeof(ptid)));</p>
-<p>int sid = ptid % SLOTS_COUNT;
-  return sid;
-}</p>
-<p>void sloppy_increment(struct sloppy_counter_t *c, pthread_t thread_id) {
-  int sid = slot_id(thread_id);</p>
-<p>c-&gt;lcounters[sid]++;
-  if (c-&gt;lcounters[sid] &gt; 128) {
-    increment_by(&amp;c-&gt;gcounter, c-&gt;lcounters[sid]);
-    c-&gt;lcounters[sid] = 0;
-  }
-}</p>
-<p>void sloppy_flush(struct sloppy_counter_t *c, pthread_t thread_id) {
-  int sid = slot_id(thread_id);
-  if (c-&gt;lcounters[sid] &gt; 0) {
-    increment_by(&amp;c-&gt;gcounter, c-&gt;lcounters[sid]);
-  }
-}</p>
-<p>int sloppy_get(struct sloppy_counter_t *counter) {
-  return get(&amp;counter-&gt;gcounter);
-}
-```</p>
+<div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;string.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#define min(a, b) ((a) &lt; (b) ? (a) : (b))</span>
+
+<span class="k">const</span> <span class="kt">uint64_t</span> <span class="n">SLOTS_COUNT</span> <span class="o">=</span> <span class="mi">101</span><span class="p">;</span>
+
+<span class="k">struct</span> <span class="n">sloppy_counter_t</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">value</span><span class="p">;</span>
+
+  <span class="k">struct</span> <span class="n">counter_t</span> <span class="n">gcounter</span><span class="p">;</span>
+
+  <span class="c1">// A hash table for per-thread counters. Since we&#39;re unlikely to run too many threads at the same time,</span>
+  <span class="c1">// chances for collision are low. If that&#39;s not the case, we can always use a per-counter mutex.</span>
+  <span class="kt">int</span> <span class="n">lcounters</span><span class="p">[</span><span class="n">SLOTS_COUNT</span><span class="p">];</span>
+<span class="p">};</span>
+
+<span class="k">static</span> <span class="k">struct</span> <span class="n">sloppy_counter_t</span> <span class="n">sloppy_counter</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">sloppy_init</span><span class="p">(</span><span class="k">struct</span> <span class="n">sloppy_counter_t</span> <span class="o">*</span><span class="n">c</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">SLOTS_COUNT</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">c</span><span class="o">-&gt;</span><span class="n">lcounters</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">gcounter</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">slot_id</span><span class="p">(</span><span class="n">pthread_t</span> <span class="n">thread_id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">uint64_t</span> <span class="n">ptid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">memcpy</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ptid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">thread_id</span><span class="p">,</span> <span class="n">min</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">thread_id</span><span class="p">),</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ptid</span><span class="p">)));</span>
+
+  <span class="kt">int</span> <span class="n">sid</span> <span class="o">=</span> <span class="n">ptid</span> <span class="o">%</span> <span class="n">SLOTS_COUNT</span><span class="p">;</span>
+  <span class="k">return</span> <span class="n">sid</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">sloppy_increment</span><span class="p">(</span><span class="k">struct</span> <span class="n">sloppy_counter_t</span> <span class="o">*</span><span class="n">c</span><span class="p">,</span> <span class="n">pthread_t</span> <span class="n">thread_id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">sid</span> <span class="o">=</span> <span class="n">slot_id</span><span class="p">(</span><span class="n">thread_id</span><span class="p">);</span>
+
+  <span class="n">c</span><span class="o">-&gt;</span><span class="n">lcounters</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">lcounters</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">128</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">increment_by</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">gcounter</span><span class="p">,</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">lcounters</span><span class="p">[</span><span class="n">sid</span><span class="p">]);</span>
+    <span class="n">c</span><span class="o">-&gt;</span><span class="n">lcounters</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">sloppy_flush</span><span class="p">(</span><span class="k">struct</span> <span class="n">sloppy_counter_t</span> <span class="o">*</span><span class="n">c</span><span class="p">,</span> <span class="n">pthread_t</span> <span class="n">thread_id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">sid</span> <span class="o">=</span> <span class="n">slot_id</span><span class="p">(</span><span class="n">thread_id</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">lcounters</span><span class="p">[</span><span class="n">sid</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">increment_by</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">gcounter</span><span class="p">,</span> <span class="n">c</span><span class="o">-&gt;</span><span class="n">lcounters</span><span class="p">[</span><span class="n">sid</span><span class="p">]);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="kt">int</span> <span class="nf">sloppy_get</span><span class="p">(</span><span class="k">struct</span> <span class="n">sloppy_counter_t</span> <span class="o">*</span><span class="n">counter</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="n">get</span><span class="p">(</span><span class="o">&amp;</span><span class="n">counter</span><span class="o">-&gt;</span><span class="n">gcounter</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+
+
 <p>Now let's time this counter.</p>
-<p><code>1 thread:  0.026s
+<div class="highlight"><pre><span></span>1 thread:  0.026s
 2 threads: 0.050s
-4 threads: 0.164s</code></p>
+4 threads: 0.164s
+</pre></div>
+
+
 <p>Much better! This counter, just like the first one, is thread safe. It's not as accurate, but the inaccuracy is small (at most 128 * number of threads) and we can use the flush function if we want accurate counts.</p>
     </div><!-- /.entry-content -->
     <div class="comments">

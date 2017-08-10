@@ -9,34 +9,42 @@ However, that seemed like too much work and I wanted something that I can implem
 &lt;p&gt;If you're not shipping compiled JavaScript, then your other option would be to have the template text somewhere and compile it client side. I have one main requirement though - I don't want my template code to be in a string which editors will display without HTML syntax highlighting.&lt;/p&gt;
 &lt;p&gt;So, working with these constraints, let's see what we can come up with.&lt;/p&gt;
 &lt;p&gt;First, let's say our template code is in &lt;code&gt;person.html&lt;/code&gt; and it looks like this:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;html
-&amp;lt;div&amp;gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
   {{#person}}
-    The user's name is {{name}}.
+    The user&amp;#39;s name is {{name}}.
   {{/person}}
   {{^person}}
-    There's no user defined.
+    There&amp;#39;s no user defined.
   {{/person}}
-&amp;lt;/div&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;div&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Now, we can include this template in the html page returned by our initial page load, like this:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;html
-&amp;lt;script&amp;gt;
-  var person_template_text = `{% include "myapp/templates/person.html" %}`
-&amp;lt;/script&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nt"&gt;script&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;person_template_text&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sb"&gt;`{% include &amp;quot;myapp/templates/person.html&amp;quot; %}`&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;/&lt;/span&gt;&lt;span class="nt"&gt;script&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;In this case, &lt;code&gt;person_template_text&lt;/code&gt; is a &lt;a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals"&gt;template literal&lt;/a&gt;. Template literals are JavaScript strings that can span multiple lines.&lt;/p&gt;
 &lt;p&gt;Now, we just need to compile the template so that it's ready to be rendered. We'll use &lt;a href="http://twitter.github.io/hogan.js/"&gt;hogan.js&lt;/a&gt;, since it's advertised as faster and smaller than mustache and it fully supports mustache syntax. Let's say we're also using jQuery. We can do something along these lines:&lt;/p&gt;
-&lt;p&gt;```javascript&lt;/p&gt;
-&lt;p&gt;function App() {
-  this.person_template = Hogan.compile(person_template_text);
-}&lt;/p&gt;
-&lt;p&gt;App.prototype.renderPerson = function(personDict) {
-  return this.person_template.render(personDict);
-}&lt;/p&gt;
-&lt;p&gt;var app;&lt;/p&gt;
-&lt;p&gt;$(document).ready(function() {
-  app = new App();
-});
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;App&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;person_template&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;Hogan&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;compile&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;person_template_text&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nx"&gt;App&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;prototype&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;renderPerson&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;personDict&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;person_template&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;render&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;personDict&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;app&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;document&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="nx"&gt;ready&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nx"&gt;app&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;App&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;And that's it. There are many other ways to do this, which will be more optimized, but this one seems like an easy one to start with.&lt;/p&gt;</content><category term="Python"></category><category term="Django"></category></entry><entry><title>How to generate user activation links in Django.</title><link href="http://pminkov.github.io/blog/how-to-generate-user-activation-links-in-django.html" rel="alternate"></link><published>2016-04-05T17:03:00-07:00</published><updated>2016-04-05T17:03:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-04-05:/blog/how-to-generate-user-activation-links-in-django.html</id><summary type="html">&lt;p&gt;Imagine the following simple user registration flow:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;User registers by setting an e-mail and a password.&lt;/li&gt;

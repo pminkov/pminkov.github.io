@@ -13,7 +13,7 @@ supposed to model a logical AND operation. The function is based on the
 sigmoid function.&lt;/p&gt;
 &lt;p&gt;&lt;/p&gt;
 The sigmoid function looks like this:&lt;/p&gt;
-&lt;p&gt;&lt;center&gt;&lt;img alt="Google sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-google.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Google sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-google.png"&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;p&gt;&lt;/p&gt;
 Computing the sigmoid function in Octave can be seen
 &lt;a href="https://gist.github.com/3205075" title="Sidmoid"&gt;here&lt;/a&gt;.&lt;/p&gt;
@@ -35,7 +35,7 @@ I got curious about how this function looks like for values between zero
 and one and wrote this &lt;a href="https://gist.github.com/3205016"&gt;short Octave
 program&lt;/a&gt; to plot the output. And here
 it is. Pretty neat, I'd say.&lt;/p&gt;
-&lt;p&gt;&lt;center&gt;&lt;img alt="Octave sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-octave.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Octave sigmoid plot" src="http://pminkov.github.io/blog/images/sigmoid-octave.png"&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;p&gt;&lt;/p&gt;
 It's easy to see that the function behaves as expected at (0,0), (0,1)
 and (1,0) and (1,1) and that for values in between its computed values

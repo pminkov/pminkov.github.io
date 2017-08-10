@@ -11,7 +11,6 @@
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h2 id="what-is-ssh-for"&gt;What is SSH for?&lt;/h2&gt;
 &lt;p&gt;SSH is used to communicate securely between a client and a server. Some examples that most people are …&lt;/p&gt;</summary><content type="html">&lt;div class="toc"&gt;&lt;span class="toctitle"&gt;Table of contents:&lt;/span&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#what-is-ssh-for"&gt;What is SSH for?&lt;/a&gt;&lt;/li&gt;
@@ -25,51 +24,54 @@
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h2 id="what-is-ssh-for"&gt;What is SSH for?&lt;/h2&gt;
 &lt;p&gt;SSH is used to communicate securely between a client and a server. Some examples that most people are familiar with are SSH-ing to a remote server or using GitHub.&lt;/p&gt;
 &lt;h2 id="the-key-pair"&gt;The key pair&lt;/h2&gt;
 &lt;p&gt;To establish an SSH connection you need a &lt;strong&gt;private key&lt;/strong&gt; and a &lt;strong&gt;public key&lt;/strong&gt;. You keep the private key in a safe place (usually in &lt;code&gt;~/.ssh/&lt;/code&gt;) and upload the public key to any server that you want to securely connect to. Encryption with a private key and a public key is called &lt;a href="https://en.wikipedia.org/wiki/Public-key_cryptography"&gt;assymetric encryption&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;How do you create a key pair. Like this:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ ssh-keygen -t rsa -b 4096 -C "myemail@gmail.com"
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh-keygen -t rsa -b &lt;span class="m"&gt;4096&lt;/span&gt; -C &lt;span class="s2"&gt;&amp;quot;myemail@gmail.com&amp;quot;&lt;/span&gt;
 Generating public/private rsa key pair.
-Enter file in which to save the key (/home/petko/.ssh/id_rsa): ./mykey
-Enter passphrase (empty for no passphrase): 
+Enter file in which to save the key &lt;span class="o"&gt;(&lt;/span&gt;/home/petko/.ssh/id_rsa&lt;span class="o"&gt;)&lt;/span&gt;: ./mykey
+Enter passphrase &lt;span class="o"&gt;(&lt;/span&gt;empty &lt;span class="k"&gt;for&lt;/span&gt; no passphrase&lt;span class="o"&gt;)&lt;/span&gt;: 
 Enter same passphrase again: 
 Your identification has been saved in ./mykey.
 Your public key has been saved in ./mykey.pub.
 The key fingerprint is:
 SHA256:0/zlEZZj0R6yM4uHVD+xJWoLOx3+TormCRcyWt3c53o myemail@gmail.com
-The key's randomart image is:
-+---[RSA 4096]----+
-|              .. |
-|             o.=o|
-|            ..Xo=|
-|         +.++B *.|
-|        S **=oB o|
-|       o +o=+= + |
-|      . . ..o.o .|
-|         o.o o..E|
-|         o+ ..o. |
-+----[SHA256]-----+
+The key&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;s randomart image is:
++---&lt;span class="o"&gt;[&lt;/span&gt;RSA &lt;span class="m"&gt;4096&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;----+
+&lt;span class="p"&gt;|&lt;/span&gt;              .. &lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;             o.&lt;span class="o"&gt;=&lt;/span&gt;o&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;            ..Xo&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;         +.++B *.&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;        S **&lt;span class="o"&gt;=&lt;/span&gt;oB o&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;       o +o&lt;span class="o"&gt;=&lt;/span&gt;+&lt;span class="o"&gt;=&lt;/span&gt; + &lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;      . . ..o.o .&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;         o.o o..E&lt;span class="p"&gt;|&lt;/span&gt;
+&lt;span class="p"&gt;|&lt;/span&gt;         o+ ..o. &lt;span class="p"&gt;|&lt;/span&gt;
++----&lt;span class="o"&gt;[&lt;/span&gt;SHA256&lt;span class="o"&gt;]&lt;/span&gt;-----+
 $ ls -l
-total 8
--rw------- 1 petko petko 3243 Aug  9 16:24 mykey
--rw-r--r-- 1 petko petko  743 Aug  9 16:24 mykey.pub&lt;/code&gt;&lt;/p&gt;
+total &lt;span class="m"&gt;8&lt;/span&gt;
+-rw------- &lt;span class="m"&gt;1&lt;/span&gt; petko petko &lt;span class="m"&gt;3243&lt;/span&gt; Aug  &lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="m"&gt;16&lt;/span&gt;:24 mykey
+-rw-r--r-- &lt;span class="m"&gt;1&lt;/span&gt; petko petko  &lt;span class="m"&gt;743&lt;/span&gt; Aug  &lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="m"&gt;16&lt;/span&gt;:24 mykey.pub
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;How do the public and private key look like. They look like this (I have removed some of the output to keep you from scrolling too much):&lt;/p&gt;
-&lt;p&gt;```bash
-$ cat ./mykey
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat ./mykey
 -----BEGIN RSA PRIVATE KEY-----
 MIIJKQIBAAKCAgEA2FGlZybznkcHQG530bj+DlrY74nTh+shP1uyJA25BrkAyOz9
 xc8Tvlk3QfBcGFfQKc1OowV80XtNyXXnOeFTqlh8B8DS1Mul165wgb+pJDROvI0J
 ...
 3vZfDPXo9w2XwAwN7hLimCVWdqr0JI8BmbussW4ZrJRcra1rvsLj6sip9Ry3oP+9
 PIUEPwDY/YUVRZV2De4cBdBnwTmj9RoXOW63mW6sL8lfeYjJQwQys+jVVjRi
------END RSA PRIVATE KEY-----&lt;/p&gt;
-&lt;p&gt;$ cat ./mykey.pub 
-ssh-rsa AAAAB3NzaC ... +PAAKfQ== myemail@gmail.com
-```&lt;/p&gt;
+-----END RSA PRIVATE KEY-----
+
+$ cat ./mykey.pub 
+ssh-rsa AAAAB3NzaC ... +PAAKfQ&lt;span class="o"&gt;==&lt;/span&gt; myemail@gmail.com
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;So that's it. A private key and a public key. Nothing else. Keep the private key secret, upload the public key.&lt;/p&gt;
 &lt;h2 id="how-does-ssh-work"&gt;How does SSH work?&lt;/h2&gt;
 &lt;p&gt;Great question. If you have a key pair you can encrypt a message with one of the keys and decrypt it with the other key. But that's not how data is exchanged with an SSH connection. SSH is actually using &lt;a href="https://en.wikipedia.org/wiki/Symmetric-key_algorithm"&gt;symmetric key encryption&lt;/a&gt;. The private and public keys are used to securely exchange a temporary symmetric key used to encrypt the data between two machines. The symmetric key crosses the wire in encrypted form, so an attacked can't find out what the key is.&lt;/p&gt;
@@ -78,60 +80,76 @@ ssh-rsa AAAAB3NzaC ... +PAAKfQ== myemail@gmail.com
 &lt;p&gt;We now know what's involved in SSH communication. Let's look at the commands that are used. &lt;/p&gt;
 &lt;p&gt;We'll start with a clean example. I have an AWS EC2 instance on which I have installed a public key. The private key is located in my &lt;code&gt;~/.ssh/&lt;/code&gt; directory. It's called &lt;code&gt;aws-laptop&lt;/code&gt;, because I use it from my laptop.&lt;/p&gt;
 &lt;p&gt;Let's try to ssh into the instance:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-~/.ssh$ ssh ubuntu@35.165.19.203
-Permission denied (publickey).&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;~/.ssh$ ssh ubuntu@35.165.19.203
+Permission denied &lt;span class="o"&gt;(&lt;/span&gt;publickey&lt;span class="o"&gt;)&lt;/span&gt;.
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Doesn't work. Well, of course - ssh doesn't know what private key to use. We have to point to it using the &lt;code&gt;-i&lt;/code&gt; option.&lt;/p&gt;
-&lt;p&gt;```bash
-~/.ssh$ ssh -i ./aws-laptop ubuntu@35.165.19.203
-The authenticity of host '35.165.19.203 (35.165.19.203)' can't be established.
-ECDSA key fingerprint is SHA256: 3w+LlpD/HH .......
-Are you sure you want to continue connecting (yes/no)? yes
-Enter passphrase for key './aws-laptop':  [Here I entered a passphrase]
-Welcome to Ubuntu 16.04.2 LTS (GNU/Linux 4.4.0-1022-aws x86_64)
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;~/.ssh$ ssh -i ./aws-laptop ubuntu@35.165.19.203
+The authenticity of host &lt;span class="s1"&gt;&amp;#39;35.165.19.203 (35.165.19.203)&amp;#39;&lt;/span&gt; can&lt;span class="s1"&gt;&amp;#39;t be established.&lt;/span&gt;
+&lt;span class="s1"&gt;ECDSA key fingerprint is SHA256: 3w+LlpD/HH .......&lt;/span&gt;
+&lt;span class="s1"&gt;Are you sure you want to continue connecting (yes/no)? yes&lt;/span&gt;
+&lt;span class="s1"&gt;Enter passphrase for key &amp;#39;&lt;/span&gt;./aws-laptop&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;:  &lt;span class="o"&gt;[&lt;/span&gt;Here I entered a passphrase&lt;span class="o"&gt;]&lt;/span&gt;
+Welcome to Ubuntu &lt;span class="m"&gt;16&lt;/span&gt;.04.2 LTS &lt;span class="o"&gt;(&lt;/span&gt;GNU/Linux &lt;span class="m"&gt;4&lt;/span&gt;.4.0-1022-aws x86_64&lt;span class="o"&gt;)&lt;/span&gt;
 ...
-Last login: Wed Aug  9 23:09:13 2017 from 76.102.141.14&lt;/p&gt;
-&lt;p&gt;ubuntu@ip-172-31-13-46:~$
-```&lt;/p&gt;
+Last login: Wed Aug  &lt;span class="m"&gt;9&lt;/span&gt; &lt;span class="m"&gt;23&lt;/span&gt;:09:13 &lt;span class="m"&gt;2017&lt;/span&gt; from &lt;span class="m"&gt;76&lt;/span&gt;.102.141.14
+
+ubuntu@ip-172-31-13-46:~$
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Hooray, I'm in! What happened in the meantime is that the ssh command saved an entry into the &lt;code&gt;known_hosts&lt;/code&gt; file, so next time I ssh it won't ask me again to confirm the authenticity of the remote host.&lt;/p&gt;
 &lt;p&gt;However, I'll still need to point to the private key and enter the passphrase for it. Very inconvenient.&lt;/p&gt;
 &lt;h2 id="the-ssh-agent-daemon"&gt;The ssh-agent daemon&lt;/h2&gt;
 &lt;p&gt;The solution to the above problem is the &lt;code&gt;ssh-agent&lt;/code&gt; daemon. &lt;code&gt;ssh-agent&lt;/code&gt; is a program that you start when you first login and you can add private keys to it so that next time you ssh into a server, you don't have to point to them.&lt;/p&gt;
 &lt;p&gt;How does ssh-agent know which private key to use? When you run &lt;code&gt;ssh -v ubuntu@35.165.19.203&lt;/code&gt; you can see that there's a bit of back and forth where &lt;code&gt;ssh&lt;/code&gt; seems to be trying out private keys from &lt;code&gt;ssh-agent&lt;/code&gt;. So I guess that's how it's done:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-debug1: Offering RSA public key: /home/petko/.ssh/id_rsa
-debug1: Authentications that can continue: publickey
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;debug1: Offering RSA public key: /home/petko/.ssh/id_rsa
+debug1: Authentications that can &lt;span class="k"&gt;continue&lt;/span&gt;: publickey
 debug1: Offering RSA public key: ./aws-laptop
-debug1: Server accepts key: pkalg rsa-sha2-512 blen 279&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;We can list the keys in ssh-agent with this command:
-&lt;code&gt;bash
+debug1: Server accepts key: pkalg rsa-sha2-512 blen &lt;span class="m"&gt;279&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We can list the keys in ssh-agent with this command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh-add -l
+The agent has no identities.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;No keys. So let's add the key that we were using.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh-add ./aws-laptop
+Enter passphrase &lt;span class="k"&gt;for&lt;/span&gt; ./aws-laptop: &lt;span class="o"&gt;[&lt;/span&gt;I entered passphrase&lt;span class="o"&gt;]&lt;/span&gt;
+Identity added: ./aws-laptop &lt;span class="o"&gt;(&lt;/span&gt;./aws-laptop&lt;span class="o"&gt;)&lt;/span&gt;
 $ ssh-add -l
-The agent has no identities.&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;No keys. So let's add the key that we were using.
-&lt;code&gt;bash
-$ ssh-add ./aws-laptop
-Enter passphrase for ./aws-laptop: [I entered passphrase]
-Identity added: ./aws-laptop (./aws-laptop)
-$ ssh-add -l
-2048 SHA256:tU++v7cfD8... ./aws-laptop (RSA)&lt;/code&gt;&lt;/p&gt;
+&lt;span class="m"&gt;2048&lt;/span&gt; SHA256:tU++v7cfD8... ./aws-laptop &lt;span class="o"&gt;(&lt;/span&gt;RSA&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;The private key is now saved! I can now ssh without pointing to it:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ ssh ubuntu@35.165.19.203
-Welcome to Ubuntu 16.04.2 LTS (GNU/Linux 4.4.0-1022-aws x86_64)
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh ubuntu@35.165.19.203
+Welcome to Ubuntu &lt;span class="m"&gt;16&lt;/span&gt;.04.2 LTS &lt;span class="o"&gt;(&lt;/span&gt;GNU/Linux &lt;span class="m"&gt;4&lt;/span&gt;.4.0-1022-aws x86_64&lt;span class="o"&gt;)&lt;/span&gt;
 ...
-ubuntu@ip-172-31-13-46:~$&lt;/code&gt;&lt;/p&gt;
+ubuntu@ip-172-31-13-46:~$ 
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Great.&lt;/p&gt;
 &lt;h2 id="tips-and-tricks"&gt;Tips and tricks&lt;/h2&gt;
 &lt;h3 id="manually-verifying-a-private-key"&gt;Manually verifying a private key&lt;/h3&gt;
 &lt;p&gt;Today I was trying again and again to connect to a remote machine using the wrong private key. I was able to connect to that machine from my laptop, but not from my Ubuntu VM.&lt;/p&gt;
 &lt;p&gt;I was running the following command:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ ssh -i ./somekey.pem  ubuntu@35.165.19.203
-Permission denied (publickey).&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh -i ./somekey.pem  ubuntu@35.165.19.203
+Permission denied &lt;span class="o"&gt;(&lt;/span&gt;publickey&lt;span class="o"&gt;)&lt;/span&gt;.
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;How did I debug this? I ssh-ed into the server from my laptop and looked up the public key in &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt;. I then generated the public key from my private key, like this:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ ssh-keygen -y -f  ./somekey.pem
-ssh-rsa AAAAB3....KY1&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ssh-keygen -y -f  ./somekey.pem
+ssh-rsa AAAAB3....KY1
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;And sure enough, the public keys were not matching. I then found the correct private key and was able to connect with it.&lt;/p&gt;
 &lt;p&gt;If you're following carefully, you'll notice that I did something here that's considered a bad practice. I reused my private key from my laptop on my VirtualBox. I should generate a new key pair and add the public key to the &lt;code&gt;authorized_keys&lt;/code&gt; file on the server.&lt;/p&gt;
 &lt;p&gt;So that's it so far. One thing that I didn't cover is how to start the ssh agent automatically. I have some commands in my &lt;code&gt;bash_profile&lt;/code&gt; to do that that I digged from Stack Overflow. Here's a &lt;a href="http://www.snailbook.com/faq/about-agent.auto.html"&gt;great description&lt;/a&gt; that can aid in starting &lt;code&gt;ssh-agent&lt;/code&gt;.&lt;/p&gt;</content></entry><entry><title>Socket Programming in Linux</title><link href="http://pminkov.github.io/blog/socket-programming-in-linux.html" rel="alternate"></link><published>2017-08-02T12:10:00-07:00</published><updated>2017-08-02T12:10:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-08-02:/blog/socket-programming-in-linux.html</id><summary type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's now time to write a bit about how all of this works.&lt;/p&gt;
@@ -141,490 +159,569 @@ ssh-rsa AAAAB3....KY1&lt;/code&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Create a socket with &lt;code&gt;socket()&lt;/code&gt;. The code looks like  this:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;code&gt;c
-int sockfd = socket(AF_INET, SOCK_STREAM, 0);&lt;/code&gt;
-&lt;code&gt;SOCK_STREAM&lt;/code&gt; means that we're creating a stream socket (TCP socket).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;sockfd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;socket&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AF_INET&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SOCK_STREAM&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;SOCK_STREAM&lt;/code&gt; means that we're creating a stream socket (TCP socket).&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Bind the socket to an address. The key lines are:
-&lt;code&gt;c
-1: struct sockaddr_in serv_addr;
-2: uint16_t port = 8000;
-...
-3: serv_addr.sin_family = AF_INET;
-4: serv_addr.sin_port = htons(port);
-5: serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-...
-6: bind(sockfd, (struct sockaddr *) &amp;amp;serv_addr, sizeof(serv_addr))&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Bind the socket to an address. The key lines are:&lt;/li&gt;
 &lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sockaddr_in&lt;/span&gt; &lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;uint16_t&lt;/span&gt; &lt;span class="n"&gt;port&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;8000&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin_family&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;AF_INET&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin_port&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;htons&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin_addr&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;s_addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;htonl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;INADDR_ANY&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;bind&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sockfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sockaddr&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;sizeof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;We're creating an address &lt;code&gt;serv_addr&lt;/code&gt; and binding it to the socket we created above. Note that we use &lt;code&gt;INADDR_ANY&lt;/code&gt; as the IP address on which the socket is listening. This is the so-called IPv4 wildcard address. It binds your server to all interfaces available on your machine. That's more useful for me than binding to &lt;code&gt;INADDR_LOOPBACK&lt;/code&gt; (127.0.0.1), because I'm running my code in a VM and accessing the server from my MacBook. Run &lt;code&gt;ifconfig&lt;/code&gt; on your box to see the network interfaces that are available on it.&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;Great, we have a socket and it's assigned to an address. This socket can now be used as as passive socket (it's listening for connections) or an active socket (it's used to connect to a peer socket). We want a passive socket. We mark it as a passive socket by calling the &lt;code&gt;listen&lt;/code&gt; function. The code looks like this:
-&lt;code&gt;c
-if (listen(sockfd, SOMAXCONN) &amp;lt; 0) error("Couldn't listen");&lt;/code&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;The socket is now ready to accept connections. This can happen in a loop that looks like this:
-```c
-struct sockaddr_in client_addr;
-int cli_len = sizeof(client_addr);&lt;/p&gt;
-&lt;/li&gt;
+&lt;li&gt;Great, we have a socket and it's assigned to an address. This socket can now be used as as passive socket (it's listening for connections) or an active socket (it's used to connect to a peer socket). We want a passive socket. We mark it as a passive socket by calling the &lt;code&gt;listen&lt;/code&gt; function. The code looks like this:&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;while (1) {
-    int newsockfd = accept(sockfd, (struct sockaddr &lt;em&gt;) &amp;amp;client_addr, 
-        (socklen_t &lt;/em&gt;) &amp;amp;cli_len);
-    if (newsockfd &amp;lt; 0) error("Error on accept");
-    // newsockfd is a file descriptor. 
-    // Handle the connection by reading from and writing to this descriptor.
-    ...
-}
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;listen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sockfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SOMAXCONN&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Couldn&amp;#39;t listen&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;The socket is now ready to accept connections. This can happen in a loop that looks like this:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sockaddr_in&lt;/span&gt; &lt;span class="n"&gt;client_addr&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;cli_len&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;sizeof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;client_addr&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;newsockfd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;accept&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sockfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sockaddr&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;client_addr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; 
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;socklen_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;cli_len&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;newsockfd&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Error on accept&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+    &lt;span class="c1"&gt;// newsockfd is a file descriptor. &lt;/span&gt;
+    &lt;span class="c1"&gt;// Handle the connection by reading from and writing to this descriptor.&lt;/span&gt;
+    &lt;span class="p"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;The &lt;code&gt;accept&lt;/code&gt; function blocks until a connection request is received and creates a new socket when that happens. After that, it's your call how you'll handle this socket. You can fork a new process, create a new thread or in my case I have a thred pool of pre-forked threads which just pull these sockets from a queue and do what's necessary to handle a web server request.&lt;/p&gt;
 &lt;p&gt;That's the server. Now let's look at the client. Full code is in &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;client.c&lt;/a&gt;. It's a pretty simple client that connects to localhost (127.0.0.1). So you can't use it if the server is running remotely.&lt;/p&gt;
-&lt;p&gt;You start by creating a socket with &lt;code&gt;socket()&lt;/code&gt; and then calling &lt;code&gt;connect()&lt;/code&gt; and passing the address to which you want to connect:
-```c
-int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-if (sockfd == -1) {
-    error("socket");
-}&lt;/p&gt;
-&lt;p&gt;uint16_t port = 8000;&lt;/p&gt;
-&lt;p&gt;struct sockaddr_in serv_addr;
-serv_addr.sin_family = AF_INET;
-serv_addr.sin_port = htons(port);
-serv_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);&lt;/p&gt;
-&lt;p&gt;if (connect(sockfd, (struct sockaddr *)&amp;amp;serv_addr, sizeof(struct sockaddr_in)) == -1) {
-    error("connect");
-}
-```&lt;/p&gt;
+&lt;p&gt;You start by creating a socket with &lt;code&gt;socket()&lt;/code&gt; and then calling &lt;code&gt;connect()&lt;/code&gt; and passing the address to which you want to connect:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;sockfd&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;socket&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;AF_INET&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;SOCK_STREAM&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sockfd&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;socket&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;uint16_t&lt;/span&gt; &lt;span class="n"&gt;port&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;8000&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sockaddr_in&lt;/span&gt; &lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin_family&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;AF_INET&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin_port&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;htons&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin_addr&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;s_addr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;htonl&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;INADDR_LOOPBACK&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;connect&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sockfd&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sockaddr&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;serv_addr&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;sizeof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sockaddr_in&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;connect&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;If the connection is successful, you can just send your request to the server using the &lt;code&gt;write()&lt;/code&gt; system call and read the response with the &lt;code&gt;read()&lt;/code&gt; call.&lt;/p&gt;
 &lt;p&gt;So that's a simple web server and a client. The code still has a lot of bugs (the client will buffer overflow if I pass a request string longer than 512 chars, I'm not closing the connection explicitly, etc.), but it gets the job done.&lt;/p&gt;
 &lt;p&gt;A final interesting thing to do is to run Wireshark and see what packets are going between the client and the server. To do this, I started the server on my Virtual box Ubuntu (192.168.1.135) and ran &lt;code&gt;curl&lt;/code&gt; from my MacBook (192.168.1.86). Here's what I saw in Wireshark:&lt;/p&gt;
-&lt;p&gt;&lt;center&gt;&lt;img alt="Wireshark" src="http://pminkov.github.io/blog/images/wireshark.png" /&gt;&lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;img alt="Wireshark" src="http://pminkov.github.io/blog/images/wireshark.png"&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;p&gt;You can see the three way TCP handshake in the beginning (&lt;code&gt;SYN&lt;/code&gt; followed by &lt;code&gt;SYN,ACK&lt;/code&gt; followed by &lt;code&gt;ACK&lt;/code&gt;) and everything else in between. It's definitely something interesting to try out.&lt;/p&gt;</content></entry><entry><title>Examining a process in Linux.</title><link href="http://pminkov.github.io/blog/examining-a-process-in-linux.html" rel="alternate"></link><published>2017-03-01T12:26:00-08:00</published><updated>2017-03-01T12:26:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-01:/blog/examining-a-process-in-linux.html</id><summary type="html">&lt;p&gt;I've been thinking about writing a blog post about Linux tools and commands related to processes. Let's take a look at some of them.&lt;/p&gt;
 &lt;p&gt;The process that we'll be looking at is a &lt;a href="https://github.com/pminkov/webserver"&gt;webserver&lt;/a&gt; that I wrote some time ago to practice my C and write some code that does …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I've been thinking about writing a blog post about Linux tools and commands related to processes. Let's take a look at some of them.&lt;/p&gt;
 &lt;p&gt;The process that we'll be looking at is a &lt;a href="https://github.com/pminkov/webserver"&gt;webserver&lt;/a&gt; that I wrote some time ago to practice my C and write some code that does network related work. This webserver runs a &lt;a href="https://github.com/pminkov/threadpool"&gt;threadpool&lt;/a&gt; where N threads are waiting for server requests that they're going to execute.&lt;/p&gt;
-&lt;p&gt;So let's start the server:
-&lt;code&gt;bash
-$ ./server
-Running on port: 8000&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;So let's start the server:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./server
+Running on port: &lt;span class="m"&gt;8000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Great. So which process is this server running as? We can use the &lt;code&gt;pidof&lt;/code&gt; command to find that out. Its output looks like this:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ pidof server
-8876&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ pidof server
+&lt;span class="m"&gt;8876&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;If we had other processes which were running an executable with that name, we'd see more process ids, but since we only have one, we see one process id.&lt;/p&gt;
 &lt;p&gt;What next? Let's see how the process is layed out in memory. To do this, we can use the &lt;code&gt;pmap&lt;/code&gt; command. Its output looks like this:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ sudo pmap -p 8876
-8876:   ./server
-0000000000400000     16K r-x-- /home/petko/work/github/webserver/server
-0000000000603000      4K r---- /home/petko/work/github/webserver/server
-0000000000604000      4K rw--- /home/petko/work/github/webserver/server
-000000000110f000    132K rw---   [ anon ]
-00007fd5ca731000      4K -----   [ anon ]
-00007fd5ca732000   8192K rw---   [ anon ]
-00007fd5caf32000      4K -----   [ anon ]
-00007fd5caf33000   8192K rw---   [ anon ]
-00007fd5cb733000      4K -----   [ anon ]
-00007fd5cb734000   8192K rw---   [ anon ]
-00007fd5cbf34000      4K -----   [ anon ]
-00007fd5cbf35000   8192K rw---   [ anon ]
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo pmap -p &lt;span class="m"&gt;8876&lt;/span&gt;
+&lt;span class="m"&gt;8876&lt;/span&gt;:   ./server
+&lt;span class="m"&gt;0000000000400000&lt;/span&gt;     16K r-x-- /home/petko/work/github/webserver/server
+&lt;span class="m"&gt;0000000000603000&lt;/span&gt;      4K r---- /home/petko/work/github/webserver/server
+&lt;span class="m"&gt;0000000000604000&lt;/span&gt;      4K rw--- /home/petko/work/github/webserver/server
+000000000110f000    132K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5ca731000      4K -----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5ca732000   8192K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5caf32000      4K -----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5caf33000   8192K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5cb733000      4K -----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5cb734000   8192K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5cbf34000      4K -----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5cbf35000   8192K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
 00007fd5cc735000   1792K r-x-- /lib/x86_64-linux-gnu/libc-2.23.so
 00007fd5cc8f5000   2044K ----- /lib/x86_64-linux-gnu/libc-2.23.so
 00007fd5ccaf4000     16K r---- /lib/x86_64-linux-gnu/libc-2.23.so
 00007fd5ccaf8000      8K rw--- /lib/x86_64-linux-gnu/libc-2.23.so
-00007fd5ccafa000     16K rw---   [ anon ]
+00007fd5ccafa000     16K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
 00007fd5ccafe000     96K r-x-- /lib/x86_64-linux-gnu/libpthread-2.23.so
 00007fd5ccb16000   2044K ----- /lib/x86_64-linux-gnu/libpthread-2.23.so
 00007fd5ccd15000      4K r---- /lib/x86_64-linux-gnu/libpthread-2.23.so
 00007fd5ccd16000      4K rw--- /lib/x86_64-linux-gnu/libpthread-2.23.so
-00007fd5ccd17000     16K rw---   [ anon ]
+00007fd5ccd17000     16K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
 00007fd5ccd1b000    152K r-x-- /lib/x86_64-linux-gnu/ld-2.23.so
-00007fd5ccf22000     12K rw---   [ anon ]
-00007fd5ccf3e000      8K rw---   [ anon ]
+00007fd5ccf22000     12K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007fd5ccf3e000      8K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
 00007fd5ccf40000      4K r---- /lib/x86_64-linux-gnu/ld-2.23.so
 00007fd5ccf41000      4K rw--- /lib/x86_64-linux-gnu/ld-2.23.so
-00007fd5ccf42000      4K rw---   [ anon ]
-00007ffca0861000    132K rw---   [ stack ]
-00007ffca09eb000      8K r----   [ anon ]
-00007ffca09ed000      8K r-x--   [ anon ]
-ffffffffff600000      4K r-x--   [ anon ]
-total            39316K&lt;/code&gt;&lt;/p&gt;
+00007fd5ccf42000      4K rw---   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007ffca0861000    132K rw---   &lt;span class="o"&gt;[&lt;/span&gt; stack &lt;span class="o"&gt;]&lt;/span&gt;
+00007ffca09eb000      8K r----   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+00007ffca09ed000      8K r-x--   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+ffffffffff600000      4K r-x--   &lt;span class="o"&gt;[&lt;/span&gt; anon &lt;span class="o"&gt;]&lt;/span&gt;
+total            39316K
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;What you see here are virtual memory addresses. For example, let's take a look at this line:&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;00007fd5cc735000   1792K r-x-- /lib/x86_64-linux-gnu/libc-2.23.so&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;This is the code for &lt;code&gt;libc&lt;/code&gt;, which is the C standard library. This code is shared between processes that need it. We can see the &lt;code&gt;x&lt;/code&gt; flag, which means that this is executable memory. The size if roughly the same as the size of this &lt;code&gt;so&lt;/code&gt; file. This library is memory mapped into a region starting at address &lt;code&gt;00007fd5cc735000&lt;/code&gt;, but in physical memory it's only stored in one place. To learn more about memory in Linux, here's a &lt;a href="https://techtalk.intersec.com/2013/07/memory-part-1-memory-types/"&gt;great post&lt;/a&gt; going into detail about it.&lt;/p&gt;
 &lt;p&gt;Another interesting command is &lt;code&gt;lsof&lt;/code&gt;. &lt;code&gt;lsof&lt;/code&gt; stands for "list of open files". Let's see its output:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ sudo lsof -p 8876
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo lsof -p &lt;span class="m"&gt;8876&lt;/span&gt;
 COMMAND  PID  USER   FD   TYPE DEVICE SIZE/OFF    NODE NAME
-server  8876 petko  cwd    DIR    8,1     4096  262299 /home/petko/work/github/webserver
-server  8876 petko  rtd    DIR    8,1     4096       2 /
-server  8876 petko  txt    REG    8,1    25536  306491 /home/petko/work/github/webserver/server
-server  8876 petko  mem    REG    8,1  1864888 1184834 /lib/x86_64-linux-gnu/libc-2.23.so
-server  8876 petko  mem    REG    8,1   138744 1184980 /lib/x86_64-linux-gnu/libpthread-2.23.so
-server  8876 petko  mem    REG    8,1   162632 1184806 /lib/x86_64-linux-gnu/ld-2.23.so
-server  8876 petko    0u   CHR  136,9      0t0      12 /dev/pts/9
-server  8876 petko    1u   CHR  136,9      0t0      12 /dev/pts/9
-server  8876 petko    2u   CHR  136,9      0t0      12 /dev/pts/9
-server  8876 petko    3u  IPv4  81993      0t0     TCP *:8000 (LISTEN)&lt;/code&gt;&lt;/p&gt;
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  cwd    DIR    &lt;span class="m"&gt;8&lt;/span&gt;,1     &lt;span class="m"&gt;4096&lt;/span&gt;  &lt;span class="m"&gt;262299&lt;/span&gt; /home/petko/work/github/webserver
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  rtd    DIR    &lt;span class="m"&gt;8&lt;/span&gt;,1     &lt;span class="m"&gt;4096&lt;/span&gt;       &lt;span class="m"&gt;2&lt;/span&gt; /
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  txt    REG    &lt;span class="m"&gt;8&lt;/span&gt;,1    &lt;span class="m"&gt;25536&lt;/span&gt;  &lt;span class="m"&gt;306491&lt;/span&gt; /home/petko/work/github/webserver/server
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  mem    REG    &lt;span class="m"&gt;8&lt;/span&gt;,1  &lt;span class="m"&gt;1864888&lt;/span&gt; &lt;span class="m"&gt;1184834&lt;/span&gt; /lib/x86_64-linux-gnu/libc-2.23.so
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  mem    REG    &lt;span class="m"&gt;8&lt;/span&gt;,1   &lt;span class="m"&gt;138744&lt;/span&gt; &lt;span class="m"&gt;1184980&lt;/span&gt; /lib/x86_64-linux-gnu/libpthread-2.23.so
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko  mem    REG    &lt;span class="m"&gt;8&lt;/span&gt;,1   &lt;span class="m"&gt;162632&lt;/span&gt; &lt;span class="m"&gt;1184806&lt;/span&gt; /lib/x86_64-linux-gnu/ld-2.23.so
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko    0u   CHR  &lt;span class="m"&gt;136&lt;/span&gt;,9      0t0      &lt;span class="m"&gt;12&lt;/span&gt; /dev/pts/9
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko    1u   CHR  &lt;span class="m"&gt;136&lt;/span&gt;,9      0t0      &lt;span class="m"&gt;12&lt;/span&gt; /dev/pts/9
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko    2u   CHR  &lt;span class="m"&gt;136&lt;/span&gt;,9      0t0      &lt;span class="m"&gt;12&lt;/span&gt; /dev/pts/9
+server  &lt;span class="m"&gt;8876&lt;/span&gt; petko    3u  IPv4  &lt;span class="m"&gt;81993&lt;/span&gt;      0t0     TCP *:8000 &lt;span class="o"&gt;(&lt;/span&gt;LISTEN&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;As you can see, we have file descriptors 0,1 and 2, which are stdin, stdout and stderr. They are linked to the terminal in which the process is running in. You can write to that terminal btw. Just type &lt;code&gt;echo "hello world" &amp;gt; /dev/pts/9&lt;/code&gt; and you'll see that text in the terminal where your webserver is running. File descriptor number 3 is our socket which accepts connections.&lt;/p&gt;
-&lt;p&gt;Another interesting way to inspect processes is the ps command. Its basic output looks like this:
-&lt;code&gt;bash
-$ ps --pid 8876
+&lt;p&gt;Another interesting way to inspect processes is the ps command. Its basic output looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ps --pid &lt;span class="m"&gt;8876&lt;/span&gt;
   PID TTY          TIME CMD
- 8876 pts/9    00:00:00 server&lt;/code&gt;&lt;/p&gt;
+ &lt;span class="m"&gt;8876&lt;/span&gt; pts/9    &lt;span class="m"&gt;00&lt;/span&gt;:00:00 server
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;This is simple. We can also show the threads inside a process, like this:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ ps  m --pid 8876 -o pid,tid,cmd
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ps  m --pid &lt;span class="m"&gt;8876&lt;/span&gt; -o pid,tid,cmd
   PID   TID CMD
- 8876     - ./server
-    -  8876 -
-    -  8877 -
-    -  8878 -
-    -  8879 -
-    -  8880 -&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;We have five threads here. One is our main thread and the other four are the threadpool threads. The &lt;code&gt;m&lt;/code&gt; option tells ps to show the threads of a process. The &lt;code&gt;-o&lt;/code&gt; option specifies fields to output. We can even get fancy and output the addresses of the threads' stack pointers and instruction pointers, like this:
-&lt;code&gt;bash
-$ ps  m --pid 8876 -o pid,tid,cmd,esp,eip
+ &lt;span class="m"&gt;8876&lt;/span&gt;     - ./server
+    -  &lt;span class="m"&gt;8876&lt;/span&gt; -
+    -  &lt;span class="m"&gt;8877&lt;/span&gt; -
+    -  &lt;span class="m"&gt;8878&lt;/span&gt; -
+    -  &lt;span class="m"&gt;8879&lt;/span&gt; -
+    -  &lt;span class="m"&gt;8880&lt;/span&gt; -
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We have five threads here. One is our main thread and the other four are the threadpool threads. The &lt;code&gt;m&lt;/code&gt; option tells ps to show the threads of a process. The &lt;code&gt;-o&lt;/code&gt; option specifies fields to output. We can even get fancy and output the addresses of the threads' stack pointers and instruction pointers, like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ps  m --pid &lt;span class="m"&gt;8876&lt;/span&gt; -o pid,tid,cmd,esp,eip
   PID   TID CMD                              ESP      EIP
- 8876     - ./server                           -        -
-    -  8876 -                           a0880b70 ccb0e7ad
-    -  8877 -                           cc733ec0 ccb0b3a0
-    -  8878 -                           cbf32ec0 ccb0b3a0
-    -  8879 -                           cb731ec0 ccb0b3a0
-    -  8880 -                           caf30ec0 ccb0b3a0&lt;/code&gt;&lt;/p&gt;
+ &lt;span class="m"&gt;8876&lt;/span&gt;     - ./server                           -        -
+    -  &lt;span class="m"&gt;8876&lt;/span&gt; -                           a0880b70 ccb0e7ad
+    -  &lt;span class="m"&gt;8877&lt;/span&gt; -                           cc733ec0 ccb0b3a0
+    -  &lt;span class="m"&gt;8878&lt;/span&gt; -                           cbf32ec0 ccb0b3a0
+    -  &lt;span class="m"&gt;8879&lt;/span&gt; -                           cb731ec0 ccb0b3a0
+    -  &lt;span class="m"&gt;8880&lt;/span&gt; -                           caf30ec0 ccb0b3a0
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;So all the threads are at the same instruction, but they have different stack pointers, which makes sense. If I execute something on one of the threads, both the &lt;code&gt;ESP&lt;/code&gt; and &lt;code&gt;EIP&lt;/code&gt; can possibly change.&lt;/p&gt;
 &lt;p&gt;A lot of data about processes lives in the &lt;code&gt;proc&lt;/code&gt; filesytem, located in &lt;code&gt;/proc&lt;/code&gt;. For each running process, there's a subdirectory of &lt;code&gt;/proc&lt;/code&gt; named after the process id. For example, for our process &lt;code&gt;8876&lt;/code&gt;, there's a &lt;code&gt;status&lt;/code&gt; file which lists various information about the process. Let's look at it:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ cat /proc/8876/status
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat /proc/8876/status
 Name:   server
-State:  S (sleeping)
-Tgid:   8876
-Ngid:   0
-Pid:    8876
-PPid:   2604
-TracerPid:      0
-Uid:    1000    1000    1000    1000
-Gid:    1000    1000    1000    1000
-FDSize: 256
-Groups: 4 24 27 30 46 113 128 999 1000 
-NStgid: 8876
-NSpid:  8876
-NSpgid: 8876
-NSsid:  2604
-VmPeak:    39316 kB
-VmSize:    39316 kB
-VmLck:         0 kB
-VmPin:         0 kB
-VmHWM:       800 kB
-VmRSS:       800 kB
-VmData:    32988 kB
-VmStk:       136 kB
-VmExe:        16 kB
-VmLib:      2040 kB
-VmPTE:        48 kB
-VmPMD:        12 kB
-VmSwap:        0 kB
-HugetlbPages:          0 kB
-Threads:        5
-SigQ:   0/7848
-SigPnd: 0000000000000000
-ShdPnd: 0000000000000000
-SigBlk: 0000000000000000
-SigIgn: 0000000000000000
-SigCgt: 0000000180000000
-CapInh: 0000000000000000
-CapPrm: 0000000000000000
-CapEff: 0000000000000000
+State:  S &lt;span class="o"&gt;(&lt;/span&gt;sleeping&lt;span class="o"&gt;)&lt;/span&gt;
+Tgid:   &lt;span class="m"&gt;8876&lt;/span&gt;
+Ngid:   &lt;span class="m"&gt;0&lt;/span&gt;
+Pid:    &lt;span class="m"&gt;8876&lt;/span&gt;
+PPid:   &lt;span class="m"&gt;2604&lt;/span&gt;
+TracerPid:      &lt;span class="m"&gt;0&lt;/span&gt;
+Uid:    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;
+Gid:    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;    &lt;span class="m"&gt;1000&lt;/span&gt;
+FDSize: &lt;span class="m"&gt;256&lt;/span&gt;
+Groups: &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;24&lt;/span&gt; &lt;span class="m"&gt;27&lt;/span&gt; &lt;span class="m"&gt;30&lt;/span&gt; &lt;span class="m"&gt;46&lt;/span&gt; &lt;span class="m"&gt;113&lt;/span&gt; &lt;span class="m"&gt;128&lt;/span&gt; &lt;span class="m"&gt;999&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt; 
+NStgid: &lt;span class="m"&gt;8876&lt;/span&gt;
+NSpid:  &lt;span class="m"&gt;8876&lt;/span&gt;
+NSpgid: &lt;span class="m"&gt;8876&lt;/span&gt;
+NSsid:  &lt;span class="m"&gt;2604&lt;/span&gt;
+VmPeak:    &lt;span class="m"&gt;39316&lt;/span&gt; kB
+VmSize:    &lt;span class="m"&gt;39316&lt;/span&gt; kB
+VmLck:         &lt;span class="m"&gt;0&lt;/span&gt; kB
+VmPin:         &lt;span class="m"&gt;0&lt;/span&gt; kB
+VmHWM:       &lt;span class="m"&gt;800&lt;/span&gt; kB
+VmRSS:       &lt;span class="m"&gt;800&lt;/span&gt; kB
+VmData:    &lt;span class="m"&gt;32988&lt;/span&gt; kB
+VmStk:       &lt;span class="m"&gt;136&lt;/span&gt; kB
+VmExe:        &lt;span class="m"&gt;16&lt;/span&gt; kB
+VmLib:      &lt;span class="m"&gt;2040&lt;/span&gt; kB
+VmPTE:        &lt;span class="m"&gt;48&lt;/span&gt; kB
+VmPMD:        &lt;span class="m"&gt;12&lt;/span&gt; kB
+VmSwap:        &lt;span class="m"&gt;0&lt;/span&gt; kB
+HugetlbPages:          &lt;span class="m"&gt;0&lt;/span&gt; kB
+Threads:        &lt;span class="m"&gt;5&lt;/span&gt;
+SigQ:   &lt;span class="m"&gt;0&lt;/span&gt;/7848
+SigPnd: &lt;span class="m"&gt;0000000000000000&lt;/span&gt;
+ShdPnd: &lt;span class="m"&gt;0000000000000000&lt;/span&gt;
+SigBlk: &lt;span class="m"&gt;0000000000000000&lt;/span&gt;
+SigIgn: &lt;span class="m"&gt;0000000000000000&lt;/span&gt;
+SigCgt: &lt;span class="m"&gt;0000000180000000&lt;/span&gt;
+CapInh: &lt;span class="m"&gt;0000000000000000&lt;/span&gt;
+CapPrm: &lt;span class="m"&gt;0000000000000000&lt;/span&gt;
+CapEff: &lt;span class="m"&gt;0000000000000000&lt;/span&gt;
 CapBnd: 0000003fffffffff
-CapAmb: 0000000000000000
-Seccomp:        0
-Cpus_allowed:   1
-Cpus_allowed_list:      0
-Mems_allowed:   00000000,00000001
-Mems_allowed_list:      0
-voluntary_ctxt_switches:        3
-nonvoluntary_ctxt_switches:     2&lt;/code&gt;&lt;/p&gt;
+CapAmb: &lt;span class="m"&gt;0000000000000000&lt;/span&gt;
+Seccomp:        &lt;span class="m"&gt;0&lt;/span&gt;
+Cpus_allowed:   &lt;span class="m"&gt;1&lt;/span&gt;
+Cpus_allowed_list:      &lt;span class="m"&gt;0&lt;/span&gt;
+Mems_allowed:   &lt;span class="m"&gt;00000000&lt;/span&gt;,00000001
+Mems_allowed_list:      &lt;span class="m"&gt;0&lt;/span&gt;
+voluntary_ctxt_switches:        &lt;span class="m"&gt;3&lt;/span&gt;
+nonvoluntary_ctxt_switches:     &lt;span class="m"&gt;2&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;There's a lot of data in here, but remember how we used &lt;code&gt;ps&lt;/code&gt; to count the number of threads in this process. That's also available here on the line saying &lt;code&gt;Threads:    5&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Our last command is &lt;code&gt;pidstat&lt;/code&gt;. &lt;code&gt;pidstat&lt;/code&gt; shows statistics about a running process, which can be updated at a regular time interval. A possible invocation can be:&lt;/p&gt;
-&lt;p&gt;```bash
-$ pidstat -p 8876 1
-Linux 4.4.0-64-generic (virtbox)        03/01/2017      &lt;em&gt;x86_64&lt;/em&gt;        (1 CPU)&lt;/p&gt;
-&lt;p&gt;12:22:00 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
-12:22:01 PM  1000      8876    0.00    0.00    0.00    0.00     0  server
-12:22:02 PM  1000      8876    0.00    0.00    0.00    0.00     0  server
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ pidstat -p &lt;span class="m"&gt;8876&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+Linux &lt;span class="m"&gt;4&lt;/span&gt;.4.0-64-generic &lt;span class="o"&gt;(&lt;/span&gt;virtbox&lt;span class="o"&gt;)&lt;/span&gt;        &lt;span class="m"&gt;03&lt;/span&gt;/01/2017      _x86_64_        &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; CPU&lt;span class="o"&gt;)&lt;/span&gt;
+
+&lt;span class="m"&gt;12&lt;/span&gt;:22:00 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
+&lt;span class="m"&gt;12&lt;/span&gt;:22:01 PM  &lt;span class="m"&gt;1000&lt;/span&gt;      &lt;span class="m"&gt;8876&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00     &lt;span class="m"&gt;0&lt;/span&gt;  server
+&lt;span class="m"&gt;12&lt;/span&gt;:22:02 PM  &lt;span class="m"&gt;1000&lt;/span&gt;      &lt;span class="m"&gt;8876&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00     &lt;span class="m"&gt;0&lt;/span&gt;  server
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Our server is not doing anything right now, so you see a lot of zeroes.&lt;/p&gt;
 &lt;p&gt;There are many other interesting commands that you can look to figure out what processes are doing. &lt;code&gt;strace&lt;/code&gt; shows system calls run by a process. &lt;code&gt;ltrace&lt;/code&gt; shows dynamic library calls. &lt;code&gt;tcpdump&lt;/code&gt; can be used to show traffic going in and out of a process.&lt;/p&gt;
 &lt;p&gt;So, that's all for today. Happy running of processes.&lt;/p&gt;</content></entry><entry><title>The Linux init system.</title><link href="http://pminkov.github.io/blog/the-linux-init-system.html" rel="alternate"></link><published>2017-02-13T21:09:00-08:00</published><updated>2017-02-13T21:09:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-02-13:/blog/the-linux-init-system.html</id><summary type="html">&lt;p&gt;I decided that I'll dig down into &lt;a href="https://en.wikipedia.org/wiki/Init"&gt;init systems&lt;/a&gt; in Linux and learn more about them. I'm running Ubuntu 16.04, so this might look different on other distributions.&lt;/p&gt;
 &lt;p&gt;The init system in Linux is mainly responsible for starting essential service processes, mounting file systems and possibly other tasks. The …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I decided that I'll dig down into &lt;a href="https://en.wikipedia.org/wiki/Init"&gt;init systems&lt;/a&gt; in Linux and learn more about them. I'm running Ubuntu 16.04, so this might look different on other distributions.&lt;/p&gt;
 &lt;p&gt;The init system in Linux is mainly responsible for starting essential service processes, mounting file systems and possibly other tasks. The main init systems are systemd, System V init and Upstart. Ubuntu uses systemd.&lt;/p&gt;
 &lt;p&gt;The init system starts after the Kernel starts its first user space process - init. Indeed, let's see what's running with PID 1:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ ps 1
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ps &lt;span class="m"&gt;1&lt;/span&gt;
   PID TTY      STAT   TIME COMMAND
-    1 ?        Ss     0:04 /sbin/init splash&lt;/code&gt;&lt;/p&gt;
+    &lt;span class="m"&gt;1&lt;/span&gt; ?        Ss     &lt;span class="m"&gt;0&lt;/span&gt;:04 /sbin/init splash
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;It's &lt;code&gt;/sbin/init&lt;/code&gt;. Let's see what this file is:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ ls -l /sbin/init
-lrwxrwxrwx 1 root root 20 Sep 28 18:40 /sbin/init -&amp;gt; /lib/systemd/systemd&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ls -l /sbin/init
+lrwxrwxrwx &lt;span class="m"&gt;1&lt;/span&gt; root root &lt;span class="m"&gt;20&lt;/span&gt; Sep &lt;span class="m"&gt;28&lt;/span&gt; &lt;span class="m"&gt;18&lt;/span&gt;:40 /sbin/init -&amp;gt; /lib/systemd/systemd
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;From this output, we can figure out that Ubuntu is using systemd. systemd is a fairly new project (initial release was 6 years ago), but it looks like its widely adopted now. systemd would take care of running various services like your ssh server, your web server and various other ones which are more "under the hood" oriented.&lt;/p&gt;
 &lt;p&gt;systemd organizes itself with unit files which contain the description of various units and their dependencies. The units are organized in configuration files, which live in various directories. The main directories are:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;System unit directory: &lt;code&gt;/usr/lib/systemd/&lt;/code&gt;. Your distribution maintains this, so don't edit it.&lt;/li&gt;
 &lt;li&gt;System configuration directory: &lt;code&gt;/etc/systemd&lt;/code&gt;. Make your local changes here.&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Well, these are not all directories that contain unit files. Here's the full set of paths that systemd uses:
-&lt;code&gt;bash
-$ systemctl -p UnitPath show
-UnitPath=/etc/systemd/system /run/systemd/system /run/systemd/generator /usr/local/lib/systemd/system /lib/systemd/system /usr/lib/systemd/system /run/systemd/generator.late&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Well, these are not all directories that contain unit files. Here's the full set of paths that systemd uses:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ systemctl -p UnitPath show
+&lt;span class="nv"&gt;UnitPath&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/systemd/system /run/systemd/system /run/systemd/generator /usr/local/lib/systemd/system /lib/systemd/system /usr/lib/systemd/system /run/systemd/generator.late
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;I won't go into details about what the unit files contain, but instead look at two services that I was curious about - ssh and apache. Who runs them? When are they run? How can I verify that they are running?&lt;/p&gt;
 &lt;p&gt;Let's start with ssh. The main command to interface with systemd is &lt;code&gt;systemctl&lt;/code&gt;. We can use it to list all services that are running, by calling &lt;code&gt;systemctl list-units&lt;/code&gt;. Let's look for ssh in here:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ systemctl list-units | grep ssh
-ssh.service                                                                              loaded active running   OpenBSD Secure Shell server&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ systemctl list-units &lt;span class="p"&gt;|&lt;/span&gt; grep ssh
+ssh.service                                                                              loaded active running   OpenBSD Secure Shell server
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Indeed, we have ssh running. Now, let's look at its status and its config file.&lt;/p&gt;
-&lt;p&gt;```bash
-$ systemctl status ssh
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ systemctl status ssh
 ● ssh.service - OpenBSD Secure Shell server
-   Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
-   Active: active (running) since Thu 2017-02-09 19:27:57 PST; 4 days ago
- Main PID: 786 (sshd)
-    Tasks: 1
-   Memory: 6.4M
+   Loaded: loaded &lt;span class="o"&gt;(&lt;/span&gt;/lib/systemd/system/ssh.service&lt;span class="p"&gt;;&lt;/span&gt; enabled&lt;span class="p"&gt;;&lt;/span&gt; vendor preset: enabled&lt;span class="o"&gt;)&lt;/span&gt;
+   Active: active &lt;span class="o"&gt;(&lt;/span&gt;running&lt;span class="o"&gt;)&lt;/span&gt; since Thu &lt;span class="m"&gt;2017&lt;/span&gt;-02-09 &lt;span class="m"&gt;19&lt;/span&gt;:27:57 PST&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="m"&gt;4&lt;/span&gt; days ago
+ Main PID: &lt;span class="m"&gt;786&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;sshd&lt;span class="o"&gt;)&lt;/span&gt;
+    Tasks: &lt;span class="m"&gt;1&lt;/span&gt;
+   Memory: &lt;span class="m"&gt;6&lt;/span&gt;.4M
       CPU: 199ms
    CGroup: /system.slice/ssh.service
-           └─786 /usr/sbin/sshd -D&lt;/p&gt;
-&lt;p&gt;Feb 12 18:23:50 virtbox sshd[5791]: Accepted password for petko from 192.168.1.86 port 57805 ssh2
-Feb 12 18:23:50 virtbox sshd[5791]: pam_unix(sshd:session): session opened for user petko by (uid=0)
+           └─786 /usr/sbin/sshd -D
+
+Feb &lt;span class="m"&gt;12&lt;/span&gt; &lt;span class="m"&gt;18&lt;/span&gt;:23:50 virtbox sshd&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="m"&gt;5791&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;: Accepted password &lt;span class="k"&gt;for&lt;/span&gt; petko from &lt;span class="m"&gt;192&lt;/span&gt;.168.1.86 port &lt;span class="m"&gt;57805&lt;/span&gt; ssh2
+Feb &lt;span class="m"&gt;12&lt;/span&gt; &lt;span class="m"&gt;18&lt;/span&gt;:23:50 virtbox sshd&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="m"&gt;5791&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;: pam_unix&lt;span class="o"&gt;(&lt;/span&gt;sshd:session&lt;span class="o"&gt;)&lt;/span&gt;: session opened &lt;span class="k"&gt;for&lt;/span&gt; user petko by &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;uid&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
 ...
-```&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;So here it is. The ssh service is running as process 786. We can see that this process is listening on port 22:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ sudo netstat -tulpn | grep 786
-tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      786/sshd        
-tcp6       0      0 :::22                   :::*                    LISTEN      786/sshd&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo netstat -tulpn &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="m"&gt;786&lt;/span&gt;
+tcp        &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:22              &lt;span class="m"&gt;0&lt;/span&gt;.0.0.0:*               LISTEN      &lt;span class="m"&gt;786&lt;/span&gt;/sshd        
+tcp6       &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; :::22                   :::*                    LISTEN      &lt;span class="m"&gt;786&lt;/span&gt;/sshd 
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Indeed, it is. &lt;code&gt;systemctl&lt;/code&gt; has another useful command that allows us to print the configuration file for a unit. It works like this:&lt;/p&gt;
-&lt;p&gt;```bash
-$ systemctl cat ssh&lt;/p&gt;
-&lt;h1 id="libsystemdsystemsshservice"&gt;/lib/systemd/system/ssh.service&lt;/h1&gt;
-&lt;p&gt;[Unit]
-Description=OpenBSD Secure Shell server
-After=network.target auditd.service
-ConditionPathExists=!/etc/ssh/sshd_not_to_be_run&lt;/p&gt;
-&lt;p&gt;[Service]
-EnvironmentFile=-/etc/default/ssh
-ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
-ExecReload=/bin/kill -HUP $MAINPID
-KillMode=process
-Restart=on-failure
-RestartPreventExitStatus=255
-Type=notify&lt;/p&gt;
-&lt;p&gt;[Install]
-WantedBy=multi-user.target
-Alias=sshd.service
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ systemctl cat ssh
+&lt;span class="c1"&gt;# /lib/systemd/system/ssh.service&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;Unit&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;Description&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;OpenBSD Secure Shell server
+&lt;span class="nv"&gt;After&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network.target auditd.service
+&lt;span class="nv"&gt;ConditionPathExists&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;!/etc/ssh/sshd_not_to_be_run
+
+&lt;span class="o"&gt;[&lt;/span&gt;Service&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;EnvironmentFile&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;-/etc/default/ssh
+&lt;span class="nv"&gt;ExecStart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/usr/sbin/sshd -D &lt;span class="nv"&gt;$SSHD_OPTS&lt;/span&gt;
+&lt;span class="nv"&gt;ExecReload&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/bin/kill -HUP &lt;span class="nv"&gt;$MAINPID&lt;/span&gt;
+&lt;span class="nv"&gt;KillMode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;process
+&lt;span class="nv"&gt;Restart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;on-failure
+&lt;span class="nv"&gt;RestartPreventExitStatus&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;255&lt;/span&gt;
+&lt;span class="nv"&gt;Type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;notify
+
+&lt;span class="o"&gt;[&lt;/span&gt;Install&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;WantedBy&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;multi-user.target
+&lt;span class="nv"&gt;Alias&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;sshd.service
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;So here you can see where is the configuration file located.&lt;/p&gt;
 &lt;p&gt;Alright, enough ssh. Let's move on to apache. First, a little history though. Before systemd, apparently the main init system in Linux was System V. System V is different than systemd, because it executes services in sequential order, while systemd can be parallel. System V also can't start services on "as-needed" basis. So I guess that's why systemd was implemented. systemd has its config files in &lt;code&gt;/etc/init.d&lt;/code&gt;. That's where Apache installs its command files as well - it doesn't create systemd unit files. However, systemd knows how to execute the System V init files. I won't go into details of how System V init works, but basically it executes commands on different runlevels and at each runlevel they are executed in sequential order.&lt;/p&gt;
 &lt;p&gt;Let's see how apache looks like in systemd:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ systemctl list-units | grep apache
-apache2.service                                                                          loaded active running   LSB: Apache2 web server&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ systemctl list-units &lt;span class="p"&gt;|&lt;/span&gt; grep apache
+apache2.service                                                                          loaded active running   LSB: Apache2 web server
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;It's running. Now let's get its status:&lt;/p&gt;
-&lt;p&gt;```bash
-$ systemctl status apache2
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ systemctl status apache2
 ● apache2.service - LSB: Apache2 web server
-   Loaded: loaded (/etc/init.d/apache2; bad; vendor preset: enabled)
+   Loaded: loaded &lt;span class="o"&gt;(&lt;/span&gt;/etc/init.d/apache2&lt;span class="p"&gt;;&lt;/span&gt; bad&lt;span class="p"&gt;;&lt;/span&gt; vendor preset: enabled&lt;span class="o"&gt;)&lt;/span&gt;
   Drop-In: /lib/systemd/system/apache2.service.d
            └─apache2-systemd.conf
-   Active: active (running) since Mon 2017-02-13 12:49:55 PST; 8h ago
-     Docs: man:systemd-sysv-generator(8)
-    Tasks: 55
-   Memory: 6.5M
-      CPU: 17.042s
+   Active: active &lt;span class="o"&gt;(&lt;/span&gt;running&lt;span class="o"&gt;)&lt;/span&gt; since Mon &lt;span class="m"&gt;2017&lt;/span&gt;-02-13 &lt;span class="m"&gt;12&lt;/span&gt;:49:55 PST&lt;span class="p"&gt;;&lt;/span&gt; 8h ago
+     Docs: man:systemd-sysv-generator&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+    Tasks: &lt;span class="m"&gt;55&lt;/span&gt;
+   Memory: &lt;span class="m"&gt;6&lt;/span&gt;.5M
+      CPU: &lt;span class="m"&gt;17&lt;/span&gt;.042s
    CGroup: /system.slice/apache2.service
            ├─9097 /usr/sbin/apache2 -k start
            ├─9100 /usr/sbin/apache2 -k start
-           └─9101 /usr/sbin/apache2 -k start&lt;/p&gt;
-&lt;p&gt;Feb 13 12:49:54 virtbox systemd[1]: Starting LSB: Apache2 web server...
-Feb 13 12:49:54 virtbox apache2[9071]:  * Starting Apache httpd web server apache2
-Feb 13 12:49:54 virtbox apache2[9071]: AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1. Set the 'ServerName' directive globall
-Feb 13 12:49:55 virtbox apache2[9071]:  *
-Feb 13 12:49:55 virtbox systemd[1]: Started LSB: Apache2 web server.
-```&lt;/p&gt;
+           └─9101 /usr/sbin/apache2 -k start
+
+Feb &lt;span class="m"&gt;13&lt;/span&gt; &lt;span class="m"&gt;12&lt;/span&gt;:49:54 virtbox systemd&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;: Starting LSB: Apache2 web server...
+Feb &lt;span class="m"&gt;13&lt;/span&gt; &lt;span class="m"&gt;12&lt;/span&gt;:49:54 virtbox apache2&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="m"&gt;9071&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;:  * Starting Apache httpd web server apache2
+Feb &lt;span class="m"&gt;13&lt;/span&gt; &lt;span class="m"&gt;12&lt;/span&gt;:49:54 virtbox apache2&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="m"&gt;9071&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;: AH00558: apache2: Could not reliably determine the server&lt;span class="s1"&gt;&amp;#39;s fully qualified domain name, using 127.0.1.1. Set the &amp;#39;&lt;/span&gt;ServerName&lt;span class="err"&gt;&amp;#39;&lt;/span&gt; directive globall
+Feb &lt;span class="m"&gt;13&lt;/span&gt; &lt;span class="m"&gt;12&lt;/span&gt;:49:55 virtbox apache2&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="m"&gt;9071&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;:  *
+Feb &lt;span class="m"&gt;13&lt;/span&gt; &lt;span class="m"&gt;12&lt;/span&gt;:49:55 virtbox systemd&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;: Started LSB: Apache2 web server.
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Look at something interesting here. The file responsible for starting apache is listed as &lt;code&gt;/etc/init.d/apache2&lt;/code&gt;. That's the file indeed. It's adapted into systemd by using the &lt;code&gt;systemd-sysv-generator&lt;/code&gt;. So that is systemd running. We can run a cat to see that:&lt;/p&gt;
-&lt;p&gt;```bash
-$ systemctl cat apache2&lt;/p&gt;
-&lt;h1 id="runsystemdgeneratorlateapache2service"&gt;/run/systemd/generator.late/apache2.service&lt;/h1&gt;
-&lt;h1 id="automatically-generated-by-systemd-sysv-generator"&gt;Automatically generated by systemd-sysv-generator&lt;/h1&gt;
-&lt;p&gt;[Unit]
-Documentation=man:systemd-sysv-generator(8)
-SourcePath=/etc/init.d/apache2
-Description=LSB: Apache2 web server
-Before=multi-user.target
-Before=multi-user.target
-Before=multi-user.target
-Before=graphical.target
-Before=shutdown.target
-After=local-fs.target
-After=remote-fs.target
-After=network-online.target
-After=systemd-journald-dev-log.socket
-After=nss-lookup.target
-Wants=network-online.target
-Conflicts=shutdown.target&lt;/p&gt;
-&lt;p&gt;[Service]
-Type=forking
-Restart=no
-TimeoutSec=5min
-IgnoreSIGPIPE=no
-KillMode=process
-GuessMainPID=no
-RemainAfterExit=yes
-ExecStart=/etc/init.d/apache2 start
-ExecStop=/etc/init.d/apache2 stop
-ExecReload=/etc/init.d/apache2 reload&lt;/p&gt;
-&lt;h1 id="libsystemdsystemapache2servicedapache2-systemdconf"&gt;/lib/systemd/system/apache2.service.d/apache2-systemd.conf&lt;/h1&gt;
-&lt;p&gt;[Service]
-Type=forking
-RemainAfterExit=no
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ systemctl cat apache2
+&lt;span class="c1"&gt;# /run/systemd/generator.late/apache2.service&lt;/span&gt;
+&lt;span class="c1"&gt;# Automatically generated by systemd-sysv-generator&lt;/span&gt;
+
+&lt;span class="o"&gt;[&lt;/span&gt;Unit&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;Documentation&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;man:systemd-sysv-generator&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;SourcePath&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/init.d/apache2
+&lt;span class="nv"&gt;Description&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;LSB: Apache2 web server
+&lt;span class="nv"&gt;Before&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;multi-user.target
+&lt;span class="nv"&gt;Before&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;multi-user.target
+&lt;span class="nv"&gt;Before&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;multi-user.target
+&lt;span class="nv"&gt;Before&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;graphical.target
+&lt;span class="nv"&gt;Before&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;shutdown.target
+&lt;span class="nv"&gt;After&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;local-fs.target
+&lt;span class="nv"&gt;After&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;remote-fs.target
+&lt;span class="nv"&gt;After&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network-online.target
+&lt;span class="nv"&gt;After&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;systemd-journald-dev-log.socket
+&lt;span class="nv"&gt;After&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;nss-lookup.target
+&lt;span class="nv"&gt;Wants&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;network-online.target
+&lt;span class="nv"&gt;Conflicts&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;shutdown.target
+
+&lt;span class="o"&gt;[&lt;/span&gt;Service&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;Type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;forking
+&lt;span class="nv"&gt;Restart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;no
+&lt;span class="nv"&gt;TimeoutSec&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;5min
+&lt;span class="nv"&gt;IgnoreSIGPIPE&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;no
+&lt;span class="nv"&gt;KillMode&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;process
+&lt;span class="nv"&gt;GuessMainPID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;no
+&lt;span class="nv"&gt;RemainAfterExit&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;yes
+&lt;span class="nv"&gt;ExecStart&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/init.d/apache2 start
+&lt;span class="nv"&gt;ExecStop&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/init.d/apache2 stop
+&lt;span class="nv"&gt;ExecReload&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/etc/init.d/apache2 reload
+
+&lt;span class="c1"&gt;# /lib/systemd/system/apache2.service.d/apache2-systemd.conf&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;Service&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;Type&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;forking
+&lt;span class="nv"&gt;RemainAfterExit&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;no
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;This is the file that systemd created in order to integrate the System V init command into its system.&lt;/p&gt;
 &lt;p&gt;What are some other interesting systemctl commands? Let's list them:&lt;/p&gt;
-&lt;p&gt;```bash&lt;/p&gt;
-&lt;h1 id="start-stop-restart-a-service"&gt;Start / stop /restart a service.&lt;/h1&gt;
-&lt;p&gt;$ sudo systemctl restart apache2&lt;/p&gt;
-&lt;h1 id="list-all-services"&gt;List all services:&lt;/h1&gt;
-&lt;p&gt;$ systemctl list-units --type=service&lt;/p&gt;
-&lt;h1 id="list-dependencies"&gt;List dependencies:&lt;/h1&gt;
-&lt;p&gt;$ systemctl list-dependencies sshd.service&lt;/p&gt;
-&lt;h1 id="see-low-level-properties-of-a-unit"&gt;See low level properties of a unit:&lt;/h1&gt;
-&lt;p&gt;$ systemctl show sshd.service
-```&lt;/p&gt;
-&lt;p&gt;And one last cool command:
-&lt;code&gt;bash
-$ systemd-analyze
-Startup finished in 3.989s (kernel) + 7.673s (userspace) = 11.663s&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Start / stop /restart a service.&lt;/span&gt;
+$ sudo systemctl restart apache2
+
+&lt;span class="c1"&gt;# List all services:&lt;/span&gt;
+$ systemctl list-units --type&lt;span class="o"&gt;=&lt;/span&gt;service
+
+&lt;span class="c1"&gt;# List dependencies:&lt;/span&gt;
+$ systemctl list-dependencies sshd.service
+
+&lt;span class="c1"&gt;# See low level properties of a unit:&lt;/span&gt;
+$ systemctl show sshd.service
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And one last cool command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ systemd-analyze
+Startup finished in &lt;span class="m"&gt;3&lt;/span&gt;.989s &lt;span class="o"&gt;(&lt;/span&gt;kernel&lt;span class="o"&gt;)&lt;/span&gt; + &lt;span class="m"&gt;7&lt;/span&gt;.673s &lt;span class="o"&gt;(&lt;/span&gt;userspace&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;11&lt;/span&gt;.663s
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;This command prints the time it took to startup our system.&lt;/p&gt;
 &lt;p&gt;So that's all for today. There's definitely more to explore in systemd land - the syntax of unit files, how systemd executes them and so on. I'll leave that for some other time.&lt;/p&gt;</content></entry><entry><title>What happens when you run out of memory in Linux?</title><link href="http://pminkov.github.io/blog/what-happens-when-you-run-out-of-memory-in-linux.html" rel="alternate"></link><published>2017-01-15T12:50:00-08:00</published><updated>2017-01-15T12:50:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-15:/blog/what-happens-when-you-run-out-of-memory-in-linux.html</id><summary type="html">&lt;p&gt;I've always been curious to figure out what happens when you run out of memory in Linux and recently I was experimenting with something that helped me figure it out. &lt;/p&gt;
 &lt;p&gt;I was trying out &lt;a href="http://dhbox.org/"&gt;dhbox&lt;/a&gt; deployment on an EC2 machine. dhbox allows you to start a virtual environment in which …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I've always been curious to figure out what happens when you run out of memory in Linux and recently I was experimenting with something that helped me figure it out. &lt;/p&gt;
 &lt;p&gt;I was trying out &lt;a href="http://dhbox.org/"&gt;dhbox&lt;/a&gt; deployment on an EC2 machine. dhbox allows you to start a virtual environment in which you can try out various data science tools. These virtual environments are run on Docker containers. These Docker containers take a lot of memory, so you can't run too many on a single machine. So far so good. But let's see what actually happens.&lt;/p&gt;
 &lt;p&gt;Before we start, &lt;a href="http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html"&gt;here&lt;/a&gt; is a great document from the Netflix Eng blog that describes the tools that can be used to debug a slow Linux box. &lt;/p&gt;
 &lt;p&gt;I deployed DHBox on an Ubuntu image in EC2 with 1GB of memory and no swap file. Yes, no swap file. Why? It seems like that's done, because having a swap file might incur a lot of EBS IO, which leads to high pricing. But still, this makes for an interesting debugging scenario, so let's continue.&lt;/p&gt;
-&lt;p&gt;Here's what our free memory situation is in the beginnging:
-&lt;code&gt;bash
-$ free -m
+&lt;p&gt;Here's what our free memory situation is in the beginnging:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ free -m
               total        used        free      shared  buff/cache   available
-Mem:            990          78         518           4         392         867
-Swap:             0           0           0&lt;/code&gt;&lt;/p&gt;
+Mem:            &lt;span class="m"&gt;990&lt;/span&gt;          &lt;span class="m"&gt;78&lt;/span&gt;         &lt;span class="m"&gt;518&lt;/span&gt;           &lt;span class="m"&gt;4&lt;/span&gt;         &lt;span class="m"&gt;392&lt;/span&gt;         &lt;span class="m"&gt;867&lt;/span&gt;
+Swap:             &lt;span class="m"&gt;0&lt;/span&gt;           &lt;span class="m"&gt;0&lt;/span&gt;           &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Notice how we have 392MB in "buff/cache". What is this? &lt;a href="http://www.tldp.org/LDP/sag/html/buffer-cache.html"&gt;Here&lt;/a&gt; is a good explanation of it. The buffer cache is caching (in RAM) data that's on disk. For example, the "ls" command, or the glibc library are things that are often used and are good candidates for caching.&lt;/p&gt;
 &lt;p&gt;The first thing I do is to start the Python web app for DHBox. It's a simple Flask app running on &lt;a href="http://gunicorn.org/"&gt;gunicorn&lt;/a&gt;. After I start it, this is what &lt;code&gt;free&lt;/code&gt; is showing:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ free -m
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ free -m
               total        used        free      shared  buff/cache   available
-Mem:            990         127         453           4         410         818
-Swap:             0           0           0&lt;/code&gt;&lt;/p&gt;
+Mem:            &lt;span class="m"&gt;990&lt;/span&gt;         &lt;span class="m"&gt;127&lt;/span&gt;         &lt;span class="m"&gt;453&lt;/span&gt;           &lt;span class="m"&gt;4&lt;/span&gt;         &lt;span class="m"&gt;410&lt;/span&gt;         &lt;span class="m"&gt;818&lt;/span&gt;
+Swap:             &lt;span class="m"&gt;0&lt;/span&gt;           &lt;span class="m"&gt;0&lt;/span&gt;           &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Reasonable. We are using a bit more memory, we have cached a bit more data from disk.&lt;/p&gt;
 &lt;p&gt;Now, I'll start running vmstat and run four virtual labs. This seems to be enough to take 1GB of memory and pretty much bring down the machine. One other tool we're going to use is &lt;code&gt;vmstat&lt;/code&gt;. &lt;code&gt;vmstat&lt;/code&gt; is great, it's outputting a lot of useful information. Let's see how it looks like before we start running the Docker containers:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ vmstat 5
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ vmstat &lt;span class="m"&gt;5&lt;/span&gt;
 procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
- 0  0      0 463880  51328 369012    0    0   635    32   94  231  2  1 95  1  1
- 0  0      0 463356  51336 369044    0    0     0     2   36   68  0  0 100  0  0
- 0  0      0 462884  51372 369116    0    0    14     2   46   69  1  0 99  0  0
- 0  0      0 462380  51372 369116    0    0     0     0   43  101  0  0 100  0  0&lt;/code&gt;&lt;/p&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;463880&lt;/span&gt;  &lt;span class="m"&gt;51328&lt;/span&gt; &lt;span class="m"&gt;369012&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;635&lt;/span&gt;    &lt;span class="m"&gt;32&lt;/span&gt;   &lt;span class="m"&gt;94&lt;/span&gt;  &lt;span class="m"&gt;231&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;95&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;463356&lt;/span&gt;  &lt;span class="m"&gt;51336&lt;/span&gt; &lt;span class="m"&gt;369044&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;2&lt;/span&gt;   &lt;span class="m"&gt;36&lt;/span&gt;   &lt;span class="m"&gt;68&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;462884&lt;/span&gt;  &lt;span class="m"&gt;51372&lt;/span&gt; &lt;span class="m"&gt;369116&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;14&lt;/span&gt;     &lt;span class="m"&gt;2&lt;/span&gt;   &lt;span class="m"&gt;46&lt;/span&gt;   &lt;span class="m"&gt;69&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;99&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;462380&lt;/span&gt;  &lt;span class="m"&gt;51372&lt;/span&gt; &lt;span class="m"&gt;369116&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;43&lt;/span&gt;  &lt;span class="m"&gt;101&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;The telling part here is the &lt;code&gt;id&lt;/code&gt; column. That's the percentage which the CPU spends being idle. As you can see, the CPU is pretty idle. Not much to do.&lt;/p&gt;
 &lt;p&gt;We're then starting the first Docker container. Things spike up for a while. Let's observe vmstat:&lt;/p&gt;
-&lt;p&gt;```bash
-procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
- 0  0      0 462380  51372 369116    0    0     0     0   43  101  0  0 100  0  0&lt;/p&gt;
-&lt;h1 id="heres-when-we-start-the-docker-container"&gt;Here's when we start the Docker container.&lt;/h1&gt;
-&lt;p&gt;2  0      0 185252  56072 497736    0    0  9159  8016 2126 7829 22 14 43 21  0
- 1  0      0  95416  56576 525740    0    0  1924  1036  396 1467 51 13 30  7  0
- 1  0      0 147764  56616 527408    0    0   336   630  117  307  1  1 96  1  0
- 0  0      0  65604  56664 537452    0    0     0    82   81  494  3  3 94  0  0
- 0  0      0  65556  56676 537500    0    0     0    59   59  181  0  0 99  1  0
- 0  0      0  65524  56684 537504    0    0     0    58   56  179  0  0 99  1  0
- 0  0      0  65400  56692 537552    0    0     0  4928  138  231  0  0 98  2  0
- 0  0      0  65400  56700 537552    0    0     0  3187  107  201  0  0 98  2  0
-```&lt;/p&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;462380&lt;/span&gt;  &lt;span class="m"&gt;51372&lt;/span&gt; &lt;span class="m"&gt;369116&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;43&lt;/span&gt;  &lt;span class="m"&gt;101&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;100&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="c1"&gt;# Here&amp;#39;s when we start the Docker container.&lt;/span&gt;
+ &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;185252&lt;/span&gt;  &lt;span class="m"&gt;56072&lt;/span&gt; &lt;span class="m"&gt;497736&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;9159&lt;/span&gt;  &lt;span class="m"&gt;8016&lt;/span&gt; &lt;span class="m"&gt;2126&lt;/span&gt; &lt;span class="m"&gt;7829&lt;/span&gt; &lt;span class="m"&gt;22&lt;/span&gt; &lt;span class="m"&gt;14&lt;/span&gt; &lt;span class="m"&gt;43&lt;/span&gt; &lt;span class="m"&gt;21&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;95416&lt;/span&gt;  &lt;span class="m"&gt;56576&lt;/span&gt; &lt;span class="m"&gt;525740&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;1924&lt;/span&gt;  &lt;span class="m"&gt;1036&lt;/span&gt;  &lt;span class="m"&gt;396&lt;/span&gt; &lt;span class="m"&gt;1467&lt;/span&gt; &lt;span class="m"&gt;51&lt;/span&gt; &lt;span class="m"&gt;13&lt;/span&gt; &lt;span class="m"&gt;30&lt;/span&gt;  &lt;span class="m"&gt;7&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;147764&lt;/span&gt;  &lt;span class="m"&gt;56616&lt;/span&gt; &lt;span class="m"&gt;527408&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;336&lt;/span&gt;   &lt;span class="m"&gt;630&lt;/span&gt;  &lt;span class="m"&gt;117&lt;/span&gt;  &lt;span class="m"&gt;307&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;96&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;65604&lt;/span&gt;  &lt;span class="m"&gt;56664&lt;/span&gt; &lt;span class="m"&gt;537452&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;82&lt;/span&gt;   &lt;span class="m"&gt;81&lt;/span&gt;  &lt;span class="m"&gt;494&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;94&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;65556&lt;/span&gt;  &lt;span class="m"&gt;56676&lt;/span&gt; &lt;span class="m"&gt;537500&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;59&lt;/span&gt;   &lt;span class="m"&gt;59&lt;/span&gt;  &lt;span class="m"&gt;181&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;99&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;65524&lt;/span&gt;  &lt;span class="m"&gt;56684&lt;/span&gt; &lt;span class="m"&gt;537504&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;58&lt;/span&gt;   &lt;span class="m"&gt;56&lt;/span&gt;  &lt;span class="m"&gt;179&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;99&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;65400&lt;/span&gt;  &lt;span class="m"&gt;56692&lt;/span&gt; &lt;span class="m"&gt;537552&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;4928&lt;/span&gt;  &lt;span class="m"&gt;138&lt;/span&gt;  &lt;span class="m"&gt;231&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;98&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;65400&lt;/span&gt;  &lt;span class="m"&gt;56700&lt;/span&gt; &lt;span class="m"&gt;537552&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;3187&lt;/span&gt;  &lt;span class="m"&gt;107&lt;/span&gt;  &lt;span class="m"&gt;201&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;98&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Interesting. As you can see the &lt;code&gt;id&lt;/code&gt; column value decreases. Less idleness, we're starting things. But after a while, the Docker container has started and we're back to things being quiet.&lt;/p&gt;
-&lt;p&gt;Let's see what &lt;code&gt;free&lt;/code&gt; is saying:
-&lt;code&gt;bash
-$ free -m
+&lt;p&gt;Let's see what &lt;code&gt;free&lt;/code&gt; is saying:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ free -m
               total        used        free      shared  buff/cache   available
-Mem:            990         350          59          10         580         569
-Swap:             0           0           0&lt;/code&gt;&lt;/p&gt;
+Mem:            &lt;span class="m"&gt;990&lt;/span&gt;         &lt;span class="m"&gt;350&lt;/span&gt;          &lt;span class="m"&gt;59&lt;/span&gt;          &lt;span class="m"&gt;10&lt;/span&gt;         &lt;span class="m"&gt;580&lt;/span&gt;         &lt;span class="m"&gt;569&lt;/span&gt;
+Swap:             &lt;span class="m"&gt;0&lt;/span&gt;           &lt;span class="m"&gt;0&lt;/span&gt;           &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;So, &lt;code&gt;used&lt;/code&gt; went up from 127MB to 350MB. The buffer cache also went up. Less available memory.&lt;/p&gt;
-&lt;p&gt;Let's start the second Docker container. We're looking at vmstat again.
-```bash
-procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+&lt;p&gt;Let's start the second Docker container. We're looking at vmstat again.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
- 0  0      0  61304  56740 537872    0    0     0    56   83  227  0  0 99  1  0&lt;/p&gt;
-&lt;h1 id="starting-second-container-here"&gt;Starting second container here.&lt;/h1&gt;
-&lt;p&gt;1  1      0 126516  59292 341252    0    0  7109  8100  823 3255 22 15 56  6  0
- 1  0      0  47572  59904 337152    0    0  9186  7515  882 2316 51 13 17 19  0
- 0  1      0 153212  59940 307720    0    0  1094  2122  214  557  2  3 92  3  0
- 0  0      0  92848  59996 303368    0    0   556   149  147  690  2  3 93  1  0
- 0  0      0  92848  60004 303368    0    0     0   108   91  311  0  0 99  0  0
- 0  0      0  92724  60012 303376    0    0     0   102   94  326  0  0 98  1  0
- 0  0      0  88296  60028 305048    0    0   320   102  147  424  2  1 96  2  0
- 0  0      0  77228  60364 314520    0    0  1876   144  306  868 28  4 64  4  0
- 0  0      0  86800  60372 304968    0    0    26   387  111  372  1  1 97  1  0
- 0  0      0  86032  60780 305120    0    0   110   119  150  399  0  0 98  2  0
-```&lt;/p&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;61304&lt;/span&gt;  &lt;span class="m"&gt;56740&lt;/span&gt; &lt;span class="m"&gt;537872&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;56&lt;/span&gt;   &lt;span class="m"&gt;83&lt;/span&gt;  &lt;span class="m"&gt;227&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;99&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="c1"&gt;# Starting second container here.&lt;/span&gt;
+ &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;126516&lt;/span&gt;  &lt;span class="m"&gt;59292&lt;/span&gt; &lt;span class="m"&gt;341252&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;7109&lt;/span&gt;  &lt;span class="m"&gt;8100&lt;/span&gt;  &lt;span class="m"&gt;823&lt;/span&gt; &lt;span class="m"&gt;3255&lt;/span&gt; &lt;span class="m"&gt;22&lt;/span&gt; &lt;span class="m"&gt;15&lt;/span&gt; &lt;span class="m"&gt;56&lt;/span&gt;  &lt;span class="m"&gt;6&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;47572&lt;/span&gt;  &lt;span class="m"&gt;59904&lt;/span&gt; &lt;span class="m"&gt;337152&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;9186&lt;/span&gt;  &lt;span class="m"&gt;7515&lt;/span&gt;  &lt;span class="m"&gt;882&lt;/span&gt; &lt;span class="m"&gt;2316&lt;/span&gt; &lt;span class="m"&gt;51&lt;/span&gt; &lt;span class="m"&gt;13&lt;/span&gt; &lt;span class="m"&gt;17&lt;/span&gt; &lt;span class="m"&gt;19&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;153212&lt;/span&gt;  &lt;span class="m"&gt;59940&lt;/span&gt; &lt;span class="m"&gt;307720&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;1094&lt;/span&gt;  &lt;span class="m"&gt;2122&lt;/span&gt;  &lt;span class="m"&gt;214&lt;/span&gt;  &lt;span class="m"&gt;557&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;92&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;92848&lt;/span&gt;  &lt;span class="m"&gt;59996&lt;/span&gt; &lt;span class="m"&gt;303368&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;556&lt;/span&gt;   &lt;span class="m"&gt;149&lt;/span&gt;  &lt;span class="m"&gt;147&lt;/span&gt;  &lt;span class="m"&gt;690&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;93&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;92848&lt;/span&gt;  &lt;span class="m"&gt;60004&lt;/span&gt; &lt;span class="m"&gt;303368&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;108&lt;/span&gt;   &lt;span class="m"&gt;91&lt;/span&gt;  &lt;span class="m"&gt;311&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;99&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;92724&lt;/span&gt;  &lt;span class="m"&gt;60012&lt;/span&gt; &lt;span class="m"&gt;303376&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;102&lt;/span&gt;   &lt;span class="m"&gt;94&lt;/span&gt;  &lt;span class="m"&gt;326&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;98&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;88296&lt;/span&gt;  &lt;span class="m"&gt;60028&lt;/span&gt; &lt;span class="m"&gt;305048&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;320&lt;/span&gt;   &lt;span class="m"&gt;102&lt;/span&gt;  &lt;span class="m"&gt;147&lt;/span&gt;  &lt;span class="m"&gt;424&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;96&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;77228&lt;/span&gt;  &lt;span class="m"&gt;60364&lt;/span&gt; &lt;span class="m"&gt;314520&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;1876&lt;/span&gt;   &lt;span class="m"&gt;144&lt;/span&gt;  &lt;span class="m"&gt;306&lt;/span&gt;  &lt;span class="m"&gt;868&lt;/span&gt; &lt;span class="m"&gt;28&lt;/span&gt;  &lt;span class="m"&gt;4&lt;/span&gt; &lt;span class="m"&gt;64&lt;/span&gt;  &lt;span class="m"&gt;4&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;86800&lt;/span&gt;  &lt;span class="m"&gt;60372&lt;/span&gt; &lt;span class="m"&gt;304968&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;26&lt;/span&gt;   &lt;span class="m"&gt;387&lt;/span&gt;  &lt;span class="m"&gt;111&lt;/span&gt;  &lt;span class="m"&gt;372&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;97&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;86032&lt;/span&gt;  &lt;span class="m"&gt;60780&lt;/span&gt; &lt;span class="m"&gt;305120&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;110&lt;/span&gt;   &lt;span class="m"&gt;119&lt;/span&gt;  &lt;span class="m"&gt;150&lt;/span&gt;  &lt;span class="m"&gt;399&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;98&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Similar situation. A spike in io, a spike in non-idle CPU percentage, followed by quiet. Let's look at &lt;code&gt;free&lt;/code&gt;:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ free -m
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ free -m
               total        used        free      shared  buff/cache   available
-Mem:            990         549          84          17         356         371
-Swap:             0           0&lt;/code&gt;&lt;/p&gt;
+Mem:            &lt;span class="m"&gt;990&lt;/span&gt;         &lt;span class="m"&gt;549&lt;/span&gt;          &lt;span class="m"&gt;84&lt;/span&gt;          &lt;span class="m"&gt;17&lt;/span&gt;         &lt;span class="m"&gt;356&lt;/span&gt;         &lt;span class="m"&gt;371&lt;/span&gt;
+Swap:             &lt;span class="m"&gt;0&lt;/span&gt;           &lt;span class="m"&gt;0&lt;/span&gt; 
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;More used memory. But notice how this time the &lt;code&gt;buff/cache&lt;/code&gt; section went down. Why? Well, because our running processes are using more memory and this memory has to come from somewhere. The kernel is freeing memory from the buffer cache and giving it to processes. Again, reasonable behavior.&lt;/p&gt;
 &lt;p&gt;Let's start the third and fourth Docker containers and see how &lt;code&gt;vmstat&lt;/code&gt; looks after that.&lt;/p&gt;
-&lt;p&gt;```bash
-procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
- 0  0      0  46052  11188 160564    0    0     0   151  153  532  0  1 97  2  0
- 0  0      0  39828  11336 166664    0    0  1246   141  235  634  1  1 95  4  0
- 0  0      0  39704  11344 166664    0    0     0   149  158  542  0  1 97  2  0&lt;/p&gt;
-&lt;h1 id="after-we-start-the-fourth-container"&gt;After we start the fourth container.&lt;/h1&gt;
-&lt;p&gt;6  3      0  18840  11668 179484    0    0 18678  7726 2711 7721  5  8 46 41  0
- 1  4      0   8964   2796 103108    0    0 38137  2508 4198 4872 37 21  0 41  1
- 0 11      0   9576    588 101548    0    0 68988   485 4097 6006  1 10  0 88  0
- 0  8      0   9352    152 100752    0    0 67797   250 2463 4497  0  8  0 90  1&lt;/p&gt;
-&lt;p&gt;....&lt;/p&gt;
-&lt;p&gt;1 18      0   9508    248 100560    0    0 63568   138 1700 3935  0  8  0 91  1
- 0 14      0   8656    400 100436    0    0 63154    68 1580 3766  0  8  0 91  1
- 0 19      0   8852    288 100552    0    0 63711   128 1606 3705  0  8  0 92  1
- 1 47      0  10232    372  98616    0    0 63410    94 1720 4316  0  7  0 91  1
- 2 50      0   9648    420  99604    0    0 63126    77 1696 4425  0  8  0 91  1
- 0 40      0  10028    272  99432    0    0 63692    74 1681 4506  0  7  0 91  1
- 0 75      0   9944    160  98220    0    0 63342    59 1724 5150  0 10  0 89  1
- 3 34      0   8952    296 100400    0    0 63575   110 1958 4663  0  8  0 91  1
- 1  5      0   9004   1716 117640    0    0 62704   123 2674 5329  3  9  0 88  1
-```&lt;/p&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;46052&lt;/span&gt;  &lt;span class="m"&gt;11188&lt;/span&gt; &lt;span class="m"&gt;160564&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;151&lt;/span&gt;  &lt;span class="m"&gt;153&lt;/span&gt;  &lt;span class="m"&gt;532&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;97&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;39828&lt;/span&gt;  &lt;span class="m"&gt;11336&lt;/span&gt; &lt;span class="m"&gt;166664&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;1246&lt;/span&gt;   &lt;span class="m"&gt;141&lt;/span&gt;  &lt;span class="m"&gt;235&lt;/span&gt;  &lt;span class="m"&gt;634&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;95&lt;/span&gt;  &lt;span class="m"&gt;4&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;39704&lt;/span&gt;  &lt;span class="m"&gt;11344&lt;/span&gt; &lt;span class="m"&gt;166664&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;     &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;149&lt;/span&gt;  &lt;span class="m"&gt;158&lt;/span&gt;  &lt;span class="m"&gt;542&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;97&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="c1"&gt;# After we start the fourth container.&lt;/span&gt;
+ &lt;span class="m"&gt;6&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;18840&lt;/span&gt;  &lt;span class="m"&gt;11668&lt;/span&gt; &lt;span class="m"&gt;179484&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;18678&lt;/span&gt;  &lt;span class="m"&gt;7726&lt;/span&gt; &lt;span class="m"&gt;2711&lt;/span&gt; &lt;span class="m"&gt;7721&lt;/span&gt;  &lt;span class="m"&gt;5&lt;/span&gt;  &lt;span class="m"&gt;8&lt;/span&gt; &lt;span class="m"&gt;46&lt;/span&gt; &lt;span class="m"&gt;41&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;4&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;8964&lt;/span&gt;   &lt;span class="m"&gt;2796&lt;/span&gt; &lt;span class="m"&gt;103108&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;38137&lt;/span&gt;  &lt;span class="m"&gt;2508&lt;/span&gt; &lt;span class="m"&gt;4198&lt;/span&gt; &lt;span class="m"&gt;4872&lt;/span&gt; &lt;span class="m"&gt;37&lt;/span&gt; &lt;span class="m"&gt;21&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;41&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;11&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;9576&lt;/span&gt;    &lt;span class="m"&gt;588&lt;/span&gt; &lt;span class="m"&gt;101548&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;68988&lt;/span&gt;   &lt;span class="m"&gt;485&lt;/span&gt; &lt;span class="m"&gt;4097&lt;/span&gt; &lt;span class="m"&gt;6006&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;88&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;8&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;9352&lt;/span&gt;    &lt;span class="m"&gt;152&lt;/span&gt; &lt;span class="m"&gt;100752&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;67797&lt;/span&gt;   &lt;span class="m"&gt;250&lt;/span&gt; &lt;span class="m"&gt;2463&lt;/span&gt; &lt;span class="m"&gt;4497&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;8&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;90&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+
+....
+
+
+ &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;18&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;9508&lt;/span&gt;    &lt;span class="m"&gt;248&lt;/span&gt; &lt;span class="m"&gt;100560&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;63568&lt;/span&gt;   &lt;span class="m"&gt;138&lt;/span&gt; &lt;span class="m"&gt;1700&lt;/span&gt; &lt;span class="m"&gt;3935&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;8&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;91&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;14&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;8656&lt;/span&gt;    &lt;span class="m"&gt;400&lt;/span&gt; &lt;span class="m"&gt;100436&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;63154&lt;/span&gt;    &lt;span class="m"&gt;68&lt;/span&gt; &lt;span class="m"&gt;1580&lt;/span&gt; &lt;span class="m"&gt;3766&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;8&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;91&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;19&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;8852&lt;/span&gt;    &lt;span class="m"&gt;288&lt;/span&gt; &lt;span class="m"&gt;100552&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;63711&lt;/span&gt;   &lt;span class="m"&gt;128&lt;/span&gt; &lt;span class="m"&gt;1606&lt;/span&gt; &lt;span class="m"&gt;3705&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;8&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;92&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="m"&gt;47&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;10232&lt;/span&gt;    &lt;span class="m"&gt;372&lt;/span&gt;  &lt;span class="m"&gt;98616&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;63410&lt;/span&gt;    &lt;span class="m"&gt;94&lt;/span&gt; &lt;span class="m"&gt;1720&lt;/span&gt; &lt;span class="m"&gt;4316&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;7&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;91&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;2&lt;/span&gt; &lt;span class="m"&gt;50&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;9648&lt;/span&gt;    &lt;span class="m"&gt;420&lt;/span&gt;  &lt;span class="m"&gt;99604&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;63126&lt;/span&gt;    &lt;span class="m"&gt;77&lt;/span&gt; &lt;span class="m"&gt;1696&lt;/span&gt; &lt;span class="m"&gt;4425&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;8&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;91&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;40&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;10028&lt;/span&gt;    &lt;span class="m"&gt;272&lt;/span&gt;  &lt;span class="m"&gt;99432&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;63692&lt;/span&gt;    &lt;span class="m"&gt;74&lt;/span&gt; &lt;span class="m"&gt;1681&lt;/span&gt; &lt;span class="m"&gt;4506&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;7&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;91&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;75&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;9944&lt;/span&gt;    &lt;span class="m"&gt;160&lt;/span&gt;  &lt;span class="m"&gt;98220&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;63342&lt;/span&gt;    &lt;span class="m"&gt;59&lt;/span&gt; &lt;span class="m"&gt;1724&lt;/span&gt; &lt;span class="m"&gt;5150&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;10&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;89&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="m"&gt;34&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;8952&lt;/span&gt;    &lt;span class="m"&gt;296&lt;/span&gt; &lt;span class="m"&gt;100400&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;63575&lt;/span&gt;   &lt;span class="m"&gt;110&lt;/span&gt; &lt;span class="m"&gt;1958&lt;/span&gt; &lt;span class="m"&gt;4663&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;  &lt;span class="m"&gt;8&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;91&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+ &lt;span class="m"&gt;1&lt;/span&gt;  &lt;span class="m"&gt;5&lt;/span&gt;      &lt;span class="m"&gt;0&lt;/span&gt;   &lt;span class="m"&gt;9004&lt;/span&gt;   &lt;span class="m"&gt;1716&lt;/span&gt; &lt;span class="m"&gt;117640&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt;    &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;62704&lt;/span&gt;   &lt;span class="m"&gt;123&lt;/span&gt; &lt;span class="m"&gt;2674&lt;/span&gt; &lt;span class="m"&gt;5329&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt;  &lt;span class="m"&gt;9&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt; &lt;span class="m"&gt;88&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;This is where things start to get bad! The box becomes very unresponsive. Typing a simple command like &lt;code&gt;ls&lt;/code&gt; takes seconds to execute. Let's take a peek at &lt;code&gt;free&lt;/code&gt; and we'll continue to our analysis after that:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ free -m
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ free -m
               total        used        free      shared  buff/cache   available
-Mem:            990         851          20          24         119          54
-Swap:             0           0           0&lt;/code&gt;&lt;/p&gt;
+Mem:            &lt;span class="m"&gt;990&lt;/span&gt;         &lt;span class="m"&gt;851&lt;/span&gt;          &lt;span class="m"&gt;20&lt;/span&gt;          &lt;span class="m"&gt;24&lt;/span&gt;         &lt;span class="m"&gt;119&lt;/span&gt;          &lt;span class="m"&gt;54&lt;/span&gt;
+Swap:             &lt;span class="m"&gt;0&lt;/span&gt;           &lt;span class="m"&gt;0&lt;/span&gt;           &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;As you can see, we barely have any free memory and the buffer cache has shrunk even more. But notice what's going on in &lt;code&gt;vmstat&lt;/code&gt;. The &lt;code&gt;bi&lt;/code&gt; (blocks received from a block device) is stuck at a constant high value. This means we're doing a lot of disk reads. Why is that, are our processes doing a lot of disk operations? No. Our many processes are executables that are located on disk. When the kernel executes them, it has to read instructions. If we have enough buffer cache, we can store these instruction in memory and not have to read them again. However, our buffer cache is small now. So when processes run, the kernel needs to pull their instructions from disk. It probably stores them in the buffer cache, but when the next process is running, it tries to store in the cache again and evicts what's stored from the old process. &lt;/p&gt;
 &lt;p&gt;Are we done? Not yet. When this whole sad mess happens, the kernel will run something called &lt;a href="https://linux-mm.org/OOM_Killer"&gt;OOM killer&lt;/a&gt;. How do we know this is what's going on? We can use &lt;code&gt;dmesg&lt;/code&gt; and view the system messages:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-$ dmesg | grep "Out of memory"
-[ 3635.537538] Out of memory: Kill process 21580 (jupyter-noteboo) score 37 or sacrifice child
-[ 3636.822607] Out of memory: Kill process 22714 (jupyter-noteboo) score 37 or sacrifice child
-[ 3643.006328] Out of memory: Kill process 24976 (jupyter-noteboo) score 37 or sacrifice child
-[ 3654.916468] Out of memory: Kill process 26118 (jupyter-noteboo) score 37 or sacrifice child
-[ 3658.712286] Out of memory: Kill process 28364 (jupyter-noteboo) score 35 or sacrifice child
-[ 3666.654763] Out of memory: Kill process 30603 (jupyter-noteboo) score 36 or sacrifice child
-[ 3685.390829] Out of memory: Kill process 30620 (jupyter-noteboo) score 36 or sacrifice child&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ dmesg &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s2"&gt;&amp;quot;Out of memory&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="m"&gt;3635&lt;/span&gt;.537538&lt;span class="o"&gt;]&lt;/span&gt; Out of memory: Kill process &lt;span class="m"&gt;21580&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;jupyter-noteboo&lt;span class="o"&gt;)&lt;/span&gt; score &lt;span class="m"&gt;37&lt;/span&gt; or sacrifice child
+&lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="m"&gt;3636&lt;/span&gt;.822607&lt;span class="o"&gt;]&lt;/span&gt; Out of memory: Kill process &lt;span class="m"&gt;22714&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;jupyter-noteboo&lt;span class="o"&gt;)&lt;/span&gt; score &lt;span class="m"&gt;37&lt;/span&gt; or sacrifice child
+&lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="m"&gt;3643&lt;/span&gt;.006328&lt;span class="o"&gt;]&lt;/span&gt; Out of memory: Kill process &lt;span class="m"&gt;24976&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;jupyter-noteboo&lt;span class="o"&gt;)&lt;/span&gt; score &lt;span class="m"&gt;37&lt;/span&gt; or sacrifice child
+&lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="m"&gt;3654&lt;/span&gt;.916468&lt;span class="o"&gt;]&lt;/span&gt; Out of memory: Kill process &lt;span class="m"&gt;26118&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;jupyter-noteboo&lt;span class="o"&gt;)&lt;/span&gt; score &lt;span class="m"&gt;37&lt;/span&gt; or sacrifice child
+&lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="m"&gt;3658&lt;/span&gt;.712286&lt;span class="o"&gt;]&lt;/span&gt; Out of memory: Kill process &lt;span class="m"&gt;28364&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;jupyter-noteboo&lt;span class="o"&gt;)&lt;/span&gt; score &lt;span class="m"&gt;35&lt;/span&gt; or sacrifice child
+&lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="m"&gt;3666&lt;/span&gt;.654763&lt;span class="o"&gt;]&lt;/span&gt; Out of memory: Kill process &lt;span class="m"&gt;30603&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;jupyter-noteboo&lt;span class="o"&gt;)&lt;/span&gt; score &lt;span class="m"&gt;36&lt;/span&gt; or sacrifice child
+&lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="m"&gt;3685&lt;/span&gt;.390829&lt;span class="o"&gt;]&lt;/span&gt; Out of memory: Kill process &lt;span class="m"&gt;30620&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;jupyter-noteboo&lt;span class="o"&gt;)&lt;/span&gt; score &lt;span class="m"&gt;36&lt;/span&gt; or sacrifice child
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;The strange thing here is that it keeps killing these &lt;a href="http://jupyter.org/"&gt;Jupyter&lt;/a&gt; processes for a long time. My guess here is that something restarts them after they're killed.&lt;/p&gt;
 &lt;p&gt;The best thing to do here is to simply kill all the running Docker containers so that the box is usable again:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;bash
-docker kill $(docker ps -q)&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;docker &lt;span class="nb"&gt;kill&lt;/span&gt; &lt;span class="k"&gt;$(&lt;/span&gt;docker ps -q&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Things would look different if there was a swap partition on the disk. I might try such a setup as well. If you think about it, the swap would allow some of the memory used by processes to be transferred to disk. That's a great win, because some parts of memory might be very rarely if at all accessed. However, without a swap, there's no such option.&lt;/p&gt;</content></entry><entry><title>How to install collectd on Ubuntu.</title><link href="http://pminkov.github.io/blog/how-to-install-collectd-on-ubuntu.html" rel="alternate"></link><published>2017-01-05T14:46:00-08:00</published><updated>2017-01-05T14:46:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-05:/blog/how-to-install-collectd-on-ubuntu.html</id><summary type="html">&lt;p&gt;Some time ago I found out about &lt;a href="https://collectd.org/"&gt;collectd&lt;/a&gt; and I was curious to see what it does. collectd collects statistics about the machine its running on - cpu, disk, memory, processes, battery, etc. &lt;/p&gt;
 &lt;p&gt;Here's how to install it on Ubuntu and visualize the data it has collected.&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
@@ -636,11 +733,13 @@ docker kill $(docker ps -q)&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;sudo apt-get install collectd&lt;/code&gt;&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h3 id="step-2-make-sure-collectd-and-apache-are-running"&gt;Step 2: Make sure collectd and apache are running.&lt;/h3&gt;
-&lt;p&gt;If you have installed apache, you should have both collectd and apache running
-&lt;code&gt;bash
-$ sudo service --status-all | egrep "collectd|apache2"
- [ + ]  apache2
- [ + ]  collectd&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;If you have installed apache, you should have both collectd and apache running&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo service --status-all &lt;span class="p"&gt;|&lt;/span&gt; egrep &lt;span class="s2"&gt;&amp;quot;collectd|apache2&amp;quot;&lt;/span&gt;
+ &lt;span class="o"&gt;[&lt;/span&gt; + &lt;span class="o"&gt;]&lt;/span&gt;  apache2
+ &lt;span class="o"&gt;[&lt;/span&gt; + &lt;span class="o"&gt;]&lt;/span&gt;  collectd
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;If collectd is not running, run &lt;code&gt;sudo service collectd start&lt;/code&gt;. For me at least, it was running after installation.&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h3 id="step-3-install-collectds-web-app-for-generating-graphs"&gt;Step 3: Install collectd's web app for generating graphs.&lt;/h3&gt;
@@ -653,49 +752,55 @@ $ sudo service --status-all | egrep "collectd|apache2"
 &lt;p&gt;You'll have to do two things.&lt;/p&gt;
 &lt;p&gt;First, you need to install the cgi module. So, go to &lt;code&gt;/etc/apache2/mods-enabled&lt;/code&gt; and run this: &lt;code&gt;$ sudo ln -s ../mods-available/cgi.load&lt;/code&gt;. You have now enabled the &lt;code&gt;cgi&lt;/code&gt; module.&lt;/p&gt;
 &lt;p&gt;Next you'll have to change &lt;code&gt;apache2.conf&lt;/code&gt;, located in &lt;code&gt;/etc/apache2&lt;/code&gt; (Ubuntu doesn't use &lt;code&gt;httpd.conf&lt;/code&gt;).&lt;/p&gt;
-&lt;p&gt;Add these lines to it:
-&lt;code&gt;text
-&amp;lt;Directory /var/www/&amp;gt;
+&lt;p&gt;Add these lines to it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&amp;lt;Directory /var/www/&amp;gt;
         Options +ExecCGI
         AddHandler cgi-script .cgi
-&amp;lt;/Directory&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&amp;lt;/Directory&amp;gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;And - you're done! If you go to &lt;code&gt;http://localhost/cgi-bin/collection3/bin/index.cgi&lt;/code&gt;, you should see some graphs.&lt;/p&gt;</content></entry><entry><title>How to fix order-violation bugs with condition variables.</title><link href="http://pminkov.github.io/blog/how-to-fix-order-violation-bugs-with-condition-variables.html" rel="alternate"></link><published>2016-11-29T11:22:00-08:00</published><updated>2016-11-29T11:22:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-11-29:/blog/how-to-fix-order-violation-bugs-with-condition-variables.html</id><summary type="html">&lt;p&gt;Let's look at the following code and try to find the bug in it.&lt;/p&gt;
-&lt;p&gt;```
-Thread 1:
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Thread 1:
 void init() {
   ...
   mThread = PR_CreateThread(mMain, ...)
   ...
-}&lt;/p&gt;
-&lt;p&gt;Thread 2:
+}
+
+Thread 2:
 void mMain(...) {
   ...
   mState = mThread-&amp;gt;State;
   ...
 }
-```&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;The problem is that if thread two executes before thread one, it can access &lt;code&gt;mThread&lt;/code&gt; which is not initialized. We need to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Let's look at the following code and try to find the bug in it.&lt;/p&gt;
-&lt;p&gt;```
-Thread 1:
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Thread 1:
 void init() {
   ...
   mThread = PR_CreateThread(mMain, ...)
   ...
-}&lt;/p&gt;
-&lt;p&gt;Thread 2:
+}
+
+Thread 2:
 void mMain(...) {
   ...
   mState = mThread-&amp;gt;State;
   ...
 }
-```&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;The problem is that if thread two executes before thread one, it can access &lt;code&gt;mThread&lt;/code&gt; which is not initialized. We need to make thread two wait for thread one. This is done with condition variables. But let's see how we're going to implement it.&lt;/p&gt;
 &lt;h3 id="solution-1-incorrect-simple-wait-and-signal"&gt;Solution 1 (Incorrect) - Simple wait and signal&lt;/h3&gt;
 &lt;p&gt;Let's say that we're not giving this a lot of thought and just put a wait and signal in the code. We have this code:&lt;/p&gt;
-&lt;p&gt;```
-pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;&lt;/p&gt;
-&lt;p&gt;Thread 1:
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;
+
+Thread 1:
 void init() {
   ...
   mThread = PR_CreateThread(mMain, ...)
@@ -703,8 +808,9 @@ void init() {
   pthread_cond_signal(&amp;amp;mtCond);
   pthread_mutex_unlock(&amp;amp;mtLock);
   ...
-}&lt;/p&gt;
-&lt;p&gt;Thread 2:
+}
+
+Thread 2:
 void mMain(...) {
   ...
   pthread_mutex_lock(&amp;amp;mtLock);
@@ -713,14 +819,16 @@ void mMain(...) {
   mState = mThread-&amp;gt;State;
   ...
 }
-```&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;The problem here is that thread one can execute before thread two. In this case, thread one will signal on the condition variable, but nobody is waiting on it. Once thread two executes, it will start waiting and nobody is going to signal on the condition variable. Thus, thread two will stay in block state.&lt;/p&gt;
 &lt;h3 id="solution-2-correct-using-a-synchronization-variable"&gt;Solution 2 (Correct) - Using a synchronization variable.&lt;/h3&gt;
-&lt;p&gt;```
-  pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
   pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;
-  int mtInit = 0;&lt;/p&gt;
-&lt;p&gt;Thread 1:
+  int mtInit = 0;
+
+  Thread 1:
   void init() {
     ...
 1   mThread = PR_CreateThread(mMain, ...)
@@ -729,8 +837,9 @@ void mMain(...) {
 4   pthread_cond_signal(&amp;amp;mtCond);
 5   pthread_mutex_unlock(&amp;amp;mtLock);
     ...
-  }&lt;/p&gt;
-&lt;p&gt;Thread 2:
+  }
+
+  Thread 2:
   void mMain(...) {
     ...
 6   pthread_mutex_lock(&amp;amp;mtLock);
@@ -740,11 +849,13 @@ void mMain(...) {
 10  mState = mThread-&amp;gt;State;
     ...
   }
-```&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Here we have used the &lt;code&gt;mtInit&lt;/code&gt; variable to prevent the bug in Solution 1 from hapenning. Let's try to reproduce the conditions that led to a bug in out first solution. Let's say thread one executes before thread two. When thread two runs, it will see that &lt;code&gt;mtInit&lt;/code&gt; is 1 and it won't wait. That basically solves our problem. Let's trace things more carfully with two possible scenarios. Of course, there are other possibilities too, but with these two I have enough confidence in the correctness of the solution.&lt;/p&gt;
-&lt;p&gt;```
-Scenario 1 - Thread 1 before Thread 2.&lt;/p&gt;
-&lt;p&gt;Line   T1    T2   COMMENT
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Scenario 1 - Thread 1 before Thread 2.
+
+Line   T1    T2   COMMENT
        1
        2          Locked mutex
              6    Blocked, because mutex is locked.
@@ -754,22 +865,26 @@ Scenario 1 - Thread 1 before Thread 2.&lt;/p&gt;
              6    Continues, mutex was unblocked.
              7    False, jump to line 9.
              9    Unlock mutex, done
-```&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;So in this scenario, thread one obtains the lock first and the solution is correct.&lt;/p&gt;
-&lt;p&gt;```
-Scenario 2 - Thread 2 before Thread 1.&lt;/p&gt;
-&lt;p&gt;Line   T1    T2   COMMENT
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Scenario 2 - Thread 2 before Thread 1.
+
+Line   T1    T2   COMMENT
              6    Locked mutex.
              7
              8    Unlocks mutex, waiting on condition variable.
-       1    &lt;br /&gt;
+       1      
        2          Locks mutex.
-       3    &lt;br /&gt;
-       4          Signals, but mutex is still locked, so thread two doesn't do anything.
+       3      
+       4          Signals, but mutex is still locked, so thread two doesn&amp;#39;t do anything.
        5          Unlocks mutex. Now thread two can continue.
              8    Returns from wait(), locks mutex.
              9    Unlocks mutex.
-```&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;This scenario works too.&lt;/p&gt;
 &lt;p&gt;There's one change that we should do though. Instead of an if statement in line 7, we should use a while. Why? Because when thread two wakes up in line 7 and obtains a lock on the mutex, it should re-verify that the condition that made it wait is not true anymore. While not a problem in this code segment, this can be a problem in other cases.&lt;/p&gt;</content></entry><entry><title>Pitfalls of POSIX condition variables.</title><link href="http://pminkov.github.io/blog/pitfalls-of-posix-condition-variables.html" rel="alternate"></link><published>2016-11-24T20:23:00-08:00</published><updated>2016-11-24T20:23:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-11-24:/blog/pitfalls-of-posix-condition-variables.html</id><summary type="html">&lt;p&gt;I'm reading this awesome &lt;a href="http://pages.cs.wisc.edu/~remzi/OSTEP/"&gt;book&lt;/a&gt; about operating systems. I find that with OSs, you can't understand things by just reading the text.
 You have to write code, write out things on paper and read certain passages multiple times. That's the difference between learning and reading. Hopefully I'm learning something.&lt;/p&gt;
@@ -777,16 +892,18 @@ You have to write code, write out things on paper and read certain passages mult
 You have to write code, write out things on paper and read certain passages multiple times. That's the difference between learning and reading. Hopefully I'm learning something.&lt;/p&gt;
 &lt;p&gt;So this book has a nice chapter on &lt;a href="https://computing.llnl.gov/tutorials/pthreads/#ConditionVariables"&gt;condition variables&lt;/a&gt;. The way condition variables operate is fairly clear, but I found two pitfalls that I had to dig deeper into in order to see what's going on.&lt;/p&gt;
 &lt;p&gt;First, a crash course in how condition variables operate. I'm using shortened function names for readability. A condition variable is a variable that you can use to make a thread wait for some condition to be true. So roughly, it looks like this:&lt;/p&gt;
-&lt;p&gt;```
-// Thread one.
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;// Thread one.
 lock(mutex);
 wait(condition, mutex);
-unlock(mutex);&lt;/p&gt;
-&lt;p&gt;// Thread two.
+unlock(mutex);
+
+// Thread two.
 lock(mutex);
 signal(condition);
 unlock(mutex);
-```&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Let's say that the first thing that happens here is that thread one obtains the mutex. Thread two runs and blocks on its call to &lt;code&gt;lock&lt;/code&gt;. Now thread one proceeds and calls &lt;code&gt;wait(condition, mutex)&lt;/code&gt;. What happens here is that mutex is unlocked and thread one goes to sleep. It's waiting for the condition to become true. Thread two is able to obtain the lock and it then signals to thread one that the condition is satisfied. Thread one obtains a lock on the mutex again and finishes its job.&lt;/p&gt;
 &lt;p&gt;Now that this is out of the way, let's look at the pitfalls.&lt;/p&gt;
 &lt;h4 id="pitfall-1"&gt;Pitfall 1&lt;/h4&gt;
@@ -803,125 +920,167 @@ Thread one will then lock the mutex and once it's done with its work, it will un
 &lt;p&gt;So that's it. Happy coding.&lt;/p&gt;</content><category term="Concurrency"></category></entry><entry><title>Implementing a fast multi-threaded counter.</title><link href="http://pminkov.github.io/blog/implementing-a-fast-multi-threaded-counter.html" rel="alternate"></link><published>2016-11-23T11:02:00-08:00</published><updated>2016-11-23T11:02:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-11-23:/blog/implementing-a-fast-multi-threaded-counter.html</id><summary type="html">&lt;p&gt;Today I'll write a bit about implementing a simple thread safe counter and improving its speed.&lt;/p&gt;
 &lt;p&gt;Implementing a basic mutli-threaded counter is a fairly easy task. Using pthreads, you just need to wrap the counter increment in a lock.&lt;/p&gt;
 &lt;p&gt;The code (&lt;a href="https://github.com/pminkov/wip/tree/master/mt-counters"&gt;github link&lt;/a&gt;) looks like this:&lt;/p&gt;
-&lt;p&gt;```&lt;/p&gt;
-&lt;h1 id="include-mythreadsh"&gt;include "mythreads.h"&lt;/h1&gt;
-&lt;p&gt;struct …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Today I'll write a bit about implementing a simple thread safe counter and improving its speed.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;quot;mythreads.h&amp;quot;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+
+&lt;span class="k"&gt;struct …&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;</summary><content type="html">&lt;p&gt;Today I'll write a bit about implementing a simple thread safe counter and improving its speed.&lt;/p&gt;
 &lt;p&gt;Implementing a basic mutli-threaded counter is a fairly easy task. Using pthreads, you just need to wrap the counter increment in a lock.&lt;/p&gt;
 &lt;p&gt;The code (&lt;a href="https://github.com/pminkov/wip/tree/master/mt-counters"&gt;github link&lt;/a&gt;) looks like this:&lt;/p&gt;
-&lt;p&gt;```&lt;/p&gt;
-&lt;h1 id="include-mythreadsh"&gt;include "mythreads.h"&lt;/h1&gt;
-&lt;p&gt;struct counter_t {
-  int value;
-  pthread_mutex_t lock;
-};&lt;/p&gt;
-&lt;p&gt;static struct counter_t counter;&lt;/p&gt;
-&lt;p&gt;void init(struct counter_t *c) {
-  c-&amp;gt;value = 0;
-  pthread_mutex_init(&amp;amp;c-&amp;gt;lock, NULL);
-}&lt;/p&gt;
-&lt;p&gt;void increment_by(struct counter_t *c, int by) {
-  Pthread_mutex_lock(&amp;amp;c-&amp;gt;lock);
-  c-&amp;gt;value += by;
-  Pthread_mutex_unlock(&amp;amp;c-&amp;gt;lock);
-}&lt;/p&gt;
-&lt;p&gt;void increment(struct counter_t *c) {
-  increment_by(c, 1);
-}&lt;/p&gt;
-&lt;p&gt;int get(struct counter_t *c) {
-  Pthread_mutex_lock(&amp;amp;c-&amp;gt;lock);
-  int rc = c-&amp;gt;value;
-  Pthread_mutex_unlock(&amp;amp;c-&amp;gt;lock);
-  return rc;
-}
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;quot;mythreads.h&amp;quot;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;counter_t&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="n"&gt;pthread_mutex_t&lt;/span&gt; &lt;span class="n"&gt;lock&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+
+&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;counter_t&lt;/span&gt; &lt;span class="n"&gt;counter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;init&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;counter_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="n"&gt;pthread_mutex_init&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lock&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;NULL&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;increment_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;counter_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;Pthread_mutex_lock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lock&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="n"&gt;by&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="n"&gt;Pthread_mutex_unlock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lock&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;increment&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;counter_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;increment_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;counter_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;Pthread_mutex_lock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lock&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;rc&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="n"&gt;Pthread_mutex_unlock&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lock&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;rc&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Nothing complicated. Let's say that we want to increment this counter 1,000,000 times. And let's do this with an increasing amount of threads, each thread incrementing the counter 1,000,000 times. I get the following timings for this exercise.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;1 thread:  0.064s real time.
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;1 thread:  0.064s real time.
 2 threads: 9.930s
-4 threads: 23.971s&lt;/code&gt;&lt;/p&gt;
+4 threads: 23.971s
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;This counter is really slow. Also, it doesn't scale well, since at the moment more than one thread starts to use it, it becomes so much slower. Why is this? Well, it's a bit difficult to tell without knowing how mutexes are implemented, but since we're using a single mutex that has to switch between two threads, it looks like there's a lot of overhead in this. The core operation - the increment, is also not parallel, since it can be done by only one thread at a time. But judging from the single threaded timing, this operation by itself is not the bottleneck here. So the synchronization must be.&lt;/p&gt;
 &lt;p&gt;How can we improve this? We can use what's called a sloppy counter. The sloppy counter is also fairly easy to understand. Each thread has its own counter and when that counter becomes bigger than a certain value, its current value is transferred into a global counter. Here's how the code for that looks like:&lt;/p&gt;
-&lt;p&gt;```&lt;/p&gt;
-&lt;h1 id="include"&gt;include &lt;string.h&gt;&lt;/h1&gt;
-&lt;h1 id="include_1"&gt;include &lt;stdlib.h&gt;&lt;/h1&gt;
-&lt;h1 id="define-mina-b-a-b-a-b"&gt;define min(a, b) ((a) &amp;lt; (b) ? (a) : (b))&lt;/h1&gt;
-&lt;p&gt;const uint64_t SLOTS_COUNT = 101;&lt;/p&gt;
-&lt;p&gt;struct sloppy_counter_t {
-  int value;&lt;/p&gt;
-&lt;p&gt;struct counter_t gcounter;&lt;/p&gt;
-&lt;p&gt;// A hash table for per-thread counters. Since we're unlikely to run too many threads at the same time,
-  // chances for collision are low. If that's not the case, we can always use a per-counter mutex.
-  int lcounters[SLOTS_COUNT];
-};&lt;/p&gt;
-&lt;p&gt;static struct sloppy_counter_t sloppy_counter;&lt;/p&gt;
-&lt;p&gt;void sloppy_init(struct sloppy_counter_t *c) {
-  for (int i = 0; i &amp;lt; SLOTS_COUNT; i++) {
-    c-&amp;gt;lcounters[i] = 0;
-  }&lt;/p&gt;
-&lt;p&gt;init(&amp;amp;c-&amp;gt;gcounter);
-}&lt;/p&gt;
-&lt;p&gt;int slot_id(pthread_t thread_id) {
-  uint64_t ptid = 0;
-  memcpy(&amp;amp;ptid, &amp;amp;thread_id, min(sizeof(thread_id), sizeof(ptid)));&lt;/p&gt;
-&lt;p&gt;int sid = ptid % SLOTS_COUNT;
-  return sid;
-}&lt;/p&gt;
-&lt;p&gt;void sloppy_increment(struct sloppy_counter_t *c, pthread_t thread_id) {
-  int sid = slot_id(thread_id);&lt;/p&gt;
-&lt;p&gt;c-&amp;gt;lcounters[sid]++;
-  if (c-&amp;gt;lcounters[sid] &amp;gt; 128) {
-    increment_by(&amp;amp;c-&amp;gt;gcounter, c-&amp;gt;lcounters[sid]);
-    c-&amp;gt;lcounters[sid] = 0;
-  }
-}&lt;/p&gt;
-&lt;p&gt;void sloppy_flush(struct sloppy_counter_t *c, pthread_t thread_id) {
-  int sid = slot_id(thread_id);
-  if (c-&amp;gt;lcounters[sid] &amp;gt; 0) {
-    increment_by(&amp;amp;c-&amp;gt;gcounter, c-&amp;gt;lcounters[sid]);
-  }
-}&lt;/p&gt;
-&lt;p&gt;int sloppy_get(struct sloppy_counter_t *counter) {
-  return get(&amp;amp;counter-&amp;gt;gcounter);
-}
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;string.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+&lt;span class="cp"&gt;#include&lt;/span&gt; &lt;span class="cpf"&gt;&amp;lt;stdlib.h&amp;gt;&lt;/span&gt;&lt;span class="cp"&gt;&lt;/span&gt;
+
+&lt;span class="cp"&gt;#define min(a, b) ((a) &amp;lt; (b) ? (a) : (b))&lt;/span&gt;
+
+&lt;span class="k"&gt;const&lt;/span&gt; &lt;span class="kt"&gt;uint64_t&lt;/span&gt; &lt;span class="n"&gt;SLOTS_COUNT&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;101&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sloppy_counter_t&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+  &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;counter_t&lt;/span&gt; &lt;span class="n"&gt;gcounter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+  &lt;span class="c1"&gt;// A hash table for per-thread counters. Since we&amp;#39;re unlikely to run too many threads at the same time,&lt;/span&gt;
+  &lt;span class="c1"&gt;// chances for collision are low. If that&amp;#39;s not the case, we can always use a per-counter mutex.&lt;/span&gt;
+  &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;lcounters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;SLOTS_COUNT&lt;/span&gt;&lt;span class="p"&gt;];&lt;/span&gt;
+&lt;span class="p"&gt;};&lt;/span&gt;
+
+&lt;span class="k"&gt;static&lt;/span&gt; &lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sloppy_counter_t&lt;/span&gt; &lt;span class="n"&gt;sloppy_counter&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;sloppy_init&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sloppy_counter_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="n"&gt;SLOTS_COUNT&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lcounters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+
+  &lt;span class="n"&gt;init&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;gcounter&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;slot_id&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pthread_t&lt;/span&gt; &lt;span class="n"&gt;thread_id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="kt"&gt;uint64_t&lt;/span&gt; &lt;span class="n"&gt;ptid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="n"&gt;memcpy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;ptid&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;thread_id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;min&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;sizeof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;thread_id&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="k"&gt;sizeof&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ptid&lt;/span&gt;&lt;span class="p"&gt;)));&lt;/span&gt;
+
+  &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;sid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;ptid&lt;/span&gt; &lt;span class="o"&gt;%&lt;/span&gt; &lt;span class="n"&gt;SLOTS_COUNT&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;sid&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;sloppy_increment&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sloppy_counter_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pthread_t&lt;/span&gt; &lt;span class="n"&gt;thread_id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;sid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;slot_id&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;thread_id&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+
+  &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lcounters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;sid&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lcounters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;sid&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;128&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;increment_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;gcounter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lcounters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;sid&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+    &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lcounters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;sid&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;sloppy_flush&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sloppy_counter_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pthread_t&lt;/span&gt; &lt;span class="n"&gt;thread_id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;sid&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;slot_id&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;thread_id&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lcounters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;sid&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="n"&gt;increment_by&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;gcounter&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;lcounters&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;sid&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;sloppy_get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="n"&gt;sloppy_counter_t&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;counter&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;get&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="n"&gt;counter&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;gcounter&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Now let's time this counter.&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;1 thread:  0.026s
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;1 thread:  0.026s
 2 threads: 0.050s
-4 threads: 0.164s&lt;/code&gt;&lt;/p&gt;
+4 threads: 0.164s
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Much better! This counter, just like the first one, is thread safe. It's not as accurate, but the inaccuracy is small (at most 128 * number of threads) and we can use the flush function if we want accurate counts.&lt;/p&gt;</content><category term="Concurrency"></category><category term="Linux"></category></entry><entry><title>Monitoring Disk I/O on Linux.</title><link href="http://pminkov.github.io/blog/monitoring-disk-io-on-linux.html" rel="alternate"></link><published>2016-11-16T14:59:00-08:00</published><updated>2016-11-16T14:59:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-11-16:/blog/monitoring-disk-io-on-linux.html</id><summary type="html">&lt;p&gt;Today I wrote a little piece of code that generates a random array of numbers, stores it into disk and sorts it on disk, using bubble sort. This uses O(1) memory, but it's obviously very slow. I did this for fun mostly. The code is &lt;a href="https://github.com/pminkov/wip/blob/master/os/disksort.c"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;I wanted to …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Today I wrote a little piece of code that generates a random array of numbers, stores it into disk and sorts it on disk, using bubble sort. This uses O(1) memory, but it's obviously very slow. I did this for fun mostly. The code is &lt;a href="https://github.com/pminkov/wip/blob/master/os/disksort.c"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;I wanted to know, if I'm running this code, what Linux tools are going to show an increase in disk I/O.&lt;/p&gt;
 &lt;p&gt;So, I run this:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;$ ./disksort 150000&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./disksort &lt;span class="m"&gt;150000&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;This starts the sorting. It takes a long time to sort 150k numbers on disk, at least with that algorithm.&lt;/p&gt;
 &lt;p&gt;So the first command that we can run is &lt;code&gt;iostat&lt;/code&gt;. Let's see what it is outputting before I start &lt;code&gt;disksort&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;```
-$ sudo iostat 5 2
-Linux 4.4.0-31-generic (petko-VirtualBox)       11/16/2016      &lt;em&gt;x86_64&lt;/em&gt;        (1 CPU)&lt;/p&gt;
-&lt;p&gt;avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-          14.68    0.19   38.34    0.05    0.00   46.73&lt;/p&gt;
-&lt;p&gt;Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
-sda               5.60        83.17        63.96     539970     415252&lt;/p&gt;
-&lt;p&gt;avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-           3.03    0.00    0.00    0.00    0.00   96.97&lt;/p&gt;
-&lt;p&gt;Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
-sda               0.00         0.00         0.00          0          0
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sudo iostat &lt;span class="m"&gt;5&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;
+Linux &lt;span class="m"&gt;4&lt;/span&gt;.4.0-31-generic &lt;span class="o"&gt;(&lt;/span&gt;petko-VirtualBox&lt;span class="o"&gt;)&lt;/span&gt;       &lt;span class="m"&gt;11&lt;/span&gt;/16/2016      _x86_64_        &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; CPU&lt;span class="o"&gt;)&lt;/span&gt;
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+          &lt;span class="m"&gt;14&lt;/span&gt;.68    &lt;span class="m"&gt;0&lt;/span&gt;.19   &lt;span class="m"&gt;38&lt;/span&gt;.34    &lt;span class="m"&gt;0&lt;/span&gt;.05    &lt;span class="m"&gt;0&lt;/span&gt;.00   &lt;span class="m"&gt;46&lt;/span&gt;.73
+
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               &lt;span class="m"&gt;5&lt;/span&gt;.60        &lt;span class="m"&gt;83&lt;/span&gt;.17        &lt;span class="m"&gt;63&lt;/span&gt;.96     &lt;span class="m"&gt;539970&lt;/span&gt;     &lt;span class="m"&gt;415252&lt;/span&gt;
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           &lt;span class="m"&gt;3&lt;/span&gt;.03    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00   &lt;span class="m"&gt;96&lt;/span&gt;.97
+
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               &lt;span class="m"&gt;0&lt;/span&gt;.00         &lt;span class="m"&gt;0&lt;/span&gt;.00         &lt;span class="m"&gt;0&lt;/span&gt;.00          &lt;span class="m"&gt;0&lt;/span&gt;          &lt;span class="m"&gt;0&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;The command line invocation is a bit strange. The &lt;code&gt;5 2&lt;/code&gt; part says "aggregate IO data for five seconds and show me two reports". The idea is that you can get continuous report output every five seconds. But I need only one report. The first one is a default one, which shows aggregated data for I'm not sure what period. But the second one is interesting. Notice &lt;code&gt;kB_read/s&lt;/code&gt; and &lt;code&gt;kB_wrtn/s&lt;/code&gt;. They're zeros. So it's all quiet. I now run &lt;code&gt;disksort&lt;/code&gt; and run the same command.&lt;/p&gt;
-&lt;p&gt;```
-$ iostat 5 2
-Linux 4.4.0-31-generic (petko-VirtualBox)       11/16/2016      &lt;em&gt;x86_64&lt;/em&gt;        (1 CPU)&lt;/p&gt;
-&lt;p&gt;avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-          15.32    0.17   40.33    0.05    0.00   44.14&lt;/p&gt;
-&lt;p&gt;Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
-sda               5.04        73.65        59.42     540254     435868&lt;/p&gt;
-&lt;p&gt;avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-          26.81    0.00   73.19    0.00    0.00    0.00&lt;/p&gt;
-&lt;p&gt;Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
-sda               0.80         0.00       157.64          0        588
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ iostat &lt;span class="m"&gt;5&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;
+Linux &lt;span class="m"&gt;4&lt;/span&gt;.4.0-31-generic &lt;span class="o"&gt;(&lt;/span&gt;petko-VirtualBox&lt;span class="o"&gt;)&lt;/span&gt;       &lt;span class="m"&gt;11&lt;/span&gt;/16/2016      _x86_64_        &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt; CPU&lt;span class="o"&gt;)&lt;/span&gt;
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+          &lt;span class="m"&gt;15&lt;/span&gt;.32    &lt;span class="m"&gt;0&lt;/span&gt;.17   &lt;span class="m"&gt;40&lt;/span&gt;.33    &lt;span class="m"&gt;0&lt;/span&gt;.05    &lt;span class="m"&gt;0&lt;/span&gt;.00   &lt;span class="m"&gt;44&lt;/span&gt;.14
+
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               &lt;span class="m"&gt;5&lt;/span&gt;.04        &lt;span class="m"&gt;73&lt;/span&gt;.65        &lt;span class="m"&gt;59&lt;/span&gt;.42     &lt;span class="m"&gt;540254&lt;/span&gt;     &lt;span class="m"&gt;435868&lt;/span&gt;
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+          &lt;span class="m"&gt;26&lt;/span&gt;.81    &lt;span class="m"&gt;0&lt;/span&gt;.00   &lt;span class="m"&gt;73&lt;/span&gt;.19    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00    &lt;span class="m"&gt;0&lt;/span&gt;.00
+
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               &lt;span class="m"&gt;0&lt;/span&gt;.80         &lt;span class="m"&gt;0&lt;/span&gt;.00       &lt;span class="m"&gt;157&lt;/span&gt;.64          &lt;span class="m"&gt;0&lt;/span&gt;        &lt;span class="m"&gt;588&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Notice how &lt;code&gt;kB_wrtn/s&lt;/code&gt; spiked up. &lt;code&gt;kB_read&lt;/code&gt; is zero and I assume that's because of the &lt;a href="http://www.tldp.org/LDP/sag/html/buffer-cache.html"&gt;buffer cache&lt;/a&gt;. After all, I'm reading the same file again and again.&lt;/p&gt;
 &lt;p&gt;Another command that we can use is &lt;code&gt;iotop&lt;/code&gt;. &lt;code&gt;iotop&lt;/code&gt; is similar to &lt;code&gt;top&lt;/code&gt;, but shows I/O stats. We'll run it using &lt;code&gt;iotop -oa&lt;/code&gt;. The &lt;code&gt;-o&lt;/code&gt; parameter makes it show only processes that do I/O. The &lt;code&gt;-a&lt;/code&gt; flag aggregates the data during the time this command is running. So after running it for a few seconds I'm seeing this:&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;Total DISK READ :       0.00 B/s | Total DISK WRITE :      83.77 K/s
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Total DISK READ :       0.00 B/s | Total DISK WRITE :      83.77 K/s
 Actual DISK READ:       0.00 B/s | Actual DISK WRITE:       0.00 B/s
   TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO&amp;gt;    COMMAND                                                                                                                                                       
   545 be/3 root          0.00 B      4.00 K  0.00 %  0.08 % [jbd2/sda1-8]
@@ -929,6 +1088,9 @@ Actual DISK READ:       0.00 B/s | Actual DISK WRITE:       0.00 B/s
  7865 be/4 root          0.00 B      0.00 B  0.00 %  0.01 % [kworker/u2:1]
  7714 be/4 petko         0.00 B   1144.00 K  0.00 %  0.00 % ./disksort 150000
  7097 be/4 root          0.00 B      0.00 B  0.00 %  0.00 % [kworker/u2:2]
- 7758 be/4 root          0.00 B      0.00 B  0.00 %  0.00 % [kworker/u2:0]&lt;/code&gt;&lt;/p&gt;
+ 7758 be/4 root          0.00 B      0.00 B  0.00 %  0.00 % [kworker/u2:0]
+&lt;/pre&gt;&lt;/div&gt;
+
+
 &lt;p&gt;Notice how &lt;code&gt;disksort&lt;/code&gt; with pid of &lt;code&gt;7714&lt;/code&gt; is well ahead of everything else shown.&lt;/p&gt;
 &lt;p&gt;So that's it, happy debugging.&lt;/p&gt;</content></entry></feed>

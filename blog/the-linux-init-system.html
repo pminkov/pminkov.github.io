@@ -43,151 +43,180 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
       <p>I decided that I'll dig down into <a href="https://en.wikipedia.org/wiki/Init">init systems</a> in Linux and learn more about them. I'm running Ubuntu 16.04, so this might look different on other distributions.</p>
 <p>The init system in Linux is mainly responsible for starting essential service processes, mounting file systems and possibly other tasks. The main init systems are systemd, System V init and Upstart. Ubuntu uses systemd.</p>
 <p>The init system starts after the Kernel starts its first user space process - init. Indeed, let's see what's running with PID 1:</p>
-<p><code>bash
-$ ps 1
+<div class="highlight"><pre><span></span>$ ps <span class="m">1</span>
   PID TTY      STAT   TIME COMMAND
-    1 ?        Ss     0:04 /sbin/init splash</code></p>
+    <span class="m">1</span> ?        Ss     <span class="m">0</span>:04 /sbin/init splash
+</pre></div>
+
+
 <p>It's <code>/sbin/init</code>. Let's see what this file is:</p>
-<p><code>bash
-$ ls -l /sbin/init
-lrwxrwxrwx 1 root root 20 Sep 28 18:40 /sbin/init -&gt; /lib/systemd/systemd</code></p>
+<div class="highlight"><pre><span></span>$ ls -l /sbin/init
+lrwxrwxrwx <span class="m">1</span> root root <span class="m">20</span> Sep <span class="m">28</span> <span class="m">18</span>:40 /sbin/init -&gt; /lib/systemd/systemd
+</pre></div>
+
+
 <p>From this output, we can figure out that Ubuntu is using systemd. systemd is a fairly new project (initial release was 6 years ago), but it looks like its widely adopted now. systemd would take care of running various services like your ssh server, your web server and various other ones which are more "under the hood" oriented.</p>
 <p>systemd organizes itself with unit files which contain the description of various units and their dependencies. The units are organized in configuration files, which live in various directories. The main directories are:</p>
 <ul>
 <li>System unit directory: <code>/usr/lib/systemd/</code>. Your distribution maintains this, so don't edit it.</li>
 <li>System configuration directory: <code>/etc/systemd</code>. Make your local changes here.</li>
 </ul>
-<p>Well, these are not all directories that contain unit files. Here's the full set of paths that systemd uses:
-<code>bash
-$ systemctl -p UnitPath show
-UnitPath=/etc/systemd/system /run/systemd/system /run/systemd/generator /usr/local/lib/systemd/system /lib/systemd/system /usr/lib/systemd/system /run/systemd/generator.late</code></p>
+<p>Well, these are not all directories that contain unit files. Here's the full set of paths that systemd uses:</p>
+<div class="highlight"><pre><span></span>$ systemctl -p UnitPath show
+<span class="nv">UnitPath</span><span class="o">=</span>/etc/systemd/system /run/systemd/system /run/systemd/generator /usr/local/lib/systemd/system /lib/systemd/system /usr/lib/systemd/system /run/systemd/generator.late
+</pre></div>
+
+
 <p>I won't go into details about what the unit files contain, but instead look at two services that I was curious about - ssh and apache. Who runs them? When are they run? How can I verify that they are running?</p>
 <p>Let's start with ssh. The main command to interface with systemd is <code>systemctl</code>. We can use it to list all services that are running, by calling <code>systemctl list-units</code>. Let's look for ssh in here:</p>
-<p><code>bash
-$ systemctl list-units | grep ssh
-ssh.service                                                                              loaded active running   OpenBSD Secure Shell server</code></p>
+<div class="highlight"><pre><span></span>$ systemctl list-units <span class="p">|</span> grep ssh
+ssh.service                                                                              loaded active running   OpenBSD Secure Shell server
+</pre></div>
+
+
 <p>Indeed, we have ssh running. Now, let's look at its status and its config file.</p>
-<p>```bash
-$ systemctl status ssh
+<div class="highlight"><pre><span></span>$ systemctl status ssh
 ● ssh.service - OpenBSD Secure Shell server
-   Loaded: loaded (/lib/systemd/system/ssh.service; enabled; vendor preset: enabled)
-   Active: active (running) since Thu 2017-02-09 19:27:57 PST; 4 days ago
- Main PID: 786 (sshd)
-    Tasks: 1
-   Memory: 6.4M
+   Loaded: loaded <span class="o">(</span>/lib/systemd/system/ssh.service<span class="p">;</span> enabled<span class="p">;</span> vendor preset: enabled<span class="o">)</span>
+   Active: active <span class="o">(</span>running<span class="o">)</span> since Thu <span class="m">2017</span>-02-09 <span class="m">19</span>:27:57 PST<span class="p">;</span> <span class="m">4</span> days ago
+ Main PID: <span class="m">786</span> <span class="o">(</span>sshd<span class="o">)</span>
+    Tasks: <span class="m">1</span>
+   Memory: <span class="m">6</span>.4M
       CPU: 199ms
    CGroup: /system.slice/ssh.service
-           └─786 /usr/sbin/sshd -D</p>
-<p>Feb 12 18:23:50 virtbox sshd[5791]: Accepted password for petko from 192.168.1.86 port 57805 ssh2
-Feb 12 18:23:50 virtbox sshd[5791]: pam_unix(sshd:session): session opened for user petko by (uid=0)
+           └─786 /usr/sbin/sshd -D
+
+Feb <span class="m">12</span> <span class="m">18</span>:23:50 virtbox sshd<span class="o">[</span><span class="m">5791</span><span class="o">]</span>: Accepted password <span class="k">for</span> petko from <span class="m">192</span>.168.1.86 port <span class="m">57805</span> ssh2
+Feb <span class="m">12</span> <span class="m">18</span>:23:50 virtbox sshd<span class="o">[</span><span class="m">5791</span><span class="o">]</span>: pam_unix<span class="o">(</span>sshd:session<span class="o">)</span>: session opened <span class="k">for</span> user petko by <span class="o">(</span><span class="nv">uid</span><span class="o">=</span><span class="m">0</span><span class="o">)</span>
 ...
-```</p>
+</pre></div>
+
+
 <p>So here it is. The ssh service is running as process 786. We can see that this process is listening on port 22:</p>
-<p><code>bash
-$ sudo netstat -tulpn | grep 786
-tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      786/sshd        
-tcp6       0      0 :::22                   :::*                    LISTEN      786/sshd</code></p>
+<div class="highlight"><pre><span></span>$ sudo netstat -tulpn <span class="p">|</span> grep <span class="m">786</span>
+tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">0</span>.0.0.0:22              <span class="m">0</span>.0.0.0:*               LISTEN      <span class="m">786</span>/sshd        
+tcp6       <span class="m">0</span>      <span class="m">0</span> :::22                   :::*                    LISTEN      <span class="m">786</span>/sshd 
+</pre></div>
+
+
 <p>Indeed, it is. <code>systemctl</code> has another useful command that allows us to print the configuration file for a unit. It works like this:</p>
-<p>```bash
-$ systemctl cat ssh</p>
-<h1 id="libsystemdsystemsshservice">/lib/systemd/system/ssh.service</h1>
-<p>[Unit]
-Description=OpenBSD Secure Shell server
-After=network.target auditd.service
-ConditionPathExists=!/etc/ssh/sshd_not_to_be_run</p>
-<p>[Service]
-EnvironmentFile=-/etc/default/ssh
-ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
-ExecReload=/bin/kill -HUP $MAINPID
-KillMode=process
-Restart=on-failure
-RestartPreventExitStatus=255
-Type=notify</p>
-<p>[Install]
-WantedBy=multi-user.target
-Alias=sshd.service
-```</p>
+<div class="highlight"><pre><span></span>$ systemctl cat ssh
+<span class="c1"># /lib/systemd/system/ssh.service</span>
+<span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Description</span><span class="o">=</span>OpenBSD Secure Shell server
+<span class="nv">After</span><span class="o">=</span>network.target auditd.service
+<span class="nv">ConditionPathExists</span><span class="o">=</span>!/etc/ssh/sshd_not_to_be_run
+
+<span class="o">[</span>Service<span class="o">]</span>
+<span class="nv">EnvironmentFile</span><span class="o">=</span>-/etc/default/ssh
+<span class="nv">ExecStart</span><span class="o">=</span>/usr/sbin/sshd -D <span class="nv">$SSHD_OPTS</span>
+<span class="nv">ExecReload</span><span class="o">=</span>/bin/kill -HUP <span class="nv">$MAINPID</span>
+<span class="nv">KillMode</span><span class="o">=</span>process
+<span class="nv">Restart</span><span class="o">=</span>on-failure
+<span class="nv">RestartPreventExitStatus</span><span class="o">=</span><span class="m">255</span>
+<span class="nv">Type</span><span class="o">=</span>notify
+
+<span class="o">[</span>Install<span class="o">]</span>
+<span class="nv">WantedBy</span><span class="o">=</span>multi-user.target
+<span class="nv">Alias</span><span class="o">=</span>sshd.service
+</pre></div>
+
+
 <p>So here you can see where is the configuration file located.</p>
 <p>Alright, enough ssh. Let's move on to apache. First, a little history though. Before systemd, apparently the main init system in Linux was System V. System V is different than systemd, because it executes services in sequential order, while systemd can be parallel. System V also can't start services on "as-needed" basis. So I guess that's why systemd was implemented. systemd has its config files in <code>/etc/init.d</code>. That's where Apache installs its command files as well - it doesn't create systemd unit files. However, systemd knows how to execute the System V init files. I won't go into details of how System V init works, but basically it executes commands on different runlevels and at each runlevel they are executed in sequential order.</p>
 <p>Let's see how apache looks like in systemd:</p>
-<p><code>bash
-$ systemctl list-units | grep apache
-apache2.service                                                                          loaded active running   LSB: Apache2 web server</code></p>
+<div class="highlight"><pre><span></span>$ systemctl list-units <span class="p">|</span> grep apache
+apache2.service                                                                          loaded active running   LSB: Apache2 web server
+</pre></div>
+
+
 <p>It's running. Now let's get its status:</p>
-<p>```bash
-$ systemctl status apache2
+<div class="highlight"><pre><span></span>$ systemctl status apache2
 ● apache2.service - LSB: Apache2 web server
-   Loaded: loaded (/etc/init.d/apache2; bad; vendor preset: enabled)
+   Loaded: loaded <span class="o">(</span>/etc/init.d/apache2<span class="p">;</span> bad<span class="p">;</span> vendor preset: enabled<span class="o">)</span>
   Drop-In: /lib/systemd/system/apache2.service.d
            └─apache2-systemd.conf
-   Active: active (running) since Mon 2017-02-13 12:49:55 PST; 8h ago
-     Docs: man:systemd-sysv-generator(8)
-    Tasks: 55
-   Memory: 6.5M
-      CPU: 17.042s
+   Active: active <span class="o">(</span>running<span class="o">)</span> since Mon <span class="m">2017</span>-02-13 <span class="m">12</span>:49:55 PST<span class="p">;</span> 8h ago
+     Docs: man:systemd-sysv-generator<span class="o">(</span><span class="m">8</span><span class="o">)</span>
+    Tasks: <span class="m">55</span>
+   Memory: <span class="m">6</span>.5M
+      CPU: <span class="m">17</span>.042s
    CGroup: /system.slice/apache2.service
            ├─9097 /usr/sbin/apache2 -k start
            ├─9100 /usr/sbin/apache2 -k start
-           └─9101 /usr/sbin/apache2 -k start</p>
-<p>Feb 13 12:49:54 virtbox systemd[1]: Starting LSB: Apache2 web server...
-Feb 13 12:49:54 virtbox apache2[9071]:  * Starting Apache httpd web server apache2
-Feb 13 12:49:54 virtbox apache2[9071]: AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1. Set the 'ServerName' directive globall
-Feb 13 12:49:55 virtbox apache2[9071]:  *
-Feb 13 12:49:55 virtbox systemd[1]: Started LSB: Apache2 web server.
-```</p>
+           └─9101 /usr/sbin/apache2 -k start
+
+Feb <span class="m">13</span> <span class="m">12</span>:49:54 virtbox systemd<span class="o">[</span><span class="m">1</span><span class="o">]</span>: Starting LSB: Apache2 web server...
+Feb <span class="m">13</span> <span class="m">12</span>:49:54 virtbox apache2<span class="o">[</span><span class="m">9071</span><span class="o">]</span>:  * Starting Apache httpd web server apache2
+Feb <span class="m">13</span> <span class="m">12</span>:49:54 virtbox apache2<span class="o">[</span><span class="m">9071</span><span class="o">]</span>: AH00558: apache2: Could not reliably determine the server<span class="s1">&#39;s fully qualified domain name, using 127.0.1.1. Set the &#39;</span>ServerName<span class="err">&#39;</span> directive globall
+Feb <span class="m">13</span> <span class="m">12</span>:49:55 virtbox apache2<span class="o">[</span><span class="m">9071</span><span class="o">]</span>:  *
+Feb <span class="m">13</span> <span class="m">12</span>:49:55 virtbox systemd<span class="o">[</span><span class="m">1</span><span class="o">]</span>: Started LSB: Apache2 web server.
+</pre></div>
+
+
 <p>Look at something interesting here. The file responsible for starting apache is listed as <code>/etc/init.d/apache2</code>. That's the file indeed. It's adapted into systemd by using the <code>systemd-sysv-generator</code>. So that is systemd running. We can run a cat to see that:</p>
-<p>```bash
-$ systemctl cat apache2</p>
-<h1 id="runsystemdgeneratorlateapache2service">/run/systemd/generator.late/apache2.service</h1>
-<h1 id="automatically-generated-by-systemd-sysv-generator">Automatically generated by systemd-sysv-generator</h1>
-<p>[Unit]
-Documentation=man:systemd-sysv-generator(8)
-SourcePath=/etc/init.d/apache2
-Description=LSB: Apache2 web server
-Before=multi-user.target
-Before=multi-user.target
-Before=multi-user.target
-Before=graphical.target
-Before=shutdown.target
-After=local-fs.target
-After=remote-fs.target
-After=network-online.target
-After=systemd-journald-dev-log.socket
-After=nss-lookup.target
-Wants=network-online.target
-Conflicts=shutdown.target</p>
-<p>[Service]
-Type=forking
-Restart=no
-TimeoutSec=5min
-IgnoreSIGPIPE=no
-KillMode=process
-GuessMainPID=no
-RemainAfterExit=yes
-ExecStart=/etc/init.d/apache2 start
-ExecStop=/etc/init.d/apache2 stop
-ExecReload=/etc/init.d/apache2 reload</p>
-<h1 id="libsystemdsystemapache2servicedapache2-systemdconf">/lib/systemd/system/apache2.service.d/apache2-systemd.conf</h1>
-<p>[Service]
-Type=forking
-RemainAfterExit=no
-```</p>
+<div class="highlight"><pre><span></span>$ systemctl cat apache2
+<span class="c1"># /run/systemd/generator.late/apache2.service</span>
+<span class="c1"># Automatically generated by systemd-sysv-generator</span>
+
+<span class="o">[</span>Unit<span class="o">]</span>
+<span class="nv">Documentation</span><span class="o">=</span>man:systemd-sysv-generator<span class="o">(</span><span class="m">8</span><span class="o">)</span>
+<span class="nv">SourcePath</span><span class="o">=</span>/etc/init.d/apache2
+<span class="nv">Description</span><span class="o">=</span>LSB: Apache2 web server
+<span class="nv">Before</span><span class="o">=</span>multi-user.target
+<span class="nv">Before</span><span class="o">=</span>multi-user.target
+<span class="nv">Before</span><span class="o">=</span>multi-user.target
+<span class="nv">Before</span><span class="o">=</span>graphical.target
+<span class="nv">Before</span><span class="o">=</span>shutdown.target
+<span class="nv">After</span><span class="o">=</span>local-fs.target
+<span class="nv">After</span><span class="o">=</span>remote-fs.target
+<span class="nv">After</span><span class="o">=</span>network-online.target
+<span class="nv">After</span><span class="o">=</span>systemd-journald-dev-log.socket
+<span class="nv">After</span><span class="o">=</span>nss-lookup.target
+<span class="nv">Wants</span><span class="o">=</span>network-online.target
+<span class="nv">Conflicts</span><span class="o">=</span>shutdown.target
+
+<span class="o">[</span>Service<span class="o">]</span>
+<span class="nv">Type</span><span class="o">=</span>forking
+<span class="nv">Restart</span><span class="o">=</span>no
+<span class="nv">TimeoutSec</span><span class="o">=</span>5min
+<span class="nv">IgnoreSIGPIPE</span><span class="o">=</span>no
+<span class="nv">KillMode</span><span class="o">=</span>process
+<span class="nv">GuessMainPID</span><span class="o">=</span>no
+<span class="nv">RemainAfterExit</span><span class="o">=</span>yes
+<span class="nv">ExecStart</span><span class="o">=</span>/etc/init.d/apache2 start
+<span class="nv">ExecStop</span><span class="o">=</span>/etc/init.d/apache2 stop
+<span class="nv">ExecReload</span><span class="o">=</span>/etc/init.d/apache2 reload
+
+<span class="c1"># /lib/systemd/system/apache2.service.d/apache2-systemd.conf</span>
+<span class="o">[</span>Service<span class="o">]</span>
+<span class="nv">Type</span><span class="o">=</span>forking
+<span class="nv">RemainAfterExit</span><span class="o">=</span>no
+</pre></div>
+
+
 <p>This is the file that systemd created in order to integrate the System V init command into its system.</p>
 <p>What are some other interesting systemctl commands? Let's list them:</p>
-<p>```bash</p>
-<h1 id="start-stop-restart-a-service">Start / stop /restart a service.</h1>
-<p>$ sudo systemctl restart apache2</p>
-<h1 id="list-all-services">List all services:</h1>
-<p>$ systemctl list-units --type=service</p>
-<h1 id="list-dependencies">List dependencies:</h1>
-<p>$ systemctl list-dependencies sshd.service</p>
-<h1 id="see-low-level-properties-of-a-unit">See low level properties of a unit:</h1>
-<p>$ systemctl show sshd.service
-```</p>
-<p>And one last cool command:
-<code>bash
-$ systemd-analyze
-Startup finished in 3.989s (kernel) + 7.673s (userspace) = 11.663s</code></p>
+<div class="highlight"><pre><span></span><span class="c1"># Start / stop /restart a service.</span>
+$ sudo systemctl restart apache2
+
+<span class="c1"># List all services:</span>
+$ systemctl list-units --type<span class="o">=</span>service
+
+<span class="c1"># List dependencies:</span>
+$ systemctl list-dependencies sshd.service
+
+<span class="c1"># See low level properties of a unit:</span>
+$ systemctl show sshd.service
+</pre></div>
+
+
+<p>And one last cool command:</p>
+<div class="highlight"><pre><span></span>$ systemd-analyze
+Startup finished in <span class="m">3</span>.989s <span class="o">(</span>kernel<span class="o">)</span> + <span class="m">7</span>.673s <span class="o">(</span>userspace<span class="o">)</span> <span class="o">=</span> <span class="m">11</span>.663s
+</pre></div>
+
+
 <p>This command prints the time it took to startup our system.</p>
 <p>So that's all for today. There's definitely more to explore in systemd land - the syntax of unit files, how systemd executes them and so on. I'll leave that for some other time.</p>
     </div><!-- /.entry-content -->
