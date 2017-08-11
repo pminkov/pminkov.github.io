@@ -45,7 +45,12 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 <li><a href="#the-key-pair">The key pair</a></li>
 <li><a href="#how-does-ssh-work">How does SSH work?</a></li>
 <li><a href="#the-ssh-command">The ssh command</a></li>
-<li><a href="#the-ssh-agent-daemon">The ssh-agent daemon</a></li>
+<li><a href="#the-ssh-agent-daemon">The ssh-agent daemon</a><ul>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#starting-ssh-agent">Starting ssh-agent</a></li>
+<li><a href="#ssh-agent-forwarding">ssh-agent forwarding</a></li>
+</ul>
+</li>
 <li><a href="#tips-and-tricks">Tips and tricks</a><ul>
 <li><a href="#manually-verifying-a-private-key">Manually verifying a private key</a></li>
 </ul>
@@ -130,7 +135,8 @@ ubuntu@ip-172-31-13-46:~$
 <p>Hooray, I'm in! What happened in the meantime is that the ssh command saved an entry into the <code>known_hosts</code> file, so next time I ssh it won't ask me again to confirm the authenticity of the remote host.</p>
 <p>However, I'll still need to point to the private key and enter the passphrase for it. Very inconvenient.</p>
 <h2 id="the-ssh-agent-daemon">The ssh-agent daemon</h2>
-<p>The solution to the above problem is the <code>ssh-agent</code> daemon. <code>ssh-agent</code> is a program that you start when you first login and you can add private keys to it so that next time you ssh into a server, you don't have to point to them.</p>
+<p>The solution to the above problem is the <code>ssh-agent</code> daemon. <code>ssh-agent</code> is a daemon that you start and you can add private keys to it so that next time you ssh into a server, you don't have to point to them.</p>
+<h3 id="usage">Usage</h3>
 <p>How does ssh-agent know which private key to use? When you run <code>ssh -v ubuntu@35.165.19.203</code> you can see that there's a bit of back and forth where <code>ssh</code> seems to be trying out private keys from <code>ssh-agent</code>. So I guess that's how it's done:</p>
 <div class="highlight"><pre><span></span>debug1: Offering RSA public key: /home/petko/.ssh/id_rsa
 debug1: Authentications that can <span class="k">continue</span>: publickey
@@ -162,7 +168,41 @@ ubuntu@ip-172-31-13-46:~$
 </pre></div>
 
 
-<p>Great.</p>
+<h3 id="starting-ssh-agent">Starting ssh-agent</h3>
+<p>You don't want to start ssh-agent manually. I'll describe my setup for automatically staring it in Ubuntu. In my <code>~/.bash_profile</code> I have the following:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Start ssh-agent.</span>
+<span class="k">if</span> <span class="o">[</span> ! -S ~/.ssh/ssh_auth_sock <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+  <span class="nb">echo</span> <span class="s2">&quot;Starting ssh-agent&quot;</span>
+  <span class="nb">eval</span> <span class="sb">`</span>ssh-agent<span class="sb">`</span>
+  ln -sf <span class="s2">&quot;</span><span class="nv">$SSH_AUTH_SOCK</span><span class="s2">&quot;</span> ~/.ssh/ssh_auth_sock
+<span class="k">fi</span>
+<span class="nb">export</span> <span class="nv">SSH_AUTH_SOCK</span><span class="o">=</span>~/.ssh/ssh_auth_sock
+ssh-add -l <span class="p">|</span> grep <span class="s2">&quot;The agent has no identities&quot;</span> <span class="o">&amp;&amp;</span> ssh-add
+</pre></div>
+
+
+<p>Remember that <code>.bash_profile</code> is executed for interactive login shells. An interactive login shell is what's run when you ssh into a machine. One interesting thing about Ubuntu is that if you open a shell from within Gnome, it's an interactive shell, but it's not a login shell. Gnome also runs a separate ssh-agent, which you can find out when you see the contents of the <code>SSH_AUTH_SOCK</code> environment variable. But I don't use shells from within Gnome, so that's not important to me. If I had a desktop Ubuntu, I'd care about that situation more.</p>
+<p>Here's an <a href="http://www.snailbook.com/faq/about-agent.auto.html">article</a> that's a good description of the mechanics of starting an ssh-agent.</p>
+<h3 id="ssh-agent-forwarding">ssh-agent forwarding</h3>
+<p>So you've setup SSH on your local machine, but you want to SSH to your cloud server and pull some git repo. Or you want to SSH from the cloud server to another server, or maybe copy some files with <code>scp</code>. You can generate a key pair for the cloud server and distribute the public key to all machines and services that you want that cloud server to have access to. But that's not convenient. This is where SSH agent forwarding is needed. With SSH agent forwarding, you ssh into a machine and it takes the private keys loaded in your ssh-agent with you to the other machine.</p>
+<p>GitHub has a <a href="https://developer.github.com/v3/guides/using-ssh-agent-forwarding/">great article</a> on how to setup that. One thing that I'd add to it is that you don't have to start ssh-agent on the target machine! It's automatically started when you ssh to it.</p>
+<p>In my particular setup, I'm ssh-ing to a machine that has just an IP address, so I added an entry for it in <code>/etc/hosts</code>:</p>
+<div class="highlight"><pre><span></span>$ cat /etc/hosts
+<span class="m">127</span>.0.0.1       localhost
+<span class="m">52</span>.39.10.196    webhost
+...
+</pre></div>
+
+
+<p>My <code>~/.ssh/config</code> file looks like this:</p>
+<div class="highlight"><pre><span></span>$ cat ./config 
+Host webhost
+  ForwardAgent yes
+  User ubuntu
+</pre></div>
+
+
+<p>So now to ssh to this machine, I only type <code>ssh webhost</code>. Once I ssh there I can run <code>ssh-add -l</code> and see that my keys are available on the remote machine.</p>
 <h2 id="tips-and-tricks">Tips and tricks</h2>
 <h3 id="manually-verifying-a-private-key">Manually verifying a private key</h3>
 <p>Today I was trying again and again to connect to a remote machine using the wrong private key. I was able to connect to that machine from my laptop, but not from my Ubuntu VM.</p>
@@ -180,7 +220,7 @@ ssh-rsa AAAAB3....KY1
 
 <p>And sure enough, the public keys were not matching. I then found the correct private key and was able to connect with it.</p>
 <p>If you're following carefully, you'll notice that I did something here that's considered a bad practice. I reused my private key from my laptop on my VirtualBox. I should generate a new key pair and add the public key to the <code>authorized_keys</code> file on the server.</p>
-<p>So that's it so far. One thing that I didn't cover is how to start the ssh agent automatically. I have some commands in my <code>bash_profile</code> to do that that I digged from Stack Overflow. Here's a <a href="http://www.snailbook.com/faq/about-agent.auto.html">great description</a> that can aid in starting <code>ssh-agent</code>.</p>
+<p>So that's it so far. Enjoy your remote access.</p>
     </div><!-- /.entry-content -->
     <div class="comments">
       <div id="disqus_thread"></div>

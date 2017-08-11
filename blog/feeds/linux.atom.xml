@@ -4,7 +4,12 @@
 &lt;li&gt;&lt;a href="#the-key-pair"&gt;The key pair&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#how-does-ssh-work"&gt;How does SSH work?&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#the-ssh-command"&gt;The ssh command&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="#the-ssh-agent-daemon"&gt;The ssh-agent daemon&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#the-ssh-agent-daemon"&gt;The ssh-agent daemon&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="#usage"&gt;Usage&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#starting-ssh-agent"&gt;Starting ssh-agent&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#ssh-agent-forwarding"&gt;ssh-agent forwarding&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
 &lt;li&gt;&lt;a href="#tips-and-tricks"&gt;Tips and tricks&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#manually-verifying-a-private-key"&gt;Manually verifying a private key&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -12,12 +17,17 @@
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;h2 id="what-is-ssh-for"&gt;What is SSH for?&lt;/h2&gt;
-&lt;p&gt;SSH is used to communicate securely between a client and a server. Some examples that most people are …&lt;/p&gt;</summary><content type="html">&lt;div class="toc"&gt;&lt;span class="toctitle"&gt;Table of contents:&lt;/span&gt;&lt;ul&gt;
+&lt;p&gt;SSH is used to communicate securely between a client and a server. Some …&lt;/p&gt;</summary><content type="html">&lt;div class="toc"&gt;&lt;span class="toctitle"&gt;Table of contents:&lt;/span&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#what-is-ssh-for"&gt;What is SSH for?&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#the-key-pair"&gt;The key pair&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#how-does-ssh-work"&gt;How does SSH work?&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#the-ssh-command"&gt;The ssh command&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="#the-ssh-agent-daemon"&gt;The ssh-agent daemon&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#the-ssh-agent-daemon"&gt;The ssh-agent daemon&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="#usage"&gt;Usage&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#starting-ssh-agent"&gt;Starting ssh-agent&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#ssh-agent-forwarding"&gt;ssh-agent forwarding&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
 &lt;li&gt;&lt;a href="#tips-and-tricks"&gt;Tips and tricks&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#manually-verifying-a-private-key"&gt;Manually verifying a private key&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -102,7 +112,8 @@ ubuntu@ip-172-31-13-46:~$
 &lt;p&gt;Hooray, I'm in! What happened in the meantime is that the ssh command saved an entry into the &lt;code&gt;known_hosts&lt;/code&gt; file, so next time I ssh it won't ask me again to confirm the authenticity of the remote host.&lt;/p&gt;
 &lt;p&gt;However, I'll still need to point to the private key and enter the passphrase for it. Very inconvenient.&lt;/p&gt;
 &lt;h2 id="the-ssh-agent-daemon"&gt;The ssh-agent daemon&lt;/h2&gt;
-&lt;p&gt;The solution to the above problem is the &lt;code&gt;ssh-agent&lt;/code&gt; daemon. &lt;code&gt;ssh-agent&lt;/code&gt; is a program that you start when you first login and you can add private keys to it so that next time you ssh into a server, you don't have to point to them.&lt;/p&gt;
+&lt;p&gt;The solution to the above problem is the &lt;code&gt;ssh-agent&lt;/code&gt; daemon. &lt;code&gt;ssh-agent&lt;/code&gt; is a daemon that you start and you can add private keys to it so that next time you ssh into a server, you don't have to point to them.&lt;/p&gt;
+&lt;h3 id="usage"&gt;Usage&lt;/h3&gt;
 &lt;p&gt;How does ssh-agent know which private key to use? When you run &lt;code&gt;ssh -v ubuntu@35.165.19.203&lt;/code&gt; you can see that there's a bit of back and forth where &lt;code&gt;ssh&lt;/code&gt; seems to be trying out private keys from &lt;code&gt;ssh-agent&lt;/code&gt;. So I guess that's how it's done:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;debug1: Offering RSA public key: /home/petko/.ssh/id_rsa
 debug1: Authentications that can &lt;span class="k"&gt;continue&lt;/span&gt;: publickey
@@ -134,7 +145,41 @@ ubuntu@ip-172-31-13-46:~$
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Great.&lt;/p&gt;
+&lt;h3 id="starting-ssh-agent"&gt;Starting ssh-agent&lt;/h3&gt;
+&lt;p&gt;You don't want to start ssh-agent manually. I'll describe my setup for automatically staring it in Ubuntu. In my &lt;code&gt;~/.bash_profile&lt;/code&gt; I have the following:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Start ssh-agent.&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; ! -S ~/.ssh/ssh_auth_sock &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
+  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Starting ssh-agent&amp;quot;&lt;/span&gt;
+  &lt;span class="nb"&gt;eval&lt;/span&gt; &lt;span class="sb"&gt;`&lt;/span&gt;ssh-agent&lt;span class="sb"&gt;`&lt;/span&gt;
+  ln -sf &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$SSH_AUTH_SOCK&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; ~/.ssh/ssh_auth_sock
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;SSH_AUTH_SOCK&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;~/.ssh/ssh_auth_sock
+ssh-add -l &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="s2"&gt;&amp;quot;The agent has no identities&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; ssh-add
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Remember that &lt;code&gt;.bash_profile&lt;/code&gt; is executed for interactive login shells. An interactive login shell is what's run when you ssh into a machine. One interesting thing about Ubuntu is that if you open a shell from within Gnome, it's an interactive shell, but it's not a login shell. Gnome also runs a separate ssh-agent, which you can find out when you see the contents of the &lt;code&gt;SSH_AUTH_SOCK&lt;/code&gt; environment variable. But I don't use shells from within Gnome, so that's not important to me. If I had a desktop Ubuntu, I'd care about that situation more.&lt;/p&gt;
+&lt;p&gt;Here's an &lt;a href="http://www.snailbook.com/faq/about-agent.auto.html"&gt;article&lt;/a&gt; that's a good description of the mechanics of starting an ssh-agent.&lt;/p&gt;
+&lt;h3 id="ssh-agent-forwarding"&gt;ssh-agent forwarding&lt;/h3&gt;
+&lt;p&gt;So you've setup SSH on your local machine, but you want to SSH to your cloud server and pull some git repo. Or you want to SSH from the cloud server to another server, or maybe copy some files with &lt;code&gt;scp&lt;/code&gt;. You can generate a key pair for the cloud server and distribute the public key to all machines and services that you want that cloud server to have access to. But that's not convenient. This is where SSH agent forwarding is needed. With SSH agent forwarding, you ssh into a machine and it takes the private keys loaded in your ssh-agent with you to the other machine.&lt;/p&gt;
+&lt;p&gt;GitHub has a &lt;a href="https://developer.github.com/v3/guides/using-ssh-agent-forwarding/"&gt;great article&lt;/a&gt; on how to setup that. One thing that I'd add to it is that you don't have to start ssh-agent on the target machine! It's automatically started when you ssh to it.&lt;/p&gt;
+&lt;p&gt;In my particular setup, I'm ssh-ing to a machine that has just an IP address, so I added an entry for it in &lt;code&gt;/etc/hosts&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat /etc/hosts
+&lt;span class="m"&gt;127&lt;/span&gt;.0.0.1       localhost
+&lt;span class="m"&gt;52&lt;/span&gt;.39.10.196    webhost
+...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;My &lt;code&gt;~/.ssh/config&lt;/code&gt; file looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat ./config 
+Host webhost
+  ForwardAgent yes
+  User ubuntu
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;So now to ssh to this machine, I only type &lt;code&gt;ssh webhost&lt;/code&gt;. Once I ssh there I can run &lt;code&gt;ssh-add -l&lt;/code&gt; and see that my keys are available on the remote machine.&lt;/p&gt;
 &lt;h2 id="tips-and-tricks"&gt;Tips and tricks&lt;/h2&gt;
 &lt;h3 id="manually-verifying-a-private-key"&gt;Manually verifying a private key&lt;/h3&gt;
 &lt;p&gt;Today I was trying again and again to connect to a remote machine using the wrong private key. I was able to connect to that machine from my laptop, but not from my Ubuntu VM.&lt;/p&gt;
@@ -152,7 +197,7 @@ ssh-rsa AAAAB3....KY1
 
 &lt;p&gt;And sure enough, the public keys were not matching. I then found the correct private key and was able to connect with it.&lt;/p&gt;
 &lt;p&gt;If you're following carefully, you'll notice that I did something here that's considered a bad practice. I reused my private key from my laptop on my VirtualBox. I should generate a new key pair and add the public key to the &lt;code&gt;authorized_keys&lt;/code&gt; file on the server.&lt;/p&gt;
-&lt;p&gt;So that's it so far. One thing that I didn't cover is how to start the ssh agent automatically. I have some commands in my &lt;code&gt;bash_profile&lt;/code&gt; to do that that I digged from Stack Overflow. Here's a &lt;a href="http://www.snailbook.com/faq/about-agent.auto.html"&gt;great description&lt;/a&gt; that can aid in starting &lt;code&gt;ssh-agent&lt;/code&gt;.&lt;/p&gt;</content></entry><entry><title>Socket Programming in Linux</title><link href="http://pminkov.github.io/blog/socket-programming-in-linux.html" rel="alternate"></link><published>2017-08-02T12:10:00-07:00</published><updated>2017-08-02T12:10:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-08-02:/blog/socket-programming-in-linux.html</id><summary type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's now time to write a bit about how all of this works.&lt;/p&gt;
+&lt;p&gt;So that's it so far. Enjoy your remote access.&lt;/p&gt;</content></entry><entry><title>Socket Programming in Linux</title><link href="http://pminkov.github.io/blog/socket-programming-in-linux.html" rel="alternate"></link><published>2017-08-02T12:10:00-07:00</published><updated>2017-08-02T12:10:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-08-02:/blog/socket-programming-in-linux.html</id><summary type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Some time last year I wanted to learn more about network programming and multi threading and wrote a &lt;a href="https://github.com/pminkov/webserver/"&gt;webserver&lt;/a&gt; in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote &lt;a href="https://github.com/pminkov/webserver/blob/master/client.c"&gt;a client&lt;/a&gt; too. It's now time to write a bit about how all of this works.&lt;/p&gt;
 &lt;p&gt;Programming sockets in Linux is similar to all system programming in C. It's easy to make errors, so you have to be careful. It's difficult to comprehend the complexity and intricacy if you're just copying and pasting code from Stack Overflow. &lt;a href="http://man7.org/tlpi/"&gt;The Linux Programming Interface&lt;/a&gt; is a book that has several chapters dedicated to socket programming and it describes it very well, as well as throwing in a lot of information about how networks work and an excellent concise description of the TCP protocol. I highly recommend that book and I might write more about it in the future.&lt;/p&gt;
 &lt;p&gt;So let's talk a bit about how to write a webserver and a client for it in C.&lt;/p&gt;
 &lt;p&gt;Let's start with the server. The full code is in &lt;a href="https://github.com/pminkov/webserver/blob/master/server.c"&gt;server.c&lt;/a&gt;, but I'll summarize the imporatnt points:&lt;/p&gt;
