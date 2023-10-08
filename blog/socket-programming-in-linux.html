@@ -3,8 +3,8 @@
 <head>
         <meta charset="utf-8" />
         <title>Socket Programming in Linux</title>
-        <link rel="stylesheet" href="http://pminkov.github.io/blog/theme/css/main.css" />
-        <link href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+        <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
 
         <!--[if IE]>
             <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -13,21 +13,21 @@
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="http://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <h1><a href="https://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
                 <nav><ul>
-                    <li><a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
-                    <li><a href="http://pminkov.github.io/blog/category/django.html">Django</a></li>
-                    <li class="active"><a href="http://pminkov.github.io/blog/category/linux.html">Linux</a></li>
-                    <li><a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
-                    <li><a href="http://pminkov.github.io/blog/category/misc.html">Misc</a></li>
-                    <li><a href="http://pminkov.github.io/blog/category/python.html">Python</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li class="active"><a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 <section id="content" class="body">
   <article>
     <header>
       <h1 class="entry-title">
-        <a href="http://pminkov.github.io/blog/socket-programming-in-linux.html" rel="bookmark"
+        <a href="https://pminkov.github.io/blog/socket-programming-in-linux.html" rel="bookmark"
            title="Permalink to Socket Programming in Linux">Socket Programming in Linux</a></h1>
     </header>
 
@@ -35,7 +35,7 @@
 <div class="post-info">
         <div class="published" title="2017-08-02T12:10:00-07:00">
                 Published: Wed 02 August 2017
-in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
+in <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
         </div>
 
 </div><!-- /.post-info -->    </div>
@@ -110,7 +110,7 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 <p>If the connection is successful, you can just send your request to the server using the <code>write()</code> system call and read the response with the <code>read()</code> call.</p>
 <p>So that's a simple web server and a client. The code still has a lot of bugs (the client will buffer overflow if I pass a request string longer than 512 chars, I'm not closing the connection explicitly, etc.), but it gets the job done.</p>
 <p>A final interesting thing to do is to run Wireshark and see what packets are going between the client and the server. To do this, I started the server on my Virtual box Ubuntu (192.168.1.135) and ran <code>curl</code> from my MacBook (192.168.1.86). Here's what I saw in Wireshark:</p>
-<p><center><img alt="Wireshark" src="http://pminkov.github.io/blog/images/wireshark.png"></center></p>
+<p><center><img alt="Wireshark" src="https://pminkov.github.io/blog/images/wireshark.png"></center></p>
 <p>You can see the three way TCP handshake in the beginning (<code>SYN</code> followed by <code>SYN,ACK</code> followed by <code>ACK</code>) and everything else in between. It's definitely something interesting to try out.</p>
     </div><!-- /.entry-content -->
     <div class="comments">
@@ -118,7 +118,7 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
       <script type="text/javascript">
         var disqus_shortname = 'pminkov-blog';
         var disqus_identifier = 'socket-programming-in-linux.html';
-        var disqus_url = 'http://pminkov.github.io/blog/socket-programming-in-linux.html';
+        var disqus_url = 'https://pminkov.github.io/blog/socket-programming-in-linux.html';
         (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
         dsq.src = '//pminkov-blog.disqus.com/embed.js';
@@ -134,7 +134,7 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
                 <div class="social">
                         <h2>social</h2>
                         <ul>
-                            <li><a href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+                            <li><a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
 
                         </ul>
                 </div><!-- /.social -->

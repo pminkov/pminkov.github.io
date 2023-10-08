@@ -3,8 +3,8 @@
 <head>
         <meta charset="utf-8" />
         <title>Starting with Kubernetes on Google Container Engine</title>
-        <link rel="stylesheet" href="http://pminkov.github.io/blog/theme/css/main.css" />
-        <link href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+        <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
 
         <!--[if IE]>
             <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -13,21 +13,21 @@
 
 <body id="index" class="home">
         <header id="banner" class="body">
-                <h1><a href="http://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <h1><a href="https://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
                 <nav><ul>
-                    <li class="active"><a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
-                    <li><a href="http://pminkov.github.io/blog/category/django.html">Django</a></li>
-                    <li><a href="http://pminkov.github.io/blog/category/linux.html">Linux</a></li>
-                    <li><a href="http://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
-                    <li><a href="http://pminkov.github.io/blog/category/misc.html">Misc</a></li>
-                    <li><a href="http://pminkov.github.io/blog/category/python.html">Python</a></li>
+                    <li class="active"><a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/python.html">Python</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 <section id="content" class="body">
   <article>
     <header>
       <h1 class="entry-title">
-        <a href="http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html" rel="bookmark"
+        <a href="https://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html" rel="bookmark"
            title="Permalink to Starting with Kubernetes on Google Container Engine">Starting with Kubernetes on Google Container Engine</a></h1>
     </header>
 
@@ -35,7 +35,7 @@
 <div class="post-info">
         <div class="published" title="2017-03-07T12:42:00-08:00">
                 Published: Tue 07 March 2017
-in <a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a>
+in <a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a>
         </div>
 
 </div><!-- /.post-info -->    </div>
@@ -150,7 +150,7 @@ latest:<span class="w"> </span>digest:<span class="w"> </span>sha256:4ad68f056e8
 </code></pre></div>
 
 <p>If you go to the Google Cloud Console and open the Google Container Registry, you'll see the container uploaded:</p>
-<p><center><img alt="Google Container Registry" src="http://pminkov.github.io/blog/images/k8s-intro/k1-registry.png"></center></p>
+<p><center><img alt="Google Container Registry" src="https://pminkov.github.io/blog/images/k8s-intro/k1-registry.png"></center></p>
 <p>Now let's create a cluster that we'll be deploying our server to:</p>
 <div class="highlight"><pre><span></span><code>$<span class="w"> </span>gcloud<span class="w"> </span>container<span class="w"> </span>clusters<span class="w"> </span>create<span class="w"> </span>example-cluster
 Creating<span class="w"> </span>cluster<span class="w"> </span>example-cluster...done.<span class="w">                                                                                                                                               </span>
@@ -216,7 +216,7 @@ Starting<span class="w"> </span>to<span class="w"> </span>serve<span class="w"> 
 </code></pre></div>
 
 <p>We can see the dashboard at <code>localhost:8001/ui</code>. It looks like this:</p>
-<p><center><img alt="Kubernetes Dashboard" src="http://pminkov.github.io/blog/images/k8s-intro/k2-dashboard.png"></center></p>
+<p><center><img alt="Kubernetes Dashboard" src="https://pminkov.github.io/blog/images/k8s-intro/k2-dashboard.png"></center></p>
 <p>This dashboard is a lot of fun. You can dig into everything available in it. You can probably see everything it shows through kubectl as well, but it's easier to do it by using an UI.</p>
 <p>Here's something else that's fun. Your cluster doesn't run on thin air. It runs on Google Compute Engine instances (I believe this is equivalent to AWS' EC2). In your cloud console, you can navigate to your instances and you can even SSH to an instance from the web UI (I wow-ed the first time I did this, much easier than setting up ssh access on AWS).</p>
 <p>Our cluster has three nodes.</p>
@@ -234,7 +234,7 @@ myserver-3430466764-04b36<span class="w">   </span><span class="m">1</span>/1<sp
 </code></pre></div>
 
 <p>It's running on <code>gke-example-cluster-default-pool-2567fc65-g7lc</code>. Now I can navigate to the web page for this instance and ssh to it. Here's a screenshot of how that looks like:</p>
-<p><center><img alt="Compute Engine SSH" src="http://pminkov.github.io/blog/images/k8s-intro/k3-compute-engine.png"></center></p>
+<p><center><img alt="Compute Engine SSH" src="https://pminkov.github.io/blog/images/k8s-intro/k3-compute-engine.png"></center></p>
 <p>I ran <code>ps aux --sort '%mem'</code> to see which process takes most memory. Since my server uses a lot of memory, it's at the top. It's using 179MB of resident memory.</p>
 <p>It's pretty nice that you're able to nagivate from a high level system like Kubernetes all the way down to ssh-ing to a machine that runs your containers. When you're ssh-ed you can execute <code>docker ps</code> to see what containers are running, run <code>top</code> to see what's going on on the machine and do all of the other systems debugging tasks that you can think of.</p>
 <p>And finally, let's delete our cluster:</p>
@@ -255,7 +255,7 @@ Deleted<span class="w"> </span><span class="o">[</span>https://container.googlea
       <script type="text/javascript">
         var disqus_shortname = 'pminkov-blog';
         var disqus_identifier = 'starting-with-kubernetes-on-google-container-engine.html';
-        var disqus_url = 'http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html';
+        var disqus_url = 'https://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html';
         (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
         dsq.src = '//pminkov-blog.disqus.com/embed.js';
@@ -271,7 +271,7 @@ Deleted<span class="w"> </span><span class="o">[</span>https://container.googlea
                 <div class="social">
                         <h2>social</h2>
                         <ul>
-                            <li><a href="http://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+                            <li><a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
 
                         </ul>
                 </div><!-- /.social -->
