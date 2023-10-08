@@ -48,7 +48,7 @@ However, that seemed like too much work and I wanted something that I can implem
 <p>If you're not shipping compiled JavaScript, then your other option would be to have the template text somewhere and compile it client side. I have one main requirement though - I don't want my template code to be in a string which editors will display without HTML syntax highlighting.</p>
 <p>So, working with these constraints, let's see what we can come up with.</p>
 <p>First, let's say our template code is in <code>person.html</code> and it looks like this:</p>
-<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
   {{#person}}
     The user&#39;s name is {{name}}.
   {{/person}}
@@ -56,33 +56,30 @@ However, that seemed like too much work and I wanted something that I can implem
     There&#39;s no user defined.
   {{/person}}
 <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Now, we can include this template in the html page returned by our initial page load, like this:</p>
-<div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-  <span class="kd">var</span> <span class="nx">person_template_text</span> <span class="o">=</span> <span class="sb">`{% include &quot;myapp/templates/person.html&quot; %}`</span>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">person_template_text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`{% include &quot;myapp/templates/person.html&quot; %}`</span>
 <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>In this case, <code>person_template_text</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals">template literal</a>. Template literals are JavaScript strings that can span multiple lines.</p>
 <p>Now, we just need to compile the template so that it's ready to be rendered. We'll use <a href="http://twitter.github.io/hogan.js/">hogan.js</a>, since it's advertised as faster and smaller than mustache and it fully supports mustache syntax. Let's say we're also using jQuery. We can do something along these lines:</p>
-<div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">App</span><span class="p">()</span> <span class="p">{</span>
-  <span class="k">this</span><span class="p">.</span><span class="nx">person_template</span> <span class="o">=</span> <span class="nx">Hogan</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">person_template_text</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="kd">function</span><span class="w"> </span><span class="nx">App</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">person_template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Hogan</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">person_template_text</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="nx">App</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">renderPerson</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">personDict</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">person_template</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">personDict</span><span class="p">);</span>
+<span class="nx">App</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">renderPerson</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">personDict</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">person_template</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">personDict</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="kd">var</span> <span class="nx">app</span><span class="p">;</span>
+<span class="kd">var</span><span class="w"> </span><span class="nx">app</span><span class="p">;</span>
 
-<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">App</span><span class="p">();</span>
+<span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">App</span><span class="p">();</span>
 <span class="p">});</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>And that's it. There are many other ways to do this, which will be more optimized, but this one seems like an easy one to start with.</p>
     </div><!-- /.entry-content -->

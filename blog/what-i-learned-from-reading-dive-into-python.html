@@ -51,48 +51,44 @@ in <a href="http://pminkov.github.io/blog/category/python.html">Python</a>
 <ul>
 <li>Here's a cool trick mentioned in this chapter:</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="p">(</span><span class="n">MONDAY</span><span class="p">,</span> <span class="n">TUESDAY</span><span class="p">,</span> <span class="n">WEDNESDAY</span><span class="p">,</span> <span class="n">THURSDAY</span><span class="p">,</span> <span class="n">FRIDAY</span><span class="p">,</span> <span class="n">SATURDAY</span><span class="p">,</span> <span class="n">SUNDAY</span><span class="p">)</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="n">MONDAY</span><span class="p">,</span> <span class="n">TUESDAY</span><span class="p">,</span> <span class="n">WEDNESDAY</span><span class="p">,</span> <span class="n">THURSDAY</span><span class="p">,</span> <span class="n">FRIDAY</span><span class="p">,</span> <span class="n">SATURDAY</span><span class="p">,</span> <span class="n">SUNDAY</span><span class="p">)</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+</code></pre></div>
 
 <h3 id="chapter-4-the-power-of-introspection">Chapter 4 (The Power Of Introspection):</h3>
 <ul>
 <li>Some useful functions are mentioned: <code>dir</code> (try on a module or an object instance), <code>callable</code>, <code>getattr</code>, <code>__doc__</code>.</li>
 </ul>
 <p>So you can do something interesting, like this:</p>
-<div class="highlight"><pre><span></span><span class="kr">class</span> <span class="nx">Sum</span><span class="o">:</span>
-  <span class="s2">&quot;&quot;&quot;Sums numbers&quot;&quot;&quot;</span>
-  <span class="nx">member</span> <span class="o">=</span> <span class="mi">3</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="n">Sum:</span>
+  <span class="s">&quot;&quot;&quot;Sums numbers&quot;&quot;&quot;</span>
+  <span class="n">member</span> = <span class="mi">3</span>
 
-  <span class="nx">def</span> <span class="nx">sum2</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span><span class="o">:</span>
-    <span class="s2">&quot;&quot;&quot;Sum two numbers&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span>
+  <span class="n">def</span> <span class="n">sum2</span>(<span class="nb">self</span>, <span class="n">a</span>, <span class="n">b</span>):
+    <span class="s">&quot;&quot;&quot;Sum two numbers&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> + <span class="n">b</span>
 
-  <span class="nx">def</span> <span class="nx">sum3</span><span class="p">(</span><span class="nx">self</span><span class="p">,</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span><span class="o">:</span>
-    <span class="s2">&quot;&quot;&quot;Sum three numbers&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span> <span class="o">+</span> <span class="nx">c</span>
+  <span class="n">def</span> <span class="n">sum3</span>(<span class="nb">self</span>, <span class="n">a</span>, <span class="n">b</span>, <span class="n">c</span>):
+    <span class="s">&quot;&quot;&quot;Sum three numbers&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">a</span> + <span class="n">b</span> + <span class="n">c</span>
 
 
-<span class="k">if</span> <span class="nx">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="o">:</span>
-  <span class="nx">methods</span> <span class="o">=</span> <span class="p">[</span><span class="nx">f</span> <span class="k">for</span> <span class="nx">f</span> <span class="k">in</span> <span class="nx">dir</span><span class="p">(</span><span class="nx">Sum</span><span class="p">)</span> <span class="k">if</span> <span class="nx">callable</span><span class="p">(</span><span class="nx">getattr</span><span class="p">(</span><span class="nx">Sum</span><span class="p">,</span> <span class="nx">f</span><span class="p">))]</span>
-  <span class="nx">docs</span> <span class="o">=</span> <span class="s1">&#39;\n&#39;</span><span class="p">.</span><span class="nx">join</span><span class="p">([</span><span class="s2">&quot;%s %s&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">getattr</span><span class="p">(</span><span class="nx">Sum</span><span class="p">,</span> <span class="nx">f</span><span class="p">).</span><span class="nx">__doc__</span><span class="p">)</span> <span class="k">for</span> <span class="nx">f</span> <span class="k">in</span> <span class="nx">methods</span><span class="p">])</span>
-  <span class="nx">print</span> <span class="nx">docs</span>
-</pre></div>
-
+<span class="k">if</span> <span class="n">__name__</span> == <span class="s">&#39;__main__&#39;</span>:
+  <span class="nb">methods</span> = [<span class="nb">f</span> <span class="k">for</span> <span class="nb">f</span> <span class="nb">in</span> <span class="nb">dir</span>(<span class="n">Sum</span>) <span class="k">if</span> <span class="n">callable</span>(<span class="n">getattr</span>(<span class="n">Sum</span>, <span class="nb">f</span>))]
+  <span class="n">docs</span> = <span class="s">&#39;\n&#39;</span>.<span class="nb">join</span>([<span class="s">&quot;%s %s&quot;</span> % (<span class="nb">f</span>, <span class="n">getattr</span>(<span class="n">Sum</span>, <span class="nb">f</span>).<span class="n">__doc__</span>) <span class="k">for</span> <span class="nb">f</span> <span class="nb">in</span> <span class="nb">methods</span>])
+  <span class="nb">print</span> <span class="n">docs</span>
+</code></pre></div>
 
 <p>And run it:</p>
-<div class="highlight"><pre><span></span>$ python ./sum.py
-sum2 Sum two numbers
-sum3 Sum three numbers
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>python<span class="w"> </span>./sum.py
+sum2<span class="w"> </span>Sum<span class="w"> </span>two<span class="w"> </span>numbers
+sum3<span class="w"> </span>Sum<span class="w"> </span>three<span class="w"> </span>numbers
+</code></pre></div>
 
 <ul>
 <li>The "and-or trick"</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="n">is_mammal</span> <span class="o">=</span> <span class="n">use_rpc</span> <span class="ow">and</span> <span class="n">remote_check_is_mammal</span><span class="p">(</span><span class="n">animal</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DEFAULT_IS_MAMMAL</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="n">is_mammal</span> <span class="o">=</span> <span class="n">use_rpc</span> <span class="ow">and</span> <span class="n">remote_check_is_mammal</span><span class="p">(</span><span class="n">animal</span><span class="p">)</span> <span class="ow">or</span> <span class="n">DEFAULT_IS_MAMMAL</span>
+</code></pre></div>
 
 <p>That's like <code>?:</code> in C++. I think I did well with creating a good example here :).</p>
 <h3 id="chapter-5-objects-and-object-orientation">Chapter 5 (Objects and Object-Orientation)</h3>
@@ -106,7 +102,7 @@ sum3 Sum three numbers
 <ul>
 <li>You can use <code>else</code> in exceptions code. Like this:</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RPC</span><span class="p">:</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">RPC</span><span class="p">:</span>
   <span class="k">def</span> <span class="nf">remote_call</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
     <span class="k">pass</span>
 
@@ -114,54 +110,51 @@ sum3 Sum three numbers
   <span class="k">try</span><span class="p">:</span>
     <span class="n">a</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">RPC</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
   <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-    <span class="k">print</span> <span class="s1">&#39;No such function.&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;No such function.&#39;</span>
   <span class="k">else</span><span class="p">:</span>
-    <span class="k">print</span> <span class="s1">&#39;Function was found.&#39;</span>
+    <span class="nb">print</span> <span class="s1">&#39;Function was found.&#39;</span>
   <span class="k">finally</span><span class="p">:</span>
-    <span class="k">print</span> <span class="s1">&#39;Enough lookups.&#39;</span>
-    <span class="k">print</span>
+    <span class="nb">print</span> <span class="s1">&#39;Enough lookups.&#39;</span>
+    <span class="nb">print</span>
 
 <span class="n">find_function</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">)</span>
 <span class="n">find_function</span><span class="p">(</span><span class="s1">&#39;remote_call&#39;</span><span class="p">)</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Output:</p>
-<div class="highlight"><pre><span></span>python ./ex.py 
-No such <span class="k">function</span>.
-Enough lookups.
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>./ex.py<span class="w"> </span>
+No<span class="w"> </span>such<span class="w"> </span><span class="k">function</span>.
+Enough<span class="w"> </span>lookups.
 
-Function was found.
-Enough lookups.
-</pre></div>
-
+Function<span class="w"> </span>was<span class="w"> </span>found.
+Enough<span class="w"> </span>lookups.
+</code></pre></div>
 
 <ul>
 <li>When you open a file, you have a variety of functions and attributes on the file object, like <code>seek</code>, <code>read</code>, <code>mode</code>, <code>name</code>. For example, to see how big a file is you can just call <code>f.seek(0, 2)</code> to seek until the end and then <code>f.tell()</code> to output the number of bytes.</li>
 <li>A class' module is accessible by calling <code>ClassName.__module__</code>. All imported modules are in the <code>sys.modules</code> dictionary. Example:</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">sum</span> <span class="kn">import</span> <span class="n">Sum</span>
+<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">sum</span> <span class="kn">import</span> <span class="n">Sum</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">sys</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">Sum</span><span class="o">.</span><span class="vm">__module__</span><span class="p">]</span>
 <span class="o">&lt;</span><span class="n">module</span> <span class="s1">&#39;sum&#39;</span> <span class="kn">from</span> <span class="s1">&#39;sum.py&#39;</span><span class="o">&gt;</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">Sum</span><span class="o">.</span><span class="vm">__module__</span><span class="p">],</span> <span class="s1">&#39;Sum&#39;</span><span class="p">)</span>
 <span class="o">&lt;</span><span class="k">class</span> <span class="nc">sum</span><span class="o">.</span><span class="n">Sum</span> <span class="n">at</span> <span class="mh">0x109535a10</span><span class="o">&gt;</span>
-</pre></div>
-
+</code></pre></div>
 
 <h3 id="chapter-7-regular-expressions">Chapter 7 (Regular Expressions)</h3>
 <ul>
 <li><code>\\b</code> matches a word boundary. This can be so useful.</li>
 <li>Verbose regular expressions. Again, very useful. Example:</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">re</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">re</span>
 
 <span class="n">raw_regex</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">  (\d{3})</span>
+<span class="s2">  (\d</span><span class="si">{3}</span><span class="s2">)</span>
 <span class="s2">  \D*</span>
-<span class="s2">  (\d{3})</span>
+<span class="s2">  (\d</span><span class="si">{3}</span><span class="s2">)</span>
 <span class="s2">  \D*</span>
-<span class="s2">  (\d{4})</span>
+<span class="s2">  (\d</span><span class="si">{4}</span><span class="s2">)</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
 <span class="n">examples</span> <span class="o">=</span> <span class="p">[</span>
@@ -178,7 +171,7 @@ Enough lookups.
 <span class="k">for</span> <span class="n">example</span> <span class="ow">in</span> <span class="n">examples</span><span class="p">:</span>
   <span class="n">groups</span> <span class="o">=</span> <span class="n">phone_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">example</span><span class="p">)</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
   <span class="k">assert</span> <span class="n">groups</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;415&#39;</span><span class="p">,</span> <span class="s1">&#39;312&#39;</span><span class="p">,</span> <span class="s1">&#39;5633&#39;</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
     </div><!-- /.entry-content -->
     <div class="comments">
       <div id="disqus_thread"></div>

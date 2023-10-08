@@ -42,35 +42,31 @@ in <a href="http://pminkov.github.io/blog/category/python.html">Python</a>
     <div>
       <p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
 One that I use in my projects is the following:</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
   <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1"> != </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Here's an example of how to use this:</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
   <span class="n">T</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
   <span class="n">T</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
   <span class="k">return</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Let's say that you call the function incorrectly, like this:</p>
-<div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="s2">&quot;hello&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="n">a</span> <span class="o">=</span> <span class="s2">&quot;hello&quot;</span>
 <span class="n">b</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">s</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>You'll get the following exception:</p>
-<div class="highlight"><pre><span></span>&gt;&gt;&gt; sum(a, b)
+<div class="highlight"><pre><span></span><code>&gt;&gt;&gt; sum(a, b)
 Traceback (most recent call last):
   File &quot;&lt;stdin&gt;&quot;, line 1, in &lt;module&gt;
   File &quot;&lt;stdin&gt;&quot;, line 2, in sum
   File &quot;&lt;stdin&gt;&quot;, line 2, in T
 AssertionError: (hello) &lt;type &#39;str&#39;&gt; != &lt;type &#39;int&#39;&gt;
-</pre></div>
-
+</code></pre></div>
 
 <p>So that's it - pretty simple. I use the <code>T</code> function every once in a while, to guard against type errors.</p>
     </div><!-- /.entry-content -->

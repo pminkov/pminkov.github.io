@@ -62,48 +62,46 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 <h2 id="the-key-pair">The key pair</h2>
 <p>To establish an SSH connection you need a <strong>private key</strong> and a <strong>public key</strong>. You keep the private key in a safe place (usually in <code>~/.ssh/</code>) and upload the public key to any server that you want to securely connect to. Encryption with a private key and a public key is called <a href="https://en.wikipedia.org/wiki/Public-key_cryptography">assymetric encryption</a>.</p>
 <p>How do you create a key pair. Like this:</p>
-<div class="highlight"><pre><span></span>$ ssh-keygen -t rsa -b <span class="m">4096</span> -C <span class="s2">&quot;myemail@gmail.com&quot;</span>
-Generating public/private rsa key pair.
-Enter file in which to save the key <span class="o">(</span>/home/petko/.ssh/id_rsa<span class="o">)</span>: ./mykey
-Enter passphrase <span class="o">(</span>empty <span class="k">for</span> no passphrase<span class="o">)</span>: 
-Enter same passphrase again: 
-Your identification has been saved in ./mykey.
-Your public key has been saved in ./mykey.pub.
-The key fingerprint is:
-SHA256:0/zlEZZj0R6yM4uHVD+xJWoLOx3+TormCRcyWt3c53o myemail@gmail.com
-The key<span class="err">&#39;</span>s randomart image is:
-+---<span class="o">[</span>RSA <span class="m">4096</span><span class="o">]</span>----+
-<span class="p">|</span>              .. <span class="p">|</span>
-<span class="p">|</span>             o.<span class="o">=</span>o<span class="p">|</span>
-<span class="p">|</span>            ..Xo<span class="o">=</span><span class="p">|</span>
-<span class="p">|</span>         +.++B *.<span class="p">|</span>
-<span class="p">|</span>        S **<span class="o">=</span>oB o<span class="p">|</span>
-<span class="p">|</span>       o +o<span class="o">=</span>+<span class="o">=</span> + <span class="p">|</span>
-<span class="p">|</span>      . . ..o.o .<span class="p">|</span>
-<span class="p">|</span>         o.o o..E<span class="p">|</span>
-<span class="p">|</span>         o+ ..o. <span class="p">|</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>rsa<span class="w"> </span>-b<span class="w"> </span><span class="m">4096</span><span class="w"> </span>-C<span class="w"> </span><span class="s2">&quot;myemail@gmail.com&quot;</span>
+Generating<span class="w"> </span>public/private<span class="w"> </span>rsa<span class="w"> </span>key<span class="w"> </span>pair.
+Enter<span class="w"> </span>file<span class="w"> </span><span class="k">in</span><span class="w"> </span>which<span class="w"> </span>to<span class="w"> </span>save<span class="w"> </span>the<span class="w"> </span>key<span class="w"> </span><span class="o">(</span>/home/petko/.ssh/id_rsa<span class="o">)</span>:<span class="w"> </span>./mykey
+Enter<span class="w"> </span>passphrase<span class="w"> </span><span class="o">(</span>empty<span class="w"> </span><span class="k">for</span><span class="w"> </span>no<span class="w"> </span>passphrase<span class="o">)</span>:<span class="w"> </span>
+Enter<span class="w"> </span>same<span class="w"> </span>passphrase<span class="w"> </span>again:<span class="w"> </span>
+Your<span class="w"> </span>identification<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>saved<span class="w"> </span><span class="k">in</span><span class="w"> </span>./mykey.
+Your<span class="w"> </span>public<span class="w"> </span>key<span class="w"> </span>has<span class="w"> </span>been<span class="w"> </span>saved<span class="w"> </span><span class="k">in</span><span class="w"> </span>./mykey.pub.
+The<span class="w"> </span>key<span class="w"> </span>fingerprint<span class="w"> </span>is:
+SHA256:0/zlEZZj0R6yM4uHVD+xJWoLOx3+TormCRcyWt3c53o<span class="w"> </span>myemail@gmail.com
+The<span class="w"> </span>key<span class="err">&#39;</span>s<span class="w"> </span>randomart<span class="w"> </span>image<span class="w"> </span>is:
++---<span class="o">[</span>RSA<span class="w"> </span><span class="m">4096</span><span class="o">]</span>----+
+<span class="p">|</span><span class="w">              </span>..<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">             </span>o.<span class="o">=</span>o<span class="p">|</span>
+<span class="p">|</span><span class="w">            </span>..Xo<span class="o">=</span><span class="p">|</span>
+<span class="p">|</span><span class="w">         </span>+.++B<span class="w"> </span>*.<span class="p">|</span>
+<span class="p">|</span><span class="w">        </span>S<span class="w"> </span>**<span class="o">=</span>oB<span class="w"> </span>o<span class="p">|</span>
+<span class="p">|</span><span class="w">       </span>o<span class="w"> </span>+o<span class="o">=</span>+<span class="o">=</span><span class="w"> </span>+<span class="w"> </span><span class="p">|</span>
+<span class="p">|</span><span class="w">      </span>.<span class="w"> </span>.<span class="w"> </span>..o.o<span class="w"> </span>.<span class="p">|</span>
+<span class="p">|</span><span class="w">         </span>o.o<span class="w"> </span>o..E<span class="p">|</span>
+<span class="p">|</span><span class="w">         </span>o+<span class="w"> </span>..o.<span class="w"> </span><span class="p">|</span>
 +----<span class="o">[</span>SHA256<span class="o">]</span>-----+
-$ ls -l
-total <span class="m">8</span>
--rw------- <span class="m">1</span> petko petko <span class="m">3243</span> Aug  <span class="m">9</span> <span class="m">16</span>:24 mykey
--rw-r--r-- <span class="m">1</span> petko petko  <span class="m">743</span> Aug  <span class="m">9</span> <span class="m">16</span>:24 mykey.pub
-</pre></div>
-
+$<span class="w"> </span>ls<span class="w"> </span>-l
+total<span class="w"> </span><span class="m">8</span>
+-rw-------<span class="w"> </span><span class="m">1</span><span class="w"> </span>petko<span class="w"> </span>petko<span class="w"> </span><span class="m">3243</span><span class="w"> </span>Aug<span class="w">  </span><span class="m">9</span><span class="w"> </span><span class="m">16</span>:24<span class="w"> </span>mykey
+-rw-r--r--<span class="w"> </span><span class="m">1</span><span class="w"> </span>petko<span class="w"> </span>petko<span class="w">  </span><span class="m">743</span><span class="w"> </span>Aug<span class="w">  </span><span class="m">9</span><span class="w"> </span><span class="m">16</span>:24<span class="w"> </span>mykey.pub
+</code></pre></div>
 
 <p>How do the public and private key look like. They look like this (I have removed some of the output to keep you from scrolling too much):</p>
-<div class="highlight"><pre><span></span>$ cat ./mykey
------BEGIN RSA PRIVATE KEY-----
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>cat<span class="w"> </span>./mykey
+-----BEGIN<span class="w"> </span>RSA<span class="w"> </span>PRIVATE<span class="w"> </span>KEY-----
 MIIJKQIBAAKCAgEA2FGlZybznkcHQG530bj+DlrY74nTh+shP1uyJA25BrkAyOz9
 xc8Tvlk3QfBcGFfQKc1OowV80XtNyXXnOeFTqlh8B8DS1Mul165wgb+pJDROvI0J
 ...
 3vZfDPXo9w2XwAwN7hLimCVWdqr0JI8BmbussW4ZrJRcra1rvsLj6sip9Ry3oP+9
 PIUEPwDY/YUVRZV2De4cBdBnwTmj9RoXOW63mW6sL8lfeYjJQwQys+jVVjRi
------END RSA PRIVATE KEY-----
+-----END<span class="w"> </span>RSA<span class="w"> </span>PRIVATE<span class="w"> </span>KEY-----
 
-$ cat ./mykey.pub 
-ssh-rsa AAAAB3NzaC ... +PAAKfQ<span class="o">==</span> myemail@gmail.com
-</pre></div>
-
+$<span class="w"> </span>cat<span class="w"> </span>./mykey.pub<span class="w"> </span>
+ssh-rsa<span class="w"> </span>AAAAB3NzaC<span class="w"> </span>...<span class="w"> </span>+PAAKfQ<span class="o">==</span><span class="w"> </span>myemail@gmail.com
+</code></pre></div>
 
 <p>So that's it. A private key and a public key. Nothing else. Keep the private key secret, upload the public key.</p>
 <h2 id="how-does-ssh-work">How does SSH work?</h2>
@@ -113,24 +111,22 @@ ssh-rsa AAAAB3NzaC ... +PAAKfQ<span class="o">==</span> myemail@gmail.com
 <p>We now know what's involved in SSH communication. Let's look at the commands that are used. </p>
 <p>We'll start with a clean example. I have an AWS EC2 instance on which I have installed a public key. The private key is located in my <code>~/.ssh/</code> directory. It's called <code>aws-laptop</code>, because I use it from my laptop.</p>
 <p>Let's try to ssh into the instance:</p>
-<div class="highlight"><pre><span></span>~/.ssh$ ssh ubuntu@35.165.19.203
-Permission denied <span class="o">(</span>publickey<span class="o">)</span>.
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>~/.ssh$<span class="w"> </span>ssh<span class="w"> </span>ubuntu@35.165.19.203
+Permission<span class="w"> </span>denied<span class="w"> </span><span class="o">(</span>publickey<span class="o">)</span>.
+</code></pre></div>
 
 <p>Doesn't work. Well, of course - ssh doesn't know what private key to use. We have to point to it using the <code>-i</code> option.</p>
-<div class="highlight"><pre><span></span>~/.ssh$ ssh -i ./aws-laptop ubuntu@35.165.19.203
-The authenticity of host <span class="s1">&#39;35.165.19.203 (35.165.19.203)&#39;</span> can<span class="s1">&#39;t be established.</span>
+<div class="highlight"><pre><span></span><code>~/.ssh$<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>./aws-laptop<span class="w"> </span>ubuntu@35.165.19.203
+The<span class="w"> </span>authenticity<span class="w"> </span>of<span class="w"> </span>host<span class="w"> </span><span class="s1">&#39;35.165.19.203 (35.165.19.203)&#39;</span><span class="w"> </span>can<span class="s1">&#39;t be established.</span>
 <span class="s1">ECDSA key fingerprint is SHA256: 3w+LlpD/HH .......</span>
 <span class="s1">Are you sure you want to continue connecting (yes/no)? yes</span>
-<span class="s1">Enter passphrase for key &#39;</span>./aws-laptop<span class="err">&#39;</span>:  <span class="o">[</span>Here I entered a passphrase<span class="o">]</span>
-Welcome to Ubuntu <span class="m">16</span>.04.2 LTS <span class="o">(</span>GNU/Linux <span class="m">4</span>.4.0-1022-aws x86_64<span class="o">)</span>
+<span class="s1">Enter passphrase for key &#39;</span>./aws-laptop<span class="err">&#39;</span>:<span class="w">  </span><span class="o">[</span>Here<span class="w"> </span>I<span class="w"> </span>entered<span class="w"> </span>a<span class="w"> </span>passphrase<span class="o">]</span>
+Welcome<span class="w"> </span>to<span class="w"> </span>Ubuntu<span class="w"> </span><span class="m">16</span>.04.2<span class="w"> </span>LTS<span class="w"> </span><span class="o">(</span>GNU/Linux<span class="w"> </span><span class="m">4</span>.4.0-1022-aws<span class="w"> </span>x86_64<span class="o">)</span>
 ...
-Last login: Wed Aug  <span class="m">9</span> <span class="m">23</span>:09:13 <span class="m">2017</span> from <span class="m">76</span>.102.141.14
+Last<span class="w"> </span>login:<span class="w"> </span>Wed<span class="w"> </span>Aug<span class="w">  </span><span class="m">9</span><span class="w"> </span><span class="m">23</span>:09:13<span class="w"> </span><span class="m">2017</span><span class="w"> </span>from<span class="w"> </span><span class="m">76</span>.102.141.14
 
 ubuntu@ip-172-31-13-46:~$
-</pre></div>
-
+</code></pre></div>
 
 <p>Hooray, I'm in! What happened in the meantime is that the ssh command saved an entry into the <code>known_hosts</code> file, so next time I ssh it won't ask me again to confirm the authenticity of the remote host.</p>
 <p>However, I'll still need to point to the private key and enter the passphrase for it. Very inconvenient.</p>
@@ -138,48 +134,43 @@ ubuntu@ip-172-31-13-46:~$
 <p>The solution to the above problem is the <code>ssh-agent</code> daemon. <code>ssh-agent</code> is a daemon that you start and you can add private keys to it so that next time you ssh into a server, you don't have to point to them.</p>
 <h3 id="usage">Usage</h3>
 <p>How does ssh-agent know which private key to use? When you run <code>ssh -v ubuntu@35.165.19.203</code> you can see that there's a bit of back and forth where <code>ssh</code> seems to be trying out private keys from <code>ssh-agent</code>. So I guess that's how it's done:</p>
-<div class="highlight"><pre><span></span>debug1: Offering RSA public key: /home/petko/.ssh/id_rsa
-debug1: Authentications that can <span class="k">continue</span>: publickey
-debug1: Offering RSA public key: ./aws-laptop
-debug1: Server accepts key: pkalg rsa-sha2-512 blen <span class="m">279</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>debug1:<span class="w"> </span>Offering<span class="w"> </span>RSA<span class="w"> </span>public<span class="w"> </span>key:<span class="w"> </span>/home/petko/.ssh/id_rsa
+debug1:<span class="w"> </span>Authentications<span class="w"> </span>that<span class="w"> </span>can<span class="w"> </span><span class="k">continue</span>:<span class="w"> </span>publickey
+debug1:<span class="w"> </span>Offering<span class="w"> </span>RSA<span class="w"> </span>public<span class="w"> </span>key:<span class="w"> </span>./aws-laptop
+debug1:<span class="w"> </span>Server<span class="w"> </span>accepts<span class="w"> </span>key:<span class="w"> </span>pkalg<span class="w"> </span>rsa-sha2-512<span class="w"> </span>blen<span class="w"> </span><span class="m">279</span>
+</code></pre></div>
 
 <p>We can list the keys in ssh-agent with this command:</p>
-<div class="highlight"><pre><span></span>$ ssh-add -l
-The agent has no identities.
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ssh-add<span class="w"> </span>-l
+The<span class="w"> </span>agent<span class="w"> </span>has<span class="w"> </span>no<span class="w"> </span>identities.
+</code></pre></div>
 
 <p>No keys. So let's add the key that we were using.</p>
-<div class="highlight"><pre><span></span>$ ssh-add ./aws-laptop
-Enter passphrase <span class="k">for</span> ./aws-laptop: <span class="o">[</span>I entered passphrase<span class="o">]</span>
-Identity added: ./aws-laptop <span class="o">(</span>./aws-laptop<span class="o">)</span>
-$ ssh-add -l
-<span class="m">2048</span> SHA256:tU++v7cfD8... ./aws-laptop <span class="o">(</span>RSA<span class="o">)</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ssh-add<span class="w"> </span>./aws-laptop
+Enter<span class="w"> </span>passphrase<span class="w"> </span><span class="k">for</span><span class="w"> </span>./aws-laptop:<span class="w"> </span><span class="o">[</span>I<span class="w"> </span>entered<span class="w"> </span>passphrase<span class="o">]</span>
+Identity<span class="w"> </span>added:<span class="w"> </span>./aws-laptop<span class="w"> </span><span class="o">(</span>./aws-laptop<span class="o">)</span>
+$<span class="w"> </span>ssh-add<span class="w"> </span>-l
+<span class="m">2048</span><span class="w"> </span>SHA256:tU++v7cfD8...<span class="w"> </span>./aws-laptop<span class="w"> </span><span class="o">(</span>RSA<span class="o">)</span>
+</code></pre></div>
 
 <p>The private key is now saved! I can now ssh without pointing to it:</p>
-<div class="highlight"><pre><span></span>$ ssh ubuntu@35.165.19.203
-Welcome to Ubuntu <span class="m">16</span>.04.2 LTS <span class="o">(</span>GNU/Linux <span class="m">4</span>.4.0-1022-aws x86_64<span class="o">)</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ssh<span class="w"> </span>ubuntu@35.165.19.203
+Welcome<span class="w"> </span>to<span class="w"> </span>Ubuntu<span class="w"> </span><span class="m">16</span>.04.2<span class="w"> </span>LTS<span class="w"> </span><span class="o">(</span>GNU/Linux<span class="w"> </span><span class="m">4</span>.4.0-1022-aws<span class="w"> </span>x86_64<span class="o">)</span>
 ...
-ubuntu@ip-172-31-13-46:~$ 
-</pre></div>
-
+ubuntu@ip-172-31-13-46:~$<span class="w"> </span>
+</code></pre></div>
 
 <h3 id="starting-ssh-agent">Starting ssh-agent</h3>
 <p>You don't want to start ssh-agent manually. I'll describe my setup for automatically staring it in Ubuntu. In my <code>~/.bash_profile</code> I have the following:</p>
-<div class="highlight"><pre><span></span><span class="c1"># Start ssh-agent.</span>
-<span class="k">if</span> <span class="o">[</span> ! -S ~/.ssh/ssh_auth_sock <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
-  <span class="nb">echo</span> <span class="s2">&quot;Starting ssh-agent&quot;</span>
-  <span class="nb">eval</span> <span class="sb">`</span>ssh-agent<span class="sb">`</span>
-  ln -sf <span class="s2">&quot;</span><span class="nv">$SSH_AUTH_SOCK</span><span class="s2">&quot;</span> ~/.ssh/ssh_auth_sock
+<div class="highlight"><pre><span></span><code><span class="c1"># Start ssh-agent.</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>!<span class="w"> </span>-S<span class="w"> </span>~/.ssh/ssh_auth_sock<span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Starting ssh-agent&quot;</span>
+<span class="w">  </span><span class="nb">eval</span><span class="w"> </span><span class="sb">`</span>ssh-agent<span class="sb">`</span>
+<span class="w">  </span>ln<span class="w"> </span>-sf<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$SSH_AUTH_SOCK</span><span class="s2">&quot;</span><span class="w"> </span>~/.ssh/ssh_auth_sock
 <span class="k">fi</span>
-<span class="nb">export</span> <span class="nv">SSH_AUTH_SOCK</span><span class="o">=</span>~/.ssh/ssh_auth_sock
-ssh-add -l <span class="p">|</span> grep <span class="s2">&quot;The agent has no identities&quot;</span> <span class="o">&amp;&amp;</span> ssh-add
-</pre></div>
-
+<span class="nb">export</span><span class="w"> </span><span class="nv">SSH_AUTH_SOCK</span><span class="o">=</span>~/.ssh/ssh_auth_sock
+ssh-add<span class="w"> </span>-l<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;The agent has no identities&quot;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>ssh-add
+</code></pre></div>
 
 <p>Remember that <code>.bash_profile</code> is executed for interactive login shells. An interactive login shell is what's run when you ssh into a machine. One interesting thing about Ubuntu is that if you open a shell from within Gnome, it's an interactive shell, but it's not a login shell. Gnome also runs a separate ssh-agent, which you can find out when you see the contents of the <code>SSH_AUTH_SOCK</code> environment variable. But I don't use shells from within Gnome, so that's not important to me. If I had a desktop Ubuntu, I'd care about that situation more.</p>
 <p>Here's an <a href="http://www.snailbook.com/faq/about-agent.auto.html">article</a> that's a good description of the mechanics of starting an ssh-agent.</p>
@@ -187,36 +178,32 @@ ssh-add -l <span class="p">|</span> grep <span class="s2">&quot;The agent has no
 <p>So you've setup SSH on your local machine, but you want to SSH to your cloud server and pull some git repo. Or you want to SSH from the cloud server to another server, or maybe copy some files with <code>scp</code>. You can generate a key pair for the cloud server and distribute the public key to all machines and services that you want that cloud server to have access to. But that's not convenient. This is where SSH agent forwarding is needed. With SSH agent forwarding, you ssh into a machine and it takes the private keys loaded in your ssh-agent with you to the other machine.</p>
 <p>GitHub has a <a href="https://developer.github.com/v3/guides/using-ssh-agent-forwarding/">great article</a> on how to setup that. One thing that I'd add to it is that you don't have to start ssh-agent on the target machine! It's automatically started when you ssh to it.</p>
 <p>In my particular setup, I'm ssh-ing to a machine that has just an IP address, so I added an entry for it in <code>/etc/hosts</code>:</p>
-<div class="highlight"><pre><span></span>$ cat /etc/hosts
-<span class="m">127</span>.0.0.1       localhost
-<span class="m">52</span>.39.10.196    webhost
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>cat<span class="w"> </span>/etc/hosts
+<span class="m">127</span>.0.0.1<span class="w">       </span>localhost
+<span class="m">52</span>.39.10.196<span class="w">    </span>webhost
 ...
-</pre></div>
-
+</code></pre></div>
 
 <p>My <code>~/.ssh/config</code> file looks like this:</p>
-<div class="highlight"><pre><span></span>$ cat ./config 
-Host webhost
-  ForwardAgent yes
-  User ubuntu
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>cat<span class="w"> </span>./config<span class="w"> </span>
+Host<span class="w"> </span>webhost
+<span class="w">  </span>ForwardAgent<span class="w"> </span>yes
+<span class="w">  </span>User<span class="w"> </span>ubuntu
+</code></pre></div>
 
 <p>So now to ssh to this machine, I only type <code>ssh webhost</code>. Once I ssh there I can run <code>ssh-add -l</code> and see that my keys are available on the remote machine.</p>
 <h2 id="tips-and-tricks">Tips and tricks</h2>
 <h3 id="manually-verifying-a-private-key">Manually verifying a private key</h3>
 <p>Today I was trying again and again to connect to a remote machine using the wrong private key. I was able to connect to that machine from my laptop, but not from my Ubuntu VM.</p>
 <p>I was running the following command:</p>
-<div class="highlight"><pre><span></span>$ ssh -i ./somekey.pem  ubuntu@35.165.19.203
-Permission denied <span class="o">(</span>publickey<span class="o">)</span>.
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ssh<span class="w"> </span>-i<span class="w"> </span>./somekey.pem<span class="w">  </span>ubuntu@35.165.19.203
+Permission<span class="w"> </span>denied<span class="w"> </span><span class="o">(</span>publickey<span class="o">)</span>.
+</code></pre></div>
 
 <p>How did I debug this? I ssh-ed into the server from my laptop and looked up the public key in <code>~/.ssh/authorized_keys</code>. I then generated the public key from my private key, like this:</p>
-<div class="highlight"><pre><span></span>$ ssh-keygen -y -f  ./somekey.pem
-ssh-rsa AAAAB3....KY1
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>ssh-keygen<span class="w"> </span>-y<span class="w"> </span>-f<span class="w">  </span>./somekey.pem
+ssh-rsa<span class="w"> </span>AAAAB3....KY1
+</code></pre></div>
 
 <p>And sure enough, the public keys were not matching. I then found the correct private key and was able to connect with it.</p>
 <p>If you're following carefully, you'll notice that I did something here that's considered a bad practice. I reused my private key from my laptop on my VirtualBox. I should generate a new key pair and add the public key to the <code>authorized_keys</code> file on the server.</p>

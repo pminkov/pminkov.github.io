@@ -49,11 +49,10 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 <p><br></p>
 <h3 id="step-2-make-sure-collectd-and-apache-are-running">Step 2: Make sure collectd and apache are running.</h3>
 <p>If you have installed apache, you should have both collectd and apache running</p>
-<div class="highlight"><pre><span></span>$ sudo service --status-all <span class="p">|</span> egrep <span class="s2">&quot;collectd|apache2&quot;</span>
- <span class="o">[</span> + <span class="o">]</span>  apache2
- <span class="o">[</span> + <span class="o">]</span>  collectd
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>sudo<span class="w"> </span>service<span class="w"> </span>--status-all<span class="w"> </span><span class="p">|</span><span class="w"> </span>egrep<span class="w"> </span><span class="s2">&quot;collectd|apache2&quot;</span>
+<span class="w"> </span><span class="o">[</span><span class="w"> </span>+<span class="w"> </span><span class="o">]</span><span class="w">  </span>apache2
+<span class="w"> </span><span class="o">[</span><span class="w"> </span>+<span class="w"> </span><span class="o">]</span><span class="w">  </span>collectd
+</code></pre></div>
 
 <p>If collectd is not running, run <code>sudo service collectd start</code>. For me at least, it was running after installation.</p>
 <p><br></p>
@@ -68,12 +67,11 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 <p>First, you need to install the cgi module. So, go to <code>/etc/apache2/mods-enabled</code> and run this: <code>$ sudo ln -s ../mods-available/cgi.load</code>. You have now enabled the <code>cgi</code> module.</p>
 <p>Next you'll have to change <code>apache2.conf</code>, located in <code>/etc/apache2</code> (Ubuntu doesn't use <code>httpd.conf</code>).</p>
 <p>Add these lines to it:</p>
-<div class="highlight"><pre><span></span>&lt;Directory /var/www/&gt;
+<div class="highlight"><pre><span></span><code>&lt;Directory /var/www/&gt;
         Options +ExecCGI
         AddHandler cgi-script .cgi
 &lt;/Directory&gt;
-</pre></div>
-
+</code></pre></div>
 
 <p>And - you're done! If you go to <code>http://localhost/cgi-bin/collection3/bin/index.cgi</code>, you should see some graphs.</p>
     </div><!-- /.entry-content -->

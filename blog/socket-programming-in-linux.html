@@ -47,70 +47,65 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 <ul>
 <li>Create a socket with <code>socket()</code>. The code looks like  this:</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">sockfd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">sockfd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span><span class="w"> </span><span class="n">SOCK_STREAM</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+</code></pre></div>
 
 <p><code>SOCK_STREAM</code> means that we're creating a stream socket (TCP socket).</p>
 <ul>
 <li>Bind the socket to an address. The key lines are:</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="mi">1</span><span class="o">:</span> <span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serv_addr</span><span class="p">;</span>
-<span class="mi">2</span><span class="o">:</span> <span class="kt">uint16_t</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">8000</span><span class="p">;</span>
+<div class="highlight"><pre><span></span><code><span class="mi">1</span><span class="o">:</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">sockaddr_in</span><span class="w"> </span><span class="n">serv_addr</span><span class="p">;</span>
+<span class="mi">2</span><span class="o">:</span><span class="w"> </span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8000</span><span class="p">;</span>
 <span class="p">...</span>
-<span class="mi">3</span><span class="o">:</span> <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
-<span class="mi">4</span><span class="o">:</span> <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">port</span><span class="p">);</span>
-<span class="mi">5</span><span class="o">:</span> <span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
+<span class="mi">3</span><span class="o">:</span><span class="w"> </span><span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_family</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AF_INET</span><span class="p">;</span>
+<span class="mi">4</span><span class="o">:</span><span class="w"> </span><span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">htons</span><span class="p">(</span><span class="n">port</span><span class="p">);</span>
+<span class="mi">5</span><span class="o">:</span><span class="w"> </span><span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_ANY</span><span class="p">);</span>
 <span class="p">...</span>
-<span class="mi">6</span><span class="o">:</span> <span class="n">bind</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">serv_addr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">serv_addr</span><span class="p">))</span>
-</pre></div>
-
+<span class="mi">6</span><span class="o">:</span><span class="w"> </span><span class="n">bind</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">sockaddr</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="n">serv_addr</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">serv_addr</span><span class="p">))</span>
+</code></pre></div>
 
 <p>We're creating an address <code>serv_addr</code> and binding it to the socket we created above. Note that we use <code>INADDR_ANY</code> as the IP address on which the socket is listening. This is the so-called IPv4 wildcard address. It binds your server to all interfaces available on your machine. That's more useful for me than binding to <code>INADDR_LOOPBACK</code> (127.0.0.1), because I'm running my code in a VM and accessing the server from my MacBook. Run <code>ifconfig</code> on your box to see the network interfaces that are available on it.</p>
 <ul>
 <li>Great, we have a socket and it's assigned to an address. This socket can now be used as as passive socket (it's listening for connections) or an active socket (it's used to connect to a peer socket). We want a passive socket. We mark it as a passive socket by calling the <code>listen</code> function. The code looks like this:</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="n">listen</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="n">SOMAXCONN</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="n">error</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t listen&quot;</span><span class="p">);</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">listen</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span><span class="w"> </span><span class="n">SOMAXCONN</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Couldn&#39;t listen&quot;</span><span class="p">);</span>
+</code></pre></div>
 
 <ul>
 <li>The socket is now ready to accept connections. This can happen in a loop that looks like this:</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">client_addr</span><span class="p">;</span>
-<span class="kt">int</span> <span class="n">cli_len</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">client_addr</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="k">struct</span><span class="w"> </span><span class="nc">sockaddr_in</span><span class="w"> </span><span class="n">client_addr</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">cli_len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="n">client_addr</span><span class="p">);</span>
 
-<span class="k">while</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kt">int</span> <span class="n">newsockfd</span> <span class="o">=</span> <span class="n">accept</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">client_addr</span><span class="p">,</span> 
-        <span class="p">(</span><span class="kt">socklen_t</span> <span class="o">*</span><span class="p">)</span> <span class="o">&amp;</span><span class="n">cli_len</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">newsockfd</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="n">error</span><span class="p">(</span><span class="s">&quot;Error on accept&quot;</span><span class="p">);</span>
-    <span class="c1">// newsockfd is a file descriptor. </span>
-    <span class="c1">// Handle the connection by reading from and writing to this descriptor.</span>
-    <span class="p">...</span>
+<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">newsockfd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">accept</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">sockaddr</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="n">client_addr</span><span class="p">,</span><span class="w"> </span>
+<span class="w">        </span><span class="p">(</span><span class="kt">socklen_t</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="n">cli_len</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">newsockfd</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;Error on accept&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// newsockfd is a file descriptor. </span>
+<span class="w">    </span><span class="c1">// Handle the connection by reading from and writing to this descriptor.</span>
+<span class="w">    </span><span class="p">...</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>The <code>accept</code> function blocks until a connection request is received and creates a new socket when that happens. After that, it's your call how you'll handle this socket. You can fork a new process, create a new thread or in my case I have a thred pool of pre-forked threads which just pull these sockets from a queue and do what's necessary to handle a web server request.</p>
 <p>That's the server. Now let's look at the client. Full code is in <a href="https://github.com/pminkov/webserver/blob/master/client.c">client.c</a>. It's a pretty simple client that connects to localhost (127.0.0.1). So you can't use it if the server is running remotely.</p>
 <p>You start by creating a socket with <code>socket()</code> and then calling <code>connect()</code> and passing the address to which you want to connect:</p>
-<div class="highlight"><pre><span></span><span class="kt">int</span> <span class="n">sockfd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">sockfd</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">error</span><span class="p">(</span><span class="s">&quot;socket&quot;</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="kt">int</span><span class="w"> </span><span class="n">sockfd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span><span class="w"> </span><span class="n">SOCK_STREAM</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">sockfd</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;socket&quot;</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="kt">uint16_t</span> <span class="n">port</span> <span class="o">=</span> <span class="mi">8000</span><span class="p">;</span>
+<span class="kt">uint16_t</span><span class="w"> </span><span class="n">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8000</span><span class="p">;</span>
 
-<span class="k">struct</span> <span class="n">sockaddr_in</span> <span class="n">serv_addr</span><span class="p">;</span>
-<span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span>
-<span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">port</span><span class="p">);</span>
-<span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_LOOPBACK</span><span class="p">);</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">sockaddr_in</span><span class="w"> </span><span class="n">serv_addr</span><span class="p">;</span>
+<span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_family</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AF_INET</span><span class="p">;</span>
+<span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">htons</span><span class="p">(</span><span class="n">port</span><span class="p">);</span>
+<span class="n">serv_addr</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">htonl</span><span class="p">(</span><span class="n">INADDR_LOOPBACK</span><span class="p">);</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="n">connect</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span> <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">serv_addr</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr_in</span><span class="p">))</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">error</span><span class="p">(</span><span class="s">&quot;connect&quot;</span><span class="p">);</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">connect</span><span class="p">(</span><span class="n">sockfd</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">sockaddr</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">serv_addr</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">sockaddr_in</span><span class="p">))</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">-1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;connect&quot;</span><span class="p">);</span>
 <span class="p">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>If the connection is successful, you can just send your request to the server using the <code>write()</code> system call and read the response with the <code>read()</code> call.</p>
 <p>So that's a simple web server and a client. The code still has a lot of bugs (the client will buffer overflow if I pass a request string longer than 512 chars, I'm not closing the connection explicitly, etc.), but it gets the job done.</p>

@@ -4,223 +4,212 @@
 &lt;p&gt;As you're iterating on your application, you'll need to push new Docker images to the registry. A natural questions that comes is how to version these images? You don't want to overwrite images using the same tag and it's cumbersome to keep track of increasing version numbers. A good versioning scheme is to use a &lt;a href="https://blog.thoughtram.io/git/2014/11/18/the-anatomy-of-a-git-commit.html"&gt;git commit hash&lt;/a&gt;. So your image name might looks like this: &lt;code&gt;gcr.io/kubeproject-172120/simple:88d38d9&lt;/code&gt;. If you take your git repository at this hash, you'll find the files that produced this exact image.&lt;/p&gt;
 &lt;p&gt;This sounds simple to implement. You get the last commit's hash, build the image using the hash as a tag and push it to the registry. There's one big inconvinience to this scheme though - you have to commit each change if you want to use a new hash (and you do, you don't want to overwrite your production image) and when you're iterating on an image, that gets tiresome quickly. One possible solution would be to commit "debug" images. These images might be tagged with something like this &lt;code&gt;88d38d9-debug&lt;/code&gt;. This is an image produced by taking the git repo at the &lt;code&gt;88d38d9&lt;/code&gt; hash and making some modifications. You'll know not to include these images in your production files and it's ok to overwrite them as you're iterating.&lt;/p&gt;
 &lt;p&gt;So let's look at how all of this can be implemented. Let's say you're putting all your images in one directory. The contents of this directory might look like this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ tree
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;tree
 .
-├── build-image.sh
-└── simple
-    ├── app.py
-    ├── Dockerfile
-    └── requirements.txt
+├──&lt;span class="w"&gt; &lt;/span&gt;build-image.sh
+└──&lt;span class="w"&gt; &lt;/span&gt;simple
+&lt;span class="w"&gt;    &lt;/span&gt;├──&lt;span class="w"&gt; &lt;/span&gt;app.py
+&lt;span class="w"&gt;    &lt;/span&gt;├──&lt;span class="w"&gt; &lt;/span&gt;Dockerfile
+&lt;span class="w"&gt;    &lt;/span&gt;└──&lt;span class="w"&gt; &lt;/span&gt;requirements.txt
 
-&lt;span class="m"&gt;1&lt;/span&gt; directory, &lt;span class="m"&gt;4&lt;/span&gt; files
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;directory,&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;files
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;The &lt;code&gt;build-image.sh&lt;/code&gt; script builds the Docker image and pushes it to &lt;code&gt;gcr.io&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;The script itself looks like this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="ch"&gt;#!/bin/bash&lt;/span&gt;
 
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; -z &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
-  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Usage: &lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt; &amp;lt;image_dir&amp;gt; [--debug]&amp;quot;&lt;/span&gt;
-  &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Usage: &lt;/span&gt;&lt;span class="nv"&gt;$0&lt;/span&gt;&lt;span class="s2"&gt; &amp;lt;image_dir&amp;gt; [--debug]&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;exit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
 &lt;span class="k"&gt;fi&lt;/span&gt;
 
 &lt;span class="nv"&gt;IMAGE_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;
 
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;--debug&amp;quot;&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
-  &lt;span class="c1"&gt;# If we&amp;#39;re debugging, we can push code that&amp;#39;s not committed.&lt;/span&gt;
-  &lt;span class="nv"&gt;APPEND&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-debug&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$2&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;--debug&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;# If we&amp;#39;re debugging, we can push code that&amp;#39;s not committed.&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;APPEND&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;-debug&amp;quot;&lt;/span&gt;
 &lt;span class="k"&gt;else&lt;/span&gt;
-  &lt;span class="nv"&gt;IMAGE_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;/
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nv"&gt;IMAGE_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;/
 
-  &lt;span class="k"&gt;if&lt;/span&gt; git status . --porcelain &lt;span class="p"&gt;|&lt;/span&gt; grep &lt;span class="nv"&gt;$IMAGE_PATH&lt;/span&gt; &amp;gt; /dev/null&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
-    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;You have uncommited changes to your Docker image. Please commit them&amp;quot;&lt;/span&gt;
-    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;before building and populating. This helps ensure that all docker images&amp;quot;&lt;/span&gt;
-    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;are traceable back to a git commit.&amp;quot;&lt;/span&gt;
-    &lt;span class="nb"&gt;echo&lt;/span&gt;
-    &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Or if you&amp;#39;re just building a debug image, use the --debug flag.&amp;quot;&lt;/span&gt;
-    &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
-  &lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;status&lt;span class="w"&gt; &lt;/span&gt;.&lt;span class="w"&gt; &lt;/span&gt;--porcelain&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;grep&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_PATH&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/null&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;You have uncommited changes to your Docker image. Please commit them&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;before building and populating. This helps ensure that all docker images&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;are traceable back to a git commit.&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Or if you&amp;#39;re just building a debug image, use the --debug flag.&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;exit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;fi&lt;/span&gt;
 &lt;span class="k"&gt;fi&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Set image tag.&lt;/span&gt;
-&lt;span class="nv"&gt;GIT_REV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;git log -n &lt;span class="m"&gt;1&lt;/span&gt; --pretty&lt;span class="o"&gt;=&lt;/span&gt;format:%h -- ./&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;/&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;GIT_REV&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;log&lt;span class="w"&gt; &lt;/span&gt;-n&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--pretty&lt;span class="o"&gt;=&lt;/span&gt;format:%h&lt;span class="w"&gt; &lt;/span&gt;--&lt;span class="w"&gt; &lt;/span&gt;./&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;/&lt;span class="k"&gt;)&lt;/span&gt;
 
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; ! &lt;span class="nv"&gt;$GIT_REV&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
-  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;You&amp;#39;re trying to build an image that has never been committed.&amp;quot;&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
-    &lt;span class="s2"&gt;&amp;quot;You need to commit at least one version.&amp;quot;&lt;/span&gt;
-  &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;!&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$GIT_REV&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;You&amp;#39;re trying to build an image that has never been committed.&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;You need to commit at least one version.&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;exit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
 &lt;span class="k"&gt;fi&lt;/span&gt;
 
 &lt;span class="nv"&gt;TAG&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$GIT_REV&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$APPEND&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Set image repo.&lt;/span&gt;
-&lt;span class="nv"&gt;PROJECT_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;gcloud config get-value project &lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;/dev/null&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;PROJECT_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;config&lt;span class="w"&gt; &lt;/span&gt;get-value&lt;span class="w"&gt; &lt;/span&gt;project&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&amp;gt;/dev/null&lt;span class="k"&gt;)&lt;/span&gt;
 &lt;span class="nv"&gt;DOCKER_REPO&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;gcr.io/&lt;/span&gt;&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Full image name.&lt;/span&gt;
 &lt;span class="nv"&gt;IMAGE_SPEC&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$DOCKER_REPO&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;&lt;span class="s2"&gt;:&lt;/span&gt;&lt;span class="nv"&gt;$TAG&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
 
-&lt;span class="nb"&gt;cd&lt;/span&gt; &lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;
 
-&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt; ! -f &lt;span class="nv"&gt;$DOCKERFILE&lt;/span&gt; &lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt;
-  &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;No such file: &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$DOCKERFILE&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
-  &lt;span class="nb"&gt;exit&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;!&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$DOCKERFILE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;No such file: &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_NAME&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$DOCKERFILE&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;exit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
 &lt;span class="k"&gt;fi&lt;/span&gt;
 
-&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;
 
-docker build -t &lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt; .
-gcloud docker -- push &lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;
+docker&lt;span class="w"&gt; &lt;/span&gt;build&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;.
+gcloud&lt;span class="w"&gt; &lt;/span&gt;docker&lt;span class="w"&gt; &lt;/span&gt;--&lt;span class="w"&gt; &lt;/span&gt;push&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;
 
-&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Pushed &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Pushed &lt;/span&gt;&lt;span class="nv"&gt;$IMAGE_SPEC&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;One thing to pay attention to is that the hash that we're using is the hash of the last commit to the directory that contains the container files. This way, if you want to push a production ready image (non-debug), you can only commit the files inside this directory and if you're still working on others outside of it, you can continue doing so.&lt;/p&gt;
 &lt;p&gt;Let's run the &lt;code&gt;build-image.sh&lt;/code&gt; script:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./build-image.sh simple
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;./build-image.sh&lt;span class="w"&gt; &lt;/span&gt;simple
 gcr.io/kubehub-172120/simple:12430ce
-Sending build context to Docker daemon &lt;span class="m"&gt;4&lt;/span&gt;.096 kB
-Step &lt;span class="m"&gt;1&lt;/span&gt;/9 : FROM ubuntu:latest
- ---&amp;gt; 14f60031763d
-Step &lt;span class="m"&gt;2&lt;/span&gt;/9 : MAINTAINER Petko Minkov &lt;span class="s2"&gt;&amp;quot;pminkov@gmail.com&amp;quot;&lt;/span&gt;
- ---&amp;gt; Using cache
- ---&amp;gt; 5a371036a9e3
-Step &lt;span class="m"&gt;3&lt;/span&gt;/9 : RUN apt-get update -y
- ---&amp;gt; Using cache
- ---&amp;gt; 8992277faa20
-Step &lt;span class="m"&gt;4&lt;/span&gt;/9 : RUN apt-get install -y python-pip python-dev build-essential
- ---&amp;gt; Using cache
- ---&amp;gt; 9c0937facaf0
-Step &lt;span class="m"&gt;5&lt;/span&gt;/9 : COPY . /app
- ---&amp;gt; Using cache
- ---&amp;gt; dd9f289c1f55
-Step &lt;span class="m"&gt;6&lt;/span&gt;/9 : WORKDIR /app
- ---&amp;gt; Using cache
- ---&amp;gt; d93c62ac371a
-Step &lt;span class="m"&gt;7&lt;/span&gt;/9 : RUN pip install --upgrade pip
- ---&amp;gt; Using cache
- ---&amp;gt; cb2f0a65c93f
-Step &lt;span class="m"&gt;8&lt;/span&gt;/9 : RUN pip install -r requirements.txt
- ---&amp;gt; Using cache
- ---&amp;gt; d8fd659127d9
-Step &lt;span class="m"&gt;9&lt;/span&gt;/9 : CMD python app.py
- ---&amp;gt; Using cache
- ---&amp;gt; 8493c8ad1a01
-Successfully built 8493c8ad1a01
-The push refers to a repository &lt;span class="o"&gt;[&lt;/span&gt;gcr.io/kubehub-172120/simple&lt;span class="o"&gt;]&lt;/span&gt;
-dacb974e8350: Layer already exists 
-6c4d57527510: Layer already exists 
-5348dff0fc19: Layer already exists 
-738da70fc9f8: Layer already exists 
-f665434eb0ee: Layer already exists 
-26b126eb8632: Layer already exists 
-220d34b5f6c9: Layer already exists 
-8a5132998025: Layer already exists 
-aca233ed29c3: Layer already exists 
-e5d2f035d7a4: Layer already exists 
-12430ce: digest: sha256:51cd80db604d1ffa5230289c1f3fe40d19b3b8dc2afb0a0c003713360b07d2c6 size: &lt;span class="m"&gt;2411&lt;/span&gt;
-Pushed gcr.io/kubehub-172120/simple:12430ce
-&lt;/pre&gt;&lt;/div&gt;
-
+Sending&lt;span class="w"&gt; &lt;/span&gt;build&lt;span class="w"&gt; &lt;/span&gt;context&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;Docker&lt;span class="w"&gt; &lt;/span&gt;daemon&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;.096&lt;span class="w"&gt; &lt;/span&gt;kB
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;/9&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;FROM&lt;span class="w"&gt; &lt;/span&gt;ubuntu:latest
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;14f60031763d
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;/9&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;MAINTAINER&lt;span class="w"&gt; &lt;/span&gt;Petko&lt;span class="w"&gt; &lt;/span&gt;Minkov&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;pminkov@gmail.com&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;5a371036a9e3
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;/9&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;RUN&lt;span class="w"&gt; &lt;/span&gt;apt-get&lt;span class="w"&gt; &lt;/span&gt;update&lt;span class="w"&gt; &lt;/span&gt;-y
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;8992277faa20
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;/9&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;RUN&lt;span class="w"&gt; &lt;/span&gt;apt-get&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-y&lt;span class="w"&gt; &lt;/span&gt;python-pip&lt;span class="w"&gt; &lt;/span&gt;python-dev&lt;span class="w"&gt; &lt;/span&gt;build-essential
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;9c0937facaf0
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;5&lt;/span&gt;/9&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;COPY&lt;span class="w"&gt; &lt;/span&gt;.&lt;span class="w"&gt; &lt;/span&gt;/app
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;dd9f289c1f55
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;6&lt;/span&gt;/9&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;WORKDIR&lt;span class="w"&gt; &lt;/span&gt;/app
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;d93c62ac371a
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;7&lt;/span&gt;/9&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;RUN&lt;span class="w"&gt; &lt;/span&gt;pip&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;--upgrade&lt;span class="w"&gt; &lt;/span&gt;pip
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;cb2f0a65c93f
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;8&lt;/span&gt;/9&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;RUN&lt;span class="w"&gt; &lt;/span&gt;pip&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;-r&lt;span class="w"&gt; &lt;/span&gt;requirements.txt
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;d8fd659127d9
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;9&lt;/span&gt;/9&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;CMD&lt;span class="w"&gt; &lt;/span&gt;python&lt;span class="w"&gt; &lt;/span&gt;app.py
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;8493c8ad1a01
+Successfully&lt;span class="w"&gt; &lt;/span&gt;built&lt;span class="w"&gt; &lt;/span&gt;8493c8ad1a01
+The&lt;span class="w"&gt; &lt;/span&gt;push&lt;span class="w"&gt; &lt;/span&gt;refers&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;a&lt;span class="w"&gt; &lt;/span&gt;repository&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;gcr.io/kubehub-172120/simple&lt;span class="o"&gt;]&lt;/span&gt;
+dacb974e8350:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+6c4d57527510:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+5348dff0fc19:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+738da70fc9f8:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+f665434eb0ee:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+26b126eb8632:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+220d34b5f6c9:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+8a5132998025:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+aca233ed29c3:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+e5d2f035d7a4:&lt;span class="w"&gt; &lt;/span&gt;Layer&lt;span class="w"&gt; &lt;/span&gt;already&lt;span class="w"&gt; &lt;/span&gt;exists&lt;span class="w"&gt; &lt;/span&gt;
+12430ce:&lt;span class="w"&gt; &lt;/span&gt;digest:&lt;span class="w"&gt; &lt;/span&gt;sha256:51cd80db604d1ffa5230289c1f3fe40d19b3b8dc2afb0a0c003713360b07d2c6&lt;span class="w"&gt; &lt;/span&gt;size:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2411&lt;/span&gt;
+Pushed&lt;span class="w"&gt; &lt;/span&gt;gcr.io/kubehub-172120/simple:12430ce
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Great, now the image is pushed. But I always like to use a "trust but verify" policy, so let's see how can we dig into what's going on at the registry.&lt;/p&gt;
 &lt;p&gt;My image's name is this &lt;code&gt;gcr.io/kubehub-172120/simple&lt;/code&gt;. Here's how I see the tags I have uploaded to &lt;code&gt;gcr.io&lt;/code&gt;:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud beta container images list-tags gcr.io/kubehub-172120/simple
-DIGEST        TAGS                   TIMESTAMP
-9b424f849df2  88d38d9-debug,e8bc006  &lt;span class="m"&gt;2017&lt;/span&gt;-07-30T23:03:14
-51cd80db604d  12430ce                &lt;span class="m"&gt;2017&lt;/span&gt;-07-30T23:06:42
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;beta&lt;span class="w"&gt; &lt;/span&gt;container&lt;span class="w"&gt; &lt;/span&gt;images&lt;span class="w"&gt; &lt;/span&gt;list-tags&lt;span class="w"&gt; &lt;/span&gt;gcr.io/kubehub-172120/simple
+DIGEST&lt;span class="w"&gt;        &lt;/span&gt;TAGS&lt;span class="w"&gt;                   &lt;/span&gt;TIMESTAMP
+9b424f849df2&lt;span class="w"&gt;  &lt;/span&gt;88d38d9-debug,e8bc006&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;2017&lt;/span&gt;-07-30T23:03:14
+51cd80db604d&lt;span class="w"&gt;  &lt;/span&gt;12430ce&lt;span class="w"&gt;                &lt;/span&gt;&lt;span class="m"&gt;2017&lt;/span&gt;-07-30T23:06:42
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;If you want to inspect the contents of the image, you can just run a shell, like this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud docker -- run -i -t gcr.io/kubehub-172120/simple:12430ce /bin/bash
-root@27cfb042d947:/app# ls
-Dockerfile  app.py  requirements.txt
-root@27cfb042d947:/app# 
-&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;docker&lt;span class="w"&gt; &lt;/span&gt;--&lt;span class="w"&gt; &lt;/span&gt;run&lt;span class="w"&gt; &lt;/span&gt;-i&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;gcr.io/kubehub-172120/simple:12430ce&lt;span class="w"&gt; &lt;/span&gt;/bin/bash
+root@27cfb042d947:/app#&lt;span class="w"&gt; &lt;/span&gt;ls
+Dockerfile&lt;span class="w"&gt;  &lt;/span&gt;app.py&lt;span class="w"&gt;  &lt;/span&gt;requirements.txt
+root@27cfb042d947:/app#&lt;span class="w"&gt; &lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
-&lt;p&gt;I've used this workflow when working with a Kubernetes deployment and it worked well for me. Hope it's useful for someone else too. Enjoy.&lt;/p&gt;</content></entry><entry><title>Removing a node from a Kubernetes cluster on GKE (Google Container Engine)</title><link href="http://pminkov.github.io/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html" rel="alternate"></link><published>2017-03-30T16:17:00-07:00</published><updated>2017-03-30T16:17:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-30:/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html</id><summary type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped me understand more about the GCE structures behind a Kubernetes cluster.&lt;/p&gt;
+&lt;p&gt;I've used this workflow when working with a Kubernetes deployment and it worked well for me. Hope it's useful for someone else too. Enjoy.&lt;/p&gt;</content><category term="Cloud"></category></entry><entry><title>Removing a node from a Kubernetes cluster on GKE (Google Container Engine)</title><link href="http://pminkov.github.io/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html" rel="alternate"></link><published>2017-03-30T16:17:00-07:00</published><updated>2017-03-30T16:17:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-30:/blog/removing-a-node-from-a-kubernetes-cluster-on-gke-google-container-engine.html</id><summary type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped …&lt;/p&gt;</summary><content type="html">&lt;p&gt;In this post, I'll describe how to remove a particular node from a Kubernetes cluster on GKE. Why would you want to do that? In my case, I'm running jupyterhub and I need to do that as part of implementing cluster scaling. That's probably a rare need, but it helped me understand more about the GCE structures behind a Kubernetes cluster.&lt;/p&gt;
 &lt;p&gt;So let's start. The first thing you need to do is:&lt;/p&gt;
 &lt;h3 id="drain-your-node"&gt;Drain your node&lt;/h3&gt;
 &lt;p&gt;Let's look at my nodes:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kl get nodes
-NAME                                      STATUS    AGE
-gke-jcluster-default-pool-9cc4e660-rx9p   Ready     1d
-gke-jcluster-default-pool-9cc4e660-xr4z   Ready     2d
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kl&lt;span class="w"&gt; &lt;/span&gt;get&lt;span class="w"&gt; &lt;/span&gt;nodes
+NAME&lt;span class="w"&gt;                                      &lt;/span&gt;STATUS&lt;span class="w"&gt;    &lt;/span&gt;AGE
+gke-jcluster-default-pool-9cc4e660-rx9p&lt;span class="w"&gt;   &lt;/span&gt;Ready&lt;span class="w"&gt;     &lt;/span&gt;1d
+gke-jcluster-default-pool-9cc4e660-xr4z&lt;span class="w"&gt;   &lt;/span&gt;Ready&lt;span class="w"&gt;     &lt;/span&gt;2d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;I want to remove rx9p. I'll first &lt;a href="https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/"&gt;drain&lt;/a&gt; it:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kl drain gke-jcluster-default-pool-9cc4e660-rx9p  --force
-node &lt;span class="s2"&gt;&amp;quot;gke-jcluster-default-pool-9cc4e660-rx9p&amp;quot;&lt;/span&gt; cordoned
-error: pods with &lt;span class="nb"&gt;local&lt;/span&gt; storage &lt;span class="o"&gt;(&lt;/span&gt;use --delete-local-data to override&lt;span class="o"&gt;)&lt;/span&gt;: jupyter-petko-1
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kl&lt;span class="w"&gt; &lt;/span&gt;drain&lt;span class="w"&gt; &lt;/span&gt;gke-jcluster-default-pool-9cc4e660-rx9p&lt;span class="w"&gt;  &lt;/span&gt;--force
+node&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;gke-jcluster-default-pool-9cc4e660-rx9p&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;cordoned
+error:&lt;span class="w"&gt; &lt;/span&gt;pods&lt;span class="w"&gt; &lt;/span&gt;with&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;local&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;storage&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;use&lt;span class="w"&gt; &lt;/span&gt;--delete-local-data&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;override&lt;span class="o"&gt;)&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;jupyter-petko-1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Great, the node is now drained. Next is:&lt;/p&gt;
 &lt;h3 id="removing-the-gce-vm"&gt;Removing the GCE VM&lt;/h3&gt;
 &lt;p&gt;Your Kubernetes cluster runs in an &lt;a href="https://cloud.google.com/compute/docs/instance-groups/"&gt;instance group&lt;/a&gt;. We'll need to know what this group is. Here's how to do it from the command line.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;GROUP_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;gcloud container clusters describe jcluster --format json &lt;span class="p"&gt;|&lt;/span&gt; jq  --raw-output &lt;span class="s1"&gt;&amp;#39;.instanceGroupUrls[0]&amp;#39;&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; rev &lt;span class="p"&gt;|&lt;/span&gt; cut -d&lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt; -f &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="p"&gt;|&lt;/span&gt; rev&lt;span class="k"&gt;)&lt;/span&gt;
-$ &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="nv"&gt;$GROUP_ID&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;GROUP_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;container&lt;span class="w"&gt; &lt;/span&gt;clusters&lt;span class="w"&gt; &lt;/span&gt;describe&lt;span class="w"&gt; &lt;/span&gt;jcluster&lt;span class="w"&gt; &lt;/span&gt;--format&lt;span class="w"&gt; &lt;/span&gt;json&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;jq&lt;span class="w"&gt;  &lt;/span&gt;--raw-output&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;.instanceGroupUrls[0]&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;rev&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;cut&lt;span class="w"&gt; &lt;/span&gt;-d&lt;span class="s1"&gt;&amp;#39;/&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;rev&lt;span class="k"&gt;)&lt;/span&gt;
+$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$GROUP_ID&lt;/span&gt;
 gke-jcluster-default-pool-9cc4e660-grp
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Let's check my instances:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud compute instances list
-NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
-gke-jcluster-default-pool-9cc4e660-rx9p  us-central1-b  n1-standard-1               &lt;span class="m"&gt;10&lt;/span&gt;.128.0.2   &lt;span class="m"&gt;104&lt;/span&gt;.198.174.222  RUNNING
-gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               &lt;span class="m"&gt;10&lt;/span&gt;.128.0.4   &lt;span class="m"&gt;104&lt;/span&gt;.197.237.135  RUNNING
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;compute&lt;span class="w"&gt; &lt;/span&gt;instances&lt;span class="w"&gt; &lt;/span&gt;list
+NAME&lt;span class="w"&gt;                                     &lt;/span&gt;ZONE&lt;span class="w"&gt;           &lt;/span&gt;MACHINE_TYPE&lt;span class="w"&gt;   &lt;/span&gt;PREEMPTIBLE&lt;span class="w"&gt;  &lt;/span&gt;INTERNAL_IP&lt;span class="w"&gt;  &lt;/span&gt;EXTERNAL_IP&lt;span class="w"&gt;      &lt;/span&gt;STATUS
+gke-jcluster-default-pool-9cc4e660-rx9p&lt;span class="w"&gt;  &lt;/span&gt;us-central1-b&lt;span class="w"&gt;  &lt;/span&gt;n1-standard-1&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.128.0.2&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;104&lt;/span&gt;.198.174.222&lt;span class="w"&gt;  &lt;/span&gt;RUNNING
+gke-jcluster-default-pool-9cc4e660-xr4z&lt;span class="w"&gt;  &lt;/span&gt;us-central1-b&lt;span class="w"&gt;  &lt;/span&gt;n1-standard-1&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.128.0.4&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;104&lt;/span&gt;.197.237.135&lt;span class="w"&gt;  &lt;/span&gt;RUNNING
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;If I just run &lt;code&gt;gcloud compute instances delete&lt;/code&gt; that won't work! That's because I have an instance group of size 2 and if I delete one of the machines, GCE will start a new one. I have to use the &lt;code&gt;gcloud compute  instance-groups managed delete-instances&lt;/code&gt; command, followed by &lt;code&gt;gcloud compute instance-groups managed wait-until-stable&lt;/code&gt; if I want to wait until the job is done.&lt;/p&gt;
 &lt;p&gt;Let's see how that looks like:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud compute instance-groups managed delete-instances &lt;span class="nv"&gt;$GROUP_ID&lt;/span&gt; --instances&lt;span class="o"&gt;=&lt;/span&gt;gke-jcluster-default-pool-9cc4e660-rx9p
-Updated &lt;span class="o"&gt;[&lt;/span&gt;https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp&lt;span class="o"&gt;]&lt;/span&gt;.
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;compute&lt;span class="w"&gt; &lt;/span&gt;instance-groups&lt;span class="w"&gt; &lt;/span&gt;managed&lt;span class="w"&gt; &lt;/span&gt;delete-instances&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$GROUP_ID&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--instances&lt;span class="o"&gt;=&lt;/span&gt;gke-jcluster-default-pool-9cc4e660-rx9p
+Updated&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp&lt;span class="o"&gt;]&lt;/span&gt;.
 ---
-baseInstanceName: gke-jcluster-default-pool-9cc4e660
-creationTimestamp: &lt;span class="s1"&gt;&amp;#39;2017-03-25T02:52:22.040-07:00&amp;#39;&lt;/span&gt;
+baseInstanceName:&lt;span class="w"&gt; &lt;/span&gt;gke-jcluster-default-pool-9cc4e660
+creationTimestamp:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;2017-03-25T02:52:22.040-07:00&amp;#39;&lt;/span&gt;
 currentActions:
-  abandoning: &lt;span class="m"&gt;0&lt;/span&gt;
-  creating: &lt;span class="m"&gt;0&lt;/span&gt;
-  creatingWithoutRetries: &lt;span class="m"&gt;0&lt;/span&gt;
-  deleting: &lt;span class="m"&gt;1&lt;/span&gt;
-  none: &lt;span class="m"&gt;1&lt;/span&gt;
-  recreating: &lt;span class="m"&gt;0&lt;/span&gt;
-  refreshing: &lt;span class="m"&gt;0&lt;/span&gt;
-  restarting: &lt;span class="m"&gt;0&lt;/span&gt;
-fingerprint: &lt;span class="nv"&gt;kUg7ggCEudY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
-id: &lt;span class="s1"&gt;&amp;#39;6475008099735012154&amp;#39;&lt;/span&gt;
-instanceGroup: gke-jcluster-default-pool-9cc4e660-grp
-instanceTemplate: gke-jcluster-default-pool-9cc4e660
-kind: compute#instanceGroupManager
-name: gke-jcluster-default-pool-9cc4e660-grp
-selfLink: https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp
-targetSize: &lt;span class="m"&gt;1&lt;/span&gt;
-zone: us-central1-b
-$ gcloud compute instance-groups managed wait-until-stable &lt;span class="nv"&gt;$GROUP_ID&lt;/span&gt;
-Waiting &lt;span class="k"&gt;for&lt;/span&gt; group to become stable, current operations: deleting: &lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;abandoning:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;creating:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;creatingWithoutRetries:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;deleting:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;none:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;recreating:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;refreshing:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;restarting:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;
+fingerprint:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;kUg7ggCEudY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;
+id:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;6475008099735012154&amp;#39;&lt;/span&gt;
+instanceGroup:&lt;span class="w"&gt; &lt;/span&gt;gke-jcluster-default-pool-9cc4e660-grp
+instanceTemplate:&lt;span class="w"&gt; &lt;/span&gt;gke-jcluster-default-pool-9cc4e660
+kind:&lt;span class="w"&gt; &lt;/span&gt;compute#instanceGroupManager
+name:&lt;span class="w"&gt; &lt;/span&gt;gke-jcluster-default-pool-9cc4e660-grp
+selfLink:&lt;span class="w"&gt; &lt;/span&gt;https://www.googleapis.com/compute/v1/projects/myhub-161019/zones/us-central1-b/instanceGroupManagers/gke-jcluster-default-pool-9cc4e660-grp
+targetSize:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
+zone:&lt;span class="w"&gt; &lt;/span&gt;us-central1-b
+$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;compute&lt;span class="w"&gt; &lt;/span&gt;instance-groups&lt;span class="w"&gt; &lt;/span&gt;managed&lt;span class="w"&gt; &lt;/span&gt;wait-until-stable&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$GROUP_ID&lt;/span&gt;
+Waiting&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;group&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;become&lt;span class="w"&gt; &lt;/span&gt;stable,&lt;span class="w"&gt; &lt;/span&gt;current&lt;span class="w"&gt; &lt;/span&gt;operations:&lt;span class="w"&gt; &lt;/span&gt;deleting:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
 ...
-Waiting &lt;span class="k"&gt;for&lt;/span&gt; group to become stable, current operations: deleting: &lt;span class="m"&gt;1&lt;/span&gt;
-Group is stable
-&lt;/pre&gt;&lt;/div&gt;
-
+Waiting&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;group&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;become&lt;span class="w"&gt; &lt;/span&gt;stable,&lt;span class="w"&gt; &lt;/span&gt;current&lt;span class="w"&gt; &lt;/span&gt;operations:&lt;span class="w"&gt; &lt;/span&gt;deleting:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
+Group&lt;span class="w"&gt; &lt;/span&gt;is&lt;span class="w"&gt; &lt;/span&gt;stable
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;And indeed, we only have one node left now:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kl get nodes
-gcloud compute instanceNAME                                      STATUS    AGE
-gke-jcluster-default-pool-9cc4e660-xr4z   Ready     2d
-$ gcloud compute instances list
-NAME                                     ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP      STATUS
-gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1               &lt;span class="m"&gt;10&lt;/span&gt;.128.0.4   &lt;span class="m"&gt;104&lt;/span&gt;.197.237.135  RUNNING
-&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kl&lt;span class="w"&gt; &lt;/span&gt;get&lt;span class="w"&gt; &lt;/span&gt;nodes
+gcloud&lt;span class="w"&gt; &lt;/span&gt;compute&lt;span class="w"&gt; &lt;/span&gt;instanceNAME&lt;span class="w"&gt;                                      &lt;/span&gt;STATUS&lt;span class="w"&gt;    &lt;/span&gt;AGE
+gke-jcluster-default-pool-9cc4e660-xr4z&lt;span class="w"&gt;   &lt;/span&gt;Ready&lt;span class="w"&gt;     &lt;/span&gt;2d
+$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;compute&lt;span class="w"&gt; &lt;/span&gt;instances&lt;span class="w"&gt; &lt;/span&gt;list
+NAME&lt;span class="w"&gt;                                     &lt;/span&gt;ZONE&lt;span class="w"&gt;           &lt;/span&gt;MACHINE_TYPE&lt;span class="w"&gt;   &lt;/span&gt;PREEMPTIBLE&lt;span class="w"&gt;  &lt;/span&gt;INTERNAL_IP&lt;span class="w"&gt;  &lt;/span&gt;EXTERNAL_IP&lt;span class="w"&gt;      &lt;/span&gt;STATUS
+gke-jcluster-default-pool-9cc4e660-xr4z&lt;span class="w"&gt;  &lt;/span&gt;us-central1-b&lt;span class="w"&gt;  &lt;/span&gt;n1-standard-1&lt;span class="w"&gt;               &lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.128.0.4&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;104&lt;/span&gt;.197.237.135&lt;span class="w"&gt;  &lt;/span&gt;RUNNING
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
-&lt;p&gt;So that's it. Regardless of whether you need to delete individual nodes, it's interesting to take a look at how you can do that.&lt;/p&gt;</content></entry><entry><title>Starting with Kubernetes on Google Container Engine</title><link href="http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html" rel="alternate"></link><published>2017-03-07T12:42:00-08:00</published><updated>2017-03-07T12:42:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-07:/blog/starting-with-kubernetes-on-google-container-engine.html</id><summary type="html">&lt;p&gt;This is a tutorial of how to run a simple Kubernetes app on &lt;a href="https://cloud.google.com/container-engine/"&gt;GKE&lt;/a&gt; (Google Container Engine).&lt;/p&gt;
+&lt;p&gt;So that's it. Regardless of whether you need to delete individual nodes, it's interesting to take a look at how you can do that.&lt;/p&gt;</content><category term="Cloud"></category></entry><entry><title>Starting with Kubernetes on Google Container Engine</title><link href="http://pminkov.github.io/blog/starting-with-kubernetes-on-google-container-engine.html" rel="alternate"></link><published>2017-03-07T12:42:00-08:00</published><updated>2017-03-07T12:42:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-03-07:/blog/starting-with-kubernetes-on-google-container-engine.html</id><summary type="html">&lt;p&gt;This is a tutorial of how to run a simple Kubernetes app on &lt;a href="https://cloud.google.com/container-engine/"&gt;GKE&lt;/a&gt; (Google Container Engine).&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://kubernetes.io/"&gt;Kubernetes&lt;/a&gt; is a container orchestration software that started at Google. Right now it's an open source project maintained by &lt;a href="https://www.cncf.io/"&gt;Cloud Native Computing Foundation&lt;/a&gt;. &lt;/p&gt;
 &lt;p&gt;So what's Kubernetes all about? Roughly, it's about managing a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This is a tutorial of how to run a simple Kubernetes app on &lt;a href="https://cloud.google.com/container-engine/"&gt;GKE&lt;/a&gt; (Google Container Engine).&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://kubernetes.io/"&gt;Kubernetes&lt;/a&gt; is a container orchestration software that started at Google. Right now it's an open source project maintained by &lt;a href="https://www.cncf.io/"&gt;Cloud Native Computing Foundation&lt;/a&gt;. &lt;/p&gt;
@@ -243,214 +232,194 @@ gke-jcluster-default-pool-9cc4e660-xr4z  us-central1-b  n1-standard-1           
 &lt;li&gt;Initialize gcloud by running &lt;code&gt;gcloud init&lt;/code&gt;. You'll be asked for the name of your project.&lt;/li&gt;
 &lt;li&gt;Set a &lt;a href="https://cloud.google.com/compute/docs/regions-zones/regions-zones#available"&gt;Compute Engine zone&lt;/a&gt;, like this:&lt;/li&gt;
 &lt;/ol&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;gcloud config &lt;span class="nb"&gt;set&lt;/span&gt; compute/zone us-central1-b
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;config&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;set&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;compute/zone&lt;span class="w"&gt; &lt;/span&gt;us-central1-b
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;That's it. You can view your configuration:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud config list
-Your active configuration is: &lt;span class="o"&gt;[&lt;/span&gt;mykube&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;config&lt;span class="w"&gt; &lt;/span&gt;list
+Your&lt;span class="w"&gt; &lt;/span&gt;active&lt;span class="w"&gt; &lt;/span&gt;configuration&lt;span class="w"&gt; &lt;/span&gt;is:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;mykube&lt;span class="o"&gt;]&lt;/span&gt;
 
 &lt;span class="o"&gt;[&lt;/span&gt;compute&lt;span class="o"&gt;]&lt;/span&gt;
-&lt;span class="nv"&gt;zone&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; us-central1-b
+&lt;span class="nv"&gt;zone&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;us-central1-b
 &lt;span class="o"&gt;[&lt;/span&gt;core&lt;span class="o"&gt;]&lt;/span&gt;
-&lt;span class="nv"&gt;account&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; pminkov@gmail.com
-&lt;span class="nv"&gt;disable_usage_reporting&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; False
-&lt;span class="nv"&gt;project&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; mykube-160819
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;span class="nv"&gt;account&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;pminkov@gmail.com
+&lt;span class="nv"&gt;disable_usage_reporting&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;False
+&lt;span class="nv"&gt;project&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;mykube-160819
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Let's authenticate gcloud too:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;gcloud auth application-default login
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;auth&lt;span class="w"&gt; &lt;/span&gt;application-default&lt;span class="w"&gt; &lt;/span&gt;login
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h3 id="run-a-container-image"&gt;Run a container image.&lt;/h3&gt;
 &lt;p&gt;Our container is going to be a node.js application that we'll build ourselves. I wanted to experiment with an app that takes a bit more memory, so here's how my code looks like:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nx"&gt;$&lt;/span&gt; &lt;span class="nx"&gt;cat&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nx"&gt;server&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;js&lt;/span&gt; 
-&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="nx"&gt;randomInt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;floor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;random&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nx"&gt;n&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;$&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;cat&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="nx"&gt;server&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;js&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;randomInt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;floor&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;Math&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;random&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;n&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
-&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;http&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;http&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
-&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;N&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;20000000&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
-&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;nums&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nb"&gt;Array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;20000000&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;nums&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ow"&gt;new&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;Array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
-&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="nx"&gt;nums&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;randomInt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;nums&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;i&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;randomInt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;10&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
 &lt;span class="p"&gt;}&lt;/span&gt;
 
-&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;handleRequest&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
-  &lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Received request for URL: &amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;request&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-  &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;writeHead&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-  &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;index&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;randomInt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-  &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Returning element at index &amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;index&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;: &amp;#39;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nx"&gt;nums&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;\n&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-  &lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;end&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Hello World!&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;handleRequest&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;request&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Received request for URL: &amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;request&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;url&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;writeHead&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;200&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;index&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;randomInt&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;N&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;write&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Returning element at index &amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;index&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;: &amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;nums&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nx"&gt;index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;\n&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nx"&gt;response&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;end&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Hello World!&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 &lt;span class="p"&gt;};&lt;/span&gt;
-&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;www&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createServer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;handleRequest&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;www&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createServer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;handleRequest&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
 
 &lt;span class="nx"&gt;console&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;log&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Listening on port 8080&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;span class="nx"&gt;www&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;8080&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;span class="nx"&gt;www&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;8080&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;We also need a Dockerfile:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ cat ./Dockerfile 
-FROM node:4
-EXPOSE &lt;span class="m"&gt;8080&lt;/span&gt;
-COPY server.js .
-CMD node server.js
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;cat&lt;span class="w"&gt; &lt;/span&gt;./Dockerfile&lt;span class="w"&gt; &lt;/span&gt;
+FROM&lt;span class="w"&gt; &lt;/span&gt;node:4
+EXPOSE&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;8080&lt;/span&gt;
+COPY&lt;span class="w"&gt; &lt;/span&gt;server.js&lt;span class="w"&gt; &lt;/span&gt;.
+CMD&lt;span class="w"&gt; &lt;/span&gt;node&lt;span class="w"&gt; &lt;/span&gt;server.js
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;In order to run a container on GKE, we need to upload it to &lt;a href="https://cloud.google.com/container-registry/"&gt;Google Container Registry&lt;/a&gt;. Let's do it:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PROJECT_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;mykube-160819
-$ docker build -t gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver .
-Sending build context to Docker daemon &lt;span class="m"&gt;3&lt;/span&gt;.584 kB
-Step &lt;span class="m"&gt;1&lt;/span&gt;/4 : FROM node:4
- ---&amp;gt; d7efee1f035d
-Step &lt;span class="m"&gt;2&lt;/span&gt;/4 : EXPOSE &lt;span class="m"&gt;8080&lt;/span&gt;
- ---&amp;gt; Using cache
- ---&amp;gt; 147e7888542d
-Step &lt;span class="m"&gt;3&lt;/span&gt;/4 : COPY server.js .
- ---&amp;gt; Using cache
- ---&amp;gt; b610e7975d20
-Step &lt;span class="m"&gt;4&lt;/span&gt;/4 : CMD node server.js
- ---&amp;gt; Using cache
- ---&amp;gt; 4e15133cdab2
-Successfully built 4e15133cdab2
-$ gcloud docker -- push gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver
-The push refers to a repository &lt;span class="o"&gt;[&lt;/span&gt;gcr.io/mykube-160819/myserver&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;PROJECT_ID&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;mykube-160819
+$&lt;span class="w"&gt; &lt;/span&gt;docker&lt;span class="w"&gt; &lt;/span&gt;build&lt;span class="w"&gt; &lt;/span&gt;-t&lt;span class="w"&gt; &lt;/span&gt;gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver&lt;span class="w"&gt; &lt;/span&gt;.
+Sending&lt;span class="w"&gt; &lt;/span&gt;build&lt;span class="w"&gt; &lt;/span&gt;context&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;Docker&lt;span class="w"&gt; &lt;/span&gt;daemon&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;.584&lt;span class="w"&gt; &lt;/span&gt;kB
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;/4&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;FROM&lt;span class="w"&gt; &lt;/span&gt;node:4
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;d7efee1f035d
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;/4&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;EXPOSE&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;8080&lt;/span&gt;
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;147e7888542d
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;/4&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;COPY&lt;span class="w"&gt; &lt;/span&gt;server.js&lt;span class="w"&gt; &lt;/span&gt;.
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;b610e7975d20
+Step&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;/4&lt;span class="w"&gt; &lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;CMD&lt;span class="w"&gt; &lt;/span&gt;node&lt;span class="w"&gt; &lt;/span&gt;server.js
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;Using&lt;span class="w"&gt; &lt;/span&gt;cache
+&lt;span class="w"&gt; &lt;/span&gt;---&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;4e15133cdab2
+Successfully&lt;span class="w"&gt; &lt;/span&gt;built&lt;span class="w"&gt; &lt;/span&gt;4e15133cdab2
+$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;docker&lt;span class="w"&gt; &lt;/span&gt;--&lt;span class="w"&gt; &lt;/span&gt;push&lt;span class="w"&gt; &lt;/span&gt;gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver
+The&lt;span class="w"&gt; &lt;/span&gt;push&lt;span class="w"&gt; &lt;/span&gt;refers&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;a&lt;span class="w"&gt; &lt;/span&gt;repository&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;gcr.io/mykube-160819/myserver&lt;span class="o"&gt;]&lt;/span&gt;
 &lt;span class="c1"&gt;# Note that I already have a project called &amp;quot;hikube&amp;quot; which has the same docker image.&lt;/span&gt;
 &lt;span class="c1"&gt;# The &amp;quot;mykube&amp;quot; project is something I created for this tutorial.&lt;/span&gt;
-1bcf3881e79d: Mounted from hikube-160719/myserver 
-65e403c25ee9: Mounted from hikube-160719/myserver 
-4732c3666dd7: Mounted from hikube-160719/myserver 
-a1fbf6fa923f: Mounted from hikube-160719/myserver 
-1b8ef9ac5116: Mounted from hikube-160719/myserver 
-41ef8cc0bccb: Mounted from hikube-160719/myserver 
-100396c46221: Mounted from hikube-160719/myserver 
-7b4b54c74241: Mounted from hikube-160719/myserver 
-d17d48b2382a: Mounted from hikube-160719/myserver 
-latest: digest: sha256:4ad68f056e870938823f6c9555355c149cf7c42a213d7243d915f1a4bcfb9cb1 size: &lt;span class="m"&gt;2213&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
+1bcf3881e79d:&lt;span class="w"&gt; &lt;/span&gt;Mounted&lt;span class="w"&gt; &lt;/span&gt;from&lt;span class="w"&gt; &lt;/span&gt;hikube-160719/myserver&lt;span class="w"&gt; &lt;/span&gt;
+65e403c25ee9:&lt;span class="w"&gt; &lt;/span&gt;Mounted&lt;span class="w"&gt; &lt;/span&gt;from&lt;span class="w"&gt; &lt;/span&gt;hikube-160719/myserver&lt;span class="w"&gt; &lt;/span&gt;
+4732c3666dd7:&lt;span class="w"&gt; &lt;/span&gt;Mounted&lt;span class="w"&gt; &lt;/span&gt;from&lt;span class="w"&gt; &lt;/span&gt;hikube-160719/myserver&lt;span class="w"&gt; &lt;/span&gt;
+a1fbf6fa923f:&lt;span class="w"&gt; &lt;/span&gt;Mounted&lt;span class="w"&gt; &lt;/span&gt;from&lt;span class="w"&gt; &lt;/span&gt;hikube-160719/myserver&lt;span class="w"&gt; &lt;/span&gt;
+1b8ef9ac5116:&lt;span class="w"&gt; &lt;/span&gt;Mounted&lt;span class="w"&gt; &lt;/span&gt;from&lt;span class="w"&gt; &lt;/span&gt;hikube-160719/myserver&lt;span class="w"&gt; &lt;/span&gt;
+41ef8cc0bccb:&lt;span class="w"&gt; &lt;/span&gt;Mounted&lt;span class="w"&gt; &lt;/span&gt;from&lt;span class="w"&gt; &lt;/span&gt;hikube-160719/myserver&lt;span class="w"&gt; &lt;/span&gt;
+100396c46221:&lt;span class="w"&gt; &lt;/span&gt;Mounted&lt;span class="w"&gt; &lt;/span&gt;from&lt;span class="w"&gt; &lt;/span&gt;hikube-160719/myserver&lt;span class="w"&gt; &lt;/span&gt;
+7b4b54c74241:&lt;span class="w"&gt; &lt;/span&gt;Mounted&lt;span class="w"&gt; &lt;/span&gt;from&lt;span class="w"&gt; &lt;/span&gt;hikube-160719/myserver&lt;span class="w"&gt; &lt;/span&gt;
+d17d48b2382a:&lt;span class="w"&gt; &lt;/span&gt;Mounted&lt;span class="w"&gt; &lt;/span&gt;from&lt;span class="w"&gt; &lt;/span&gt;hikube-160719/myserver&lt;span class="w"&gt; &lt;/span&gt;
+latest:&lt;span class="w"&gt; &lt;/span&gt;digest:&lt;span class="w"&gt; &lt;/span&gt;sha256:4ad68f056e870938823f6c9555355c149cf7c42a213d7243d915f1a4bcfb9cb1&lt;span class="w"&gt; &lt;/span&gt;size:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2213&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;If you go to the Google Cloud Console and open the Google Container Registry, you'll see the container uploaded:&lt;/p&gt;
 &lt;p&gt;&lt;center&gt;&lt;img alt="Google Container Registry" src="http://pminkov.github.io/blog/images/k8s-intro/k1-registry.png"&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;p&gt;Now let's create a cluster that we'll be deploying our server to:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud container clusters create example-cluster
-Creating cluster example-cluster...done.                                                                                                                                               
-Created &lt;span class="o"&gt;[&lt;/span&gt;https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster&lt;span class="o"&gt;]&lt;/span&gt;.
-kubeconfig entry generated &lt;span class="k"&gt;for&lt;/span&gt; example-cluster.
-NAME             ZONE           MASTER_VERSION  MASTER_IP       MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
-example-cluster  us-central1-b  &lt;span class="m"&gt;1&lt;/span&gt;.5.3           &lt;span class="m"&gt;104&lt;/span&gt;.198.190.52  n1-standard-1  &lt;span class="m"&gt;1&lt;/span&gt;.5.3         &lt;span class="m"&gt;3&lt;/span&gt;          RUNNING
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;container&lt;span class="w"&gt; &lt;/span&gt;clusters&lt;span class="w"&gt; &lt;/span&gt;create&lt;span class="w"&gt; &lt;/span&gt;example-cluster
+Creating&lt;span class="w"&gt; &lt;/span&gt;cluster&lt;span class="w"&gt; &lt;/span&gt;example-cluster...done.&lt;span class="w"&gt;                                                                                                                                               &lt;/span&gt;
+Created&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster&lt;span class="o"&gt;]&lt;/span&gt;.
+kubeconfig&lt;span class="w"&gt; &lt;/span&gt;entry&lt;span class="w"&gt; &lt;/span&gt;generated&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;example-cluster.
+NAME&lt;span class="w"&gt;             &lt;/span&gt;ZONE&lt;span class="w"&gt;           &lt;/span&gt;MASTER_VERSION&lt;span class="w"&gt;  &lt;/span&gt;MASTER_IP&lt;span class="w"&gt;       &lt;/span&gt;MACHINE_TYPE&lt;span class="w"&gt;   &lt;/span&gt;NODE_VERSION&lt;span class="w"&gt;  &lt;/span&gt;NUM_NODES&lt;span class="w"&gt;  &lt;/span&gt;STATUS
+example-cluster&lt;span class="w"&gt;  &lt;/span&gt;us-central1-b&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;.5.3&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="m"&gt;104&lt;/span&gt;.198.190.52&lt;span class="w"&gt;  &lt;/span&gt;n1-standard-1&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;.5.3&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="m"&gt;3&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;RUNNING
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Congratulations! We have a cluster running.&lt;/p&gt;
 &lt;p&gt;A little segway. kubectl has a config that determines which cluster you're working with. You can switch between different clusters. Try it:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl config current-context
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;config&lt;span class="w"&gt; &lt;/span&gt;current-context
 gke_mykube-160819_us-central1-b_example-cluster
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;We're good here - our context is for the "mykube" cluster. The cluster is empty, we can verify it like this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods
-No resources found.
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;get&lt;span class="w"&gt; &lt;/span&gt;pods
+No&lt;span class="w"&gt; &lt;/span&gt;resources&lt;span class="w"&gt; &lt;/span&gt;found.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Now let's start out server finally:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl run myserver --image&lt;span class="o"&gt;=&lt;/span&gt;gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver --port&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;8080&lt;/span&gt;
-deployment &lt;span class="s2"&gt;&amp;quot;myserver&amp;quot;&lt;/span&gt; created
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;run&lt;span class="w"&gt; &lt;/span&gt;myserver&lt;span class="w"&gt; &lt;/span&gt;--image&lt;span class="o"&gt;=&lt;/span&gt;gcr.io/&lt;span class="nv"&gt;$PROJECT_ID&lt;/span&gt;/myserver&lt;span class="w"&gt; &lt;/span&gt;--port&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;8080&lt;/span&gt;
+deployment&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;myserver&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;created
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;We have created a deployment that contains a pod. Let's see what pods we have now:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods
-NAME                        READY     STATUS              RESTARTS   AGE
-myserver-3430466764-04b36   &lt;span class="m"&gt;0&lt;/span&gt;/1       ContainerCreating   &lt;span class="m"&gt;0&lt;/span&gt;          17s
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;get&lt;span class="w"&gt; &lt;/span&gt;pods
+NAME&lt;span class="w"&gt;                        &lt;/span&gt;READY&lt;span class="w"&gt;     &lt;/span&gt;STATUS&lt;span class="w"&gt;              &lt;/span&gt;RESTARTS&lt;span class="w"&gt;   &lt;/span&gt;AGE
+myserver-3430466764-04b36&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;/1&lt;span class="w"&gt;       &lt;/span&gt;ContainerCreating&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;17s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Nice, our container is getting spinned. We wait for a bit and we see:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods
-NAME                        READY     STATUS    RESTARTS   AGE
-myserver-3430466764-04b36   &lt;span class="m"&gt;1&lt;/span&gt;/1       Running   &lt;span class="m"&gt;0&lt;/span&gt;          58s
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;get&lt;span class="w"&gt; &lt;/span&gt;pods
+NAME&lt;span class="w"&gt;                        &lt;/span&gt;READY&lt;span class="w"&gt;     &lt;/span&gt;STATUS&lt;span class="w"&gt;    &lt;/span&gt;RESTARTS&lt;span class="w"&gt;   &lt;/span&gt;AGE
+myserver-3430466764-04b36&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;/1&lt;span class="w"&gt;       &lt;/span&gt;Running&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;58s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;We can now expose the container:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl expose deployment myserver --type&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;LoadBalancer&amp;quot;&lt;/span&gt;
-service &lt;span class="s2"&gt;&amp;quot;myserver&amp;quot;&lt;/span&gt; exposed
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;expose&lt;span class="w"&gt; &lt;/span&gt;deployment&lt;span class="w"&gt; &lt;/span&gt;myserver&lt;span class="w"&gt; &lt;/span&gt;--type&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;LoadBalancer&amp;quot;&lt;/span&gt;
+service&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;myserver&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;exposed
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;This will also take some time:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get service myserver
-NAME       CLUSTER-IP   EXTERNAL-IP   PORT&lt;span class="o"&gt;(&lt;/span&gt;S&lt;span class="o"&gt;)&lt;/span&gt;          AGE
-myserver   &lt;span class="m"&gt;10&lt;/span&gt;.3.247.6   &amp;lt;pending&amp;gt;     &lt;span class="m"&gt;8080&lt;/span&gt;:31574/TCP   34s
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;get&lt;span class="w"&gt; &lt;/span&gt;service&lt;span class="w"&gt; &lt;/span&gt;myserver
+NAME&lt;span class="w"&gt;       &lt;/span&gt;CLUSTER-IP&lt;span class="w"&gt;   &lt;/span&gt;EXTERNAL-IP&lt;span class="w"&gt;   &lt;/span&gt;PORT&lt;span class="o"&gt;(&lt;/span&gt;S&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;AGE
+myserver&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.3.247.6&lt;span class="w"&gt;   &lt;/span&gt;&amp;lt;pending&amp;gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="m"&gt;8080&lt;/span&gt;:31574/TCP&lt;span class="w"&gt;   &lt;/span&gt;34s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Aaand, it's done:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get service myserver
-NAME       CLUSTER-IP   EXTERNAL-IP      PORT&lt;span class="o"&gt;(&lt;/span&gt;S&lt;span class="o"&gt;)&lt;/span&gt;          AGE
-myserver   &lt;span class="m"&gt;10&lt;/span&gt;.3.247.6   &lt;span class="m"&gt;104&lt;/span&gt;.155.177.47   &lt;span class="m"&gt;8080&lt;/span&gt;:31574/TCP   1m
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;get&lt;span class="w"&gt; &lt;/span&gt;service&lt;span class="w"&gt; &lt;/span&gt;myserver
+NAME&lt;span class="w"&gt;       &lt;/span&gt;CLUSTER-IP&lt;span class="w"&gt;   &lt;/span&gt;EXTERNAL-IP&lt;span class="w"&gt;      &lt;/span&gt;PORT&lt;span class="o"&gt;(&lt;/span&gt;S&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;AGE
+myserver&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.3.247.6&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;104&lt;/span&gt;.155.177.47&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;8080&lt;/span&gt;:31574/TCP&lt;span class="w"&gt;   &lt;/span&gt;1m
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;If we go to &lt;code&gt;http://104.155.177.47:8080/&lt;/code&gt;, we'll see:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Returning element at index &lt;span class="m"&gt;6110645&lt;/span&gt;: &lt;span class="m"&gt;116527640&lt;/span&gt;
-Hello World!
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Returning&lt;span class="w"&gt; &lt;/span&gt;element&lt;span class="w"&gt; &lt;/span&gt;at&lt;span class="w"&gt; &lt;/span&gt;index&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;6110645&lt;/span&gt;:&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;116527640&lt;/span&gt;
+Hello&lt;span class="w"&gt; &lt;/span&gt;World!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Now, the tedious part is over. Let's have some fun. We can monitor our cluster through the Kubernetes dashboard. For a reason unclear to me, this dashboard is not available on the Google website. You have to run a proxy to do it. Like this:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl proxy
-Starting to serve on &lt;span class="m"&gt;127&lt;/span&gt;.0.0.1:8001
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;proxy
+Starting&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;serve&lt;span class="w"&gt; &lt;/span&gt;on&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;127&lt;/span&gt;.0.0.1:8001
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;We can see the dashboard at &lt;code&gt;localhost:8001/ui&lt;/code&gt;. It looks like this:&lt;/p&gt;
 &lt;p&gt;&lt;center&gt;&lt;img alt="Kubernetes Dashboard" src="http://pminkov.github.io/blog/images/k8s-intro/k2-dashboard.png"&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;p&gt;This dashboard is a lot of fun. You can dig into everything available in it. You can probably see everything it shows through kubectl as well, but it's easier to do it by using an UI.&lt;/p&gt;
 &lt;p&gt;Here's something else that's fun. Your cluster doesn't run on thin air. It runs on Google Compute Engine instances (I believe this is equivalent to AWS' EC2). In your cloud console, you can navigate to your instances and you can even SSH to an instance from the web UI (I wow-ed the first time I did this, much easier than setting up ssh access on AWS).&lt;/p&gt;
 &lt;p&gt;Our cluster has three nodes.&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get nodes
-NAME                                             STATUS    AGE
-gke-example-cluster-default-pool-2567fc65-1h40   Ready     21m
-gke-example-cluster-default-pool-2567fc65-g7lc   Ready     21m
-gke-example-cluster-default-pool-2567fc65-n0cp   Ready     21m
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;get&lt;span class="w"&gt; &lt;/span&gt;nodes
+NAME&lt;span class="w"&gt;                                             &lt;/span&gt;STATUS&lt;span class="w"&gt;    &lt;/span&gt;AGE
+gke-example-cluster-default-pool-2567fc65-1h40&lt;span class="w"&gt;   &lt;/span&gt;Ready&lt;span class="w"&gt;     &lt;/span&gt;21m
+gke-example-cluster-default-pool-2567fc65-g7lc&lt;span class="w"&gt;   &lt;/span&gt;Ready&lt;span class="w"&gt;     &lt;/span&gt;21m
+gke-example-cluster-default-pool-2567fc65-n0cp&lt;span class="w"&gt;   &lt;/span&gt;Ready&lt;span class="w"&gt;     &lt;/span&gt;21m
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;These are three GCE instances. Where is our pod running at?&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ kubectl get pods -o wide
-NAME                        READY     STATUS    RESTARTS   AGE       IP         NODE
-myserver-3430466764-04b36   &lt;span class="m"&gt;1&lt;/span&gt;/1       Running   &lt;span class="m"&gt;0&lt;/span&gt;          18m       &lt;span class="m"&gt;10&lt;/span&gt;.0.1.5   gke-example-cluster-default-pool-2567fc65-g7lc
-&lt;/pre&gt;&lt;/div&gt;
-
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;kubectl&lt;span class="w"&gt; &lt;/span&gt;get&lt;span class="w"&gt; &lt;/span&gt;pods&lt;span class="w"&gt; &lt;/span&gt;-o&lt;span class="w"&gt; &lt;/span&gt;wide
+NAME&lt;span class="w"&gt;                        &lt;/span&gt;READY&lt;span class="w"&gt;     &lt;/span&gt;STATUS&lt;span class="w"&gt;    &lt;/span&gt;RESTARTS&lt;span class="w"&gt;   &lt;/span&gt;AGE&lt;span class="w"&gt;       &lt;/span&gt;IP&lt;span class="w"&gt;         &lt;/span&gt;NODE
+myserver-3430466764-04b36&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;/1&lt;span class="w"&gt;       &lt;/span&gt;Running&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;18m&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="m"&gt;10&lt;/span&gt;.0.1.5&lt;span class="w"&gt;   &lt;/span&gt;gke-example-cluster-default-pool-2567fc65-g7lc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;It's running on &lt;code&gt;gke-example-cluster-default-pool-2567fc65-g7lc&lt;/code&gt;. Now I can navigate to the web page for this instance and ssh to it. Here's a screenshot of how that looks like:&lt;/p&gt;
 &lt;p&gt;&lt;center&gt;&lt;img alt="Compute Engine SSH" src="http://pminkov.github.io/blog/images/k8s-intro/k3-compute-engine.png"&gt;&lt;/center&gt;&lt;/p&gt;
 &lt;p&gt;I ran &lt;code&gt;ps aux --sort '%mem'&lt;/code&gt; to see which process takes most memory. Since my server uses a lot of memory, it's at the top. It's using 179MB of resident memory.&lt;/p&gt;
 &lt;p&gt;It's pretty nice that you're able to nagivate from a high level system like Kubernetes all the way down to ssh-ing to a machine that runs your containers. When you're ssh-ed you can execute &lt;code&gt;docker ps&lt;/code&gt; to see what containers are running, run &lt;code&gt;top&lt;/code&gt; to see what's going on on the machine and do all of the other systems debugging tasks that you can think of.&lt;/p&gt;
 &lt;p&gt;And finally, let's delete our cluster:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ gcloud container clusters delete example-cluster
-The following clusters will be deleted.
- - &lt;span class="o"&gt;[&lt;/span&gt;example-cluster&lt;span class="o"&gt;]&lt;/span&gt; in &lt;span class="o"&gt;[&lt;/span&gt;us-central1-b&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;gcloud&lt;span class="w"&gt; &lt;/span&gt;container&lt;span class="w"&gt; &lt;/span&gt;clusters&lt;span class="w"&gt; &lt;/span&gt;delete&lt;span class="w"&gt; &lt;/span&gt;example-cluster
+The&lt;span class="w"&gt; &lt;/span&gt;following&lt;span class="w"&gt; &lt;/span&gt;clusters&lt;span class="w"&gt; &lt;/span&gt;will&lt;span class="w"&gt; &lt;/span&gt;be&lt;span class="w"&gt; &lt;/span&gt;deleted.
+&lt;span class="w"&gt; &lt;/span&gt;-&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;example-cluster&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;us-central1-b&lt;span class="o"&gt;]&lt;/span&gt;
 
-Do you want to &lt;span class="k"&gt;continue&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;Y/n&lt;span class="o"&gt;)&lt;/span&gt;?  
+Do&lt;span class="w"&gt; &lt;/span&gt;you&lt;span class="w"&gt; &lt;/span&gt;want&lt;span class="w"&gt; &lt;/span&gt;to&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;continue&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;Y/n&lt;span class="o"&gt;)&lt;/span&gt;?&lt;span class="w"&gt;  &lt;/span&gt;
 
-Deleting cluster example-cluster...done.                                                                                                                                               
-Deleted &lt;span class="o"&gt;[&lt;/span&gt;https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster&lt;span class="o"&gt;]&lt;/span&gt;.
-&lt;/pre&gt;&lt;/div&gt;
+Deleting&lt;span class="w"&gt; &lt;/span&gt;cluster&lt;span class="w"&gt; &lt;/span&gt;example-cluster...done.&lt;span class="w"&gt;                                                                                                                                               &lt;/span&gt;
+Deleted&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster&lt;span class="o"&gt;]&lt;/span&gt;.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-
-&lt;p&gt;That's all for today - enjoy.&lt;/p&gt;</content></entry><entry><title>How to shut down and restore an Elastic Beanstalk environment.</title><link href="http://pminkov.github.io/blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html" rel="alternate"></link><published>2017-01-30T12:07:00-08:00</published><updated>2017-01-30T12:07:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-30:/blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html</id><summary type="html">&lt;p&gt;Let's say you're running an &lt;a href="https://aws.amazon.com/elasticbeanstalk/"&gt;Elastic Beanstalk&lt;/a&gt; application. You might want to stop it so that you're not paying money for it. There's one way to do this by running commands. You can use &lt;code&gt;eb terminate&lt;/code&gt; and &lt;code&gt;eb restore&lt;/code&gt;, but if you terminate a setup with a database and you …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Let's say you're running an &lt;a href="https://aws.amazon.com/elasticbeanstalk/"&gt;Elastic Beanstalk&lt;/a&gt; application. You might want to stop it so that you're not paying money for it. There's one way to do this by running commands. You can use &lt;code&gt;eb terminate&lt;/code&gt; and &lt;code&gt;eb restore&lt;/code&gt;, but if you terminate a setup with a database and you restore it, the contents of the database won't be restored. You can also only restore an environment that has been terminated within the last 6 weeks.&lt;/p&gt;
+&lt;p&gt;That's all for today - enjoy.&lt;/p&gt;</content><category term="Cloud"></category></entry><entry><title>How to shut down and restore an Elastic Beanstalk environment.</title><link href="http://pminkov.github.io/blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html" rel="alternate"></link><published>2017-01-30T12:07:00-08:00</published><updated>2017-01-30T12:07:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-30:/blog/how-to-shut-down-and-restore-an-elastic-beanstalk-environment.html</id><summary type="html">&lt;p&gt;Let's say you're running an &lt;a href="https://aws.amazon.com/elasticbeanstalk/"&gt;Elastic Beanstalk&lt;/a&gt; application. You might want to stop it so that you're not paying money for it. There's one way to do this by running commands. You can use &lt;code&gt;eb terminate&lt;/code&gt; and &lt;code&gt;eb restore&lt;/code&gt;, but if you terminate a setup with a database and you …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Let's say you're running an &lt;a href="https://aws.amazon.com/elasticbeanstalk/"&gt;Elastic Beanstalk&lt;/a&gt; application. You might want to stop it so that you're not paying money for it. There's one way to do this by running commands. You can use &lt;code&gt;eb terminate&lt;/code&gt; and &lt;code&gt;eb restore&lt;/code&gt;, but if you terminate a setup with a database and you restore it, the contents of the database won't be restored. You can also only restore an environment that has been terminated within the last 6 weeks.&lt;/p&gt;
 &lt;p&gt;Let's see how we can terminate and restore without the 6 weeks restriction and let's also see how does the database backup and restore look like.&lt;/p&gt;
 &lt;p&gt;The first thing that you have to do is to save your environment, which pretty much consists of:&lt;/p&gt;
 &lt;ul&gt;
@@ -463,32 +432,31 @@ Deleted &lt;span class="o"&gt;[&lt;/span&gt;https://container.googleapis.com/v1/
 &lt;p&gt;So let's get started.&lt;/p&gt;
 &lt;h2 id="backing-up-your-environment"&gt;Backing up your environment.&lt;/h2&gt;
 &lt;p&gt;First, get the name of your environment. Mine is &lt;code&gt;neatlinks-dev&lt;/code&gt;. Run the following commands after that:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_DATE_LABEL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;date +&lt;span class="s2"&gt;&amp;quot;D%F-T%H-%M-%S&amp;quot;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;EB_DATE_LABEL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;date&lt;span class="w"&gt; &lt;/span&gt;+&lt;span class="s2"&gt;&amp;quot;D%F-T%H-%M-%S&amp;quot;&lt;/span&gt;&lt;span class="sb"&gt;`&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Name of saved config.&lt;/span&gt;
-&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_CONFIG&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;saved-&lt;span class="nv"&gt;$EB_DATE_LABEL&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;EB_CONFIG&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;saved-&lt;span class="nv"&gt;$EB_DATE_LABEL&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Name of database snapshot.&lt;/span&gt;
-&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_SNAPSHOT_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;snapshot-&lt;span class="nv"&gt;$EB_DATE_LABEL&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;EB_SNAPSHOT_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;snapshot-&lt;span class="nv"&gt;$EB_DATE_LABEL&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Instance id for our current database.&lt;/span&gt;
-&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_DB&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;aaeag9ndvxonft&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;EB_DB&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;aaeag9ndvxonft&amp;quot;&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Save the environment cname, we&amp;#39;ll need it later.&lt;/span&gt;
-&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_CNAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;neatlinks-dev-www&amp;#39;&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;EB_CNAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;neatlinks-dev-www&amp;#39;&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Save current config.&lt;/span&gt;
-eb config save neatlinks-dev --cfg &lt;span class="nv"&gt;$EB_CONFIG&lt;/span&gt;
+eb&lt;span class="w"&gt; &lt;/span&gt;config&lt;span class="w"&gt; &lt;/span&gt;save&lt;span class="w"&gt; &lt;/span&gt;neatlinks-dev&lt;span class="w"&gt; &lt;/span&gt;--cfg&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_CONFIG&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Create and wait for database snapshot.&lt;/span&gt;
-aws rds create-db-snapshot &lt;span class="se"&gt;\&lt;/span&gt;
-    --db-instance-identifier &lt;span class="nv"&gt;$EB_DB&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
-    --db-snapshot-identifier &lt;span class="nv"&gt;$EB_SNAPSHOT_NAME&lt;/span&gt;
-&lt;span class="nb"&gt;time&lt;/span&gt; aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-snapshot-completed &lt;span class="se"&gt;\&lt;/span&gt;
-    --db-instance-identifier &lt;span class="nv"&gt;$EB_DB&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
-    --db-snapshot-identifier &lt;span class="nv"&gt;$EB_SNAPSHOT_NAME&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
+aws&lt;span class="w"&gt; &lt;/span&gt;rds&lt;span class="w"&gt; &lt;/span&gt;create-db-snapshot&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;--db-instance-identifier&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_DB&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;--db-snapshot-identifier&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_SNAPSHOT_NAME&lt;/span&gt;
+&lt;span class="nb"&gt;time&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;aws&lt;span class="w"&gt; &lt;/span&gt;rds&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;wait&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;db-snapshot-completed&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;--db-instance-identifier&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_DB&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;--db-snapshot-identifier&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_SNAPSHOT_NAME&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;So we did two things:&lt;/p&gt;
 &lt;ol&gt;
@@ -500,28 +468,27 @@ aws rds create-db-snapshot &lt;span class="se"&gt;\&lt;/span&gt;
 &lt;p&gt;Now, your application is sitting safely saved for a while and you decide to restore it.&lt;/p&gt;
 &lt;h2 id="restoring-your-environment"&gt;Restoring your environment.&lt;/h2&gt;
 &lt;p&gt;If you have deleted your application, you'll need to run &lt;code&gt;eb init&lt;/code&gt;. After that, we'll run the following commands:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Create environment. It&amp;#39;s important to specify a cname, so that we don&amp;#39;t have to&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# Create environment. It&amp;#39;s important to specify a cname, so that we don&amp;#39;t have to&lt;/span&gt;
 &lt;span class="c1"&gt;# change our DNS config. This takes a lot of time, so I bump the timeout.&lt;/span&gt;
 &lt;span class="c1"&gt;# This command will print the name of your new database instance.&lt;/span&gt;
-&lt;span class="nb"&gt;time&lt;/span&gt; eb create neatlinks-dev --cfg &lt;span class="nv"&gt;$EB_CONFIG&lt;/span&gt; --cname &lt;span class="nv"&gt;$EB_CNAME&lt;/span&gt; --timeout &lt;span class="m"&gt;30&lt;/span&gt;
+&lt;span class="nb"&gt;time&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;eb&lt;span class="w"&gt; &lt;/span&gt;create&lt;span class="w"&gt; &lt;/span&gt;neatlinks-dev&lt;span class="w"&gt; &lt;/span&gt;--cfg&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_CONFIG&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--cname&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_CNAME&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--timeout&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;30&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Get this id from the printed output of &amp;quot;eb create&amp;quot;.&lt;/span&gt;
-&lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;EB_NEW_DB&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;aa1q3no37rzd407&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;EB_NEW_DB&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;aa1q3no37rzd407&amp;quot;&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Delete DB instance. We&amp;#39;ll replace it with the snapshot.&lt;/span&gt;
-aws rds delete-db-instance --db-instance-identifier &lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt; --skip-final-snapshot
-aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-instance-deleted --db-instance-identifier &lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt;
+aws&lt;span class="w"&gt; &lt;/span&gt;rds&lt;span class="w"&gt; &lt;/span&gt;delete-db-instance&lt;span class="w"&gt; &lt;/span&gt;--db-instance-identifier&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--skip-final-snapshot
+aws&lt;span class="w"&gt; &lt;/span&gt;rds&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;wait&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;db-instance-deleted&lt;span class="w"&gt; &lt;/span&gt;--db-instance-identifier&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Restore from snapshot.&lt;/span&gt;
-aws rds restore-db-instance-from-db-snapshot &lt;span class="se"&gt;\&lt;/span&gt;
-        --db-instance-identifier &lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt; &lt;span class="se"&gt;\&lt;/span&gt;
-        --db-snapshot-identifier &lt;span class="nv"&gt;$EB_SNAPSHOT_NAME&lt;/span&gt;
-aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-instance-available --db-instance-identifier &lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
+aws&lt;span class="w"&gt; &lt;/span&gt;rds&lt;span class="w"&gt; &lt;/span&gt;restore-db-instance-from-db-snapshot&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;--db-instance-identifier&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;--db-snapshot-identifier&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_SNAPSHOT_NAME&lt;/span&gt;
+aws&lt;span class="w"&gt; &lt;/span&gt;rds&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;wait&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;db-instance-available&lt;span class="w"&gt; &lt;/span&gt;--db-instance-identifier&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;$EB_NEW_DB&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Your production setup is ready now! Your application probably won't work though, because your DB endpoint is different. Edit your source code or your own configuration files so that your application connects to the new database. Once done, call &lt;code&gt;eb deploy&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;That's it. Your application should be running now. You can use this procedure to rename your Elastic Beanstalk application and environment as well, which is a feature that's missing from the &lt;code&gt;eb&lt;/code&gt; CLI app.&lt;/p&gt;</content></entry><entry><title>The Cloud Infrastructure Landscape</title><link href="http://pminkov.github.io/blog/the-cloud-infrastructure-landscape.html" rel="alternate"></link><published>2017-01-15T12:10:00-08:00</published><updated>2017-01-15T12:10:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-15:/blog/the-cloud-infrastructure-landscape.html</id><summary type="html">&lt;p&gt;I'm taking a &lt;a href="https://www.edx.org/course/introduction-cloud-infrastructure-linuxfoundationx-lfs151-x"&gt;Cloud Infrastructure&lt;/a&gt; class on EdX and I have found it to be a really nice overview of the cloud space. It's missing anything related to Hadoop and data analytics, but it describes probably all the tools related to running applications in the cloud. Of course, since the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I'm taking a &lt;a href="https://www.edx.org/course/introduction-cloud-infrastructure-linuxfoundationx-lfs151-x"&gt;Cloud Infrastructure&lt;/a&gt; class on EdX and I have found it to be a really nice overview of the cloud space. It's missing anything related to Hadoop and data analytics, but it describes probably all the tools related to running applications in the cloud. Of course, since the class describes so many tools, it can't do so in depth, but you can pick whatever is interesting to you and learn more about it.&lt;/p&gt;
+&lt;p&gt;That's it. Your application should be running now. You can use this procedure to rename your Elastic Beanstalk application and environment as well, which is a feature that's missing from the &lt;code&gt;eb&lt;/code&gt; CLI app.&lt;/p&gt;</content><category term="Cloud"></category></entry><entry><title>The Cloud Infrastructure Landscape</title><link href="http://pminkov.github.io/blog/the-cloud-infrastructure-landscape.html" rel="alternate"></link><published>2017-01-15T12:10:00-08:00</published><updated>2017-01-15T12:10:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-01-15:/blog/the-cloud-infrastructure-landscape.html</id><summary type="html">&lt;p&gt;I'm taking a &lt;a href="https://www.edx.org/course/introduction-cloud-infrastructure-linuxfoundationx-lfs151-x"&gt;Cloud Infrastructure&lt;/a&gt; class on EdX and I have found it to be a really nice overview of the cloud space. It's missing anything related to Hadoop and data analytics, but it describes probably all the tools related to running applications in the cloud. Of course, since the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I'm taking a &lt;a href="https://www.edx.org/course/introduction-cloud-infrastructure-linuxfoundationx-lfs151-x"&gt;Cloud Infrastructure&lt;/a&gt; class on EdX and I have found it to be a really nice overview of the cloud space. It's missing anything related to Hadoop and data analytics, but it describes probably all the tools related to running applications in the cloud. Of course, since the class describes so many tools, it can't do so in depth, but you can pick whatever is interesting to you and learn more about it.&lt;/p&gt;
 &lt;p&gt;Here's a list of all the tools described in it, which list I might use as a future reference for myself. I'd say that knowing a bit about such a big amount of products definitely helps when you're trying to come up with a cloud infrastructure for a project.&lt;/p&gt;
 &lt;p&gt;So, big list, based on the course contents:&lt;/p&gt;
 &lt;h3 id="virtualization"&gt;Virtualization&lt;/h3&gt;
@@ -590,7 +557,7 @@ aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-instance-available --db-inst
 &lt;p&gt;&lt;a href="https://www.sysdig.com/"&gt;Sysdig&lt;/a&gt;&lt;br&gt;
 &lt;a href="https://github.com/google/cadvisor"&gt;cAdvisor&lt;/a&gt;&lt;br&gt;
 &lt;a href="http://www.fluentd.org/"&gt;Fluentd&lt;/a&gt;&lt;br&gt;
-&lt;a href="https://www.datadoghq.com/"&gt;Datadog&lt;/a&gt;&lt;br&gt;&lt;/p&gt;</content></entry><entry><title>How much does it cost to run a Django app on AWS using Elastic Beanstalk?</title><link href="http://pminkov.github.io/blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html" rel="alternate"></link><published>2016-04-20T13:56:00-07:00</published><updated>2016-04-20T13:56:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-04-20:/blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html</id><summary type="html">&lt;p&gt;I've been running a Django app on &lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html"&gt;Elastic Beanstalk&lt;/a&gt; for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I've been running a Django app on &lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html"&gt;Elastic Beanstalk&lt;/a&gt; for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.&lt;/p&gt;
+&lt;a href="https://www.datadoghq.com/"&gt;Datadog&lt;/a&gt;&lt;br&gt;&lt;/p&gt;</content><category term="Cloud"></category></entry><entry><title>How much does it cost to run a Django app on AWS using Elastic Beanstalk?</title><link href="http://pminkov.github.io/blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html" rel="alternate"></link><published>2016-04-20T13:56:00-07:00</published><updated>2016-04-20T13:56:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2016-04-20:/blog/how-much-does-it-cost-to-run-a-django-app-on-aws-using-elastic-beanstalk.html</id><summary type="html">&lt;p&gt;I've been running a Django app on &lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html"&gt;Elastic Beanstalk&lt;/a&gt; for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I've been running a Django app on &lt;a href="http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-django.html"&gt;Elastic Beanstalk&lt;/a&gt; for a couple of months and I have a decent idea now of the costs involved and the pros and cons of this approach. My goal was to get something going as soon as possible and I'd say Elastic Beanstalk is good for that purpose. There are a few things that took me more time to figure out and I might write about them too, but overall everything is running smoothly now.&lt;/p&gt;
 &lt;p&gt;Let's first describe what my setup is. Elastic Beanstalk is AWS's PaaS offering. I use a MySQL database running on RDS, a load balancer, a single EC2 instance and I have a DNS setup on Route 53. And that's more or less what I'm paying for. My bill was &lt;strong&gt;$42.58&lt;/strong&gt; last month. Breaking it down, here are the three major components it has:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;strong&gt;EC2&lt;/strong&gt;&lt;/li&gt;
@@ -618,4 +585,4 @@ aws rds &lt;span class="nb"&gt;wait&lt;/span&gt; db-instance-available --db-inst
 &lt;p&gt;&lt;strong&gt;How can I bring these costs down?&lt;/strong&gt;&lt;/p&gt;
 &lt;p&gt;It's possible to do all of this with a single EC2 instance and avoid paying for load balancing and RDS. What I get from these components right now is convenience and scalability. I don't really need scalability, since I don't operate at scale and might not come to that point. Convenience can be traded for the learning experience of settings up things manually. AWS has an &lt;a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html"&gt;article&lt;/a&gt; on how to install a LAMP setup on EC2. It doesn't look too complicated. Supposedly my bill will be around $10 per month for my 1GB RAM t2.micro machine.&lt;/p&gt;
 &lt;p&gt;Another option would be to use &lt;a href="https://www.digitalocean.com/pricing/"&gt;Digital Ocean&lt;/a&gt;. They're basically offering something similar to EC2 instances, but I haven't looked too much in detail. Digital Ocean is an IaaS provider, you need to do some manual setup. Their cost is pretty similar. An offering with 1GB of RAM costs $10 per month too. That's a very rough comparison, but it seems like we're in the same ballpark if we're not pushing the limits on disk space or bandwidth.&lt;/p&gt;
-&lt;p&gt;It should also be possibe to continue to use Elastic Beanstalk, but run a MySQL server directly on the EC2 instance. Here's a long &lt;a href="http://d0.awsstatic.com/whitepapers/rdbms-in-the-cloud-sql-server-on-aws.pdf"&gt;white paper&lt;/a&gt; that talks about this.&lt;/p&gt;</content><category term="AWS"></category><category term="Elastic Beanstalk"></category><category term="Python"></category><category term="Django"></category></entry></feed>
+&lt;p&gt;It should also be possibe to continue to use Elastic Beanstalk, but run a MySQL server directly on the EC2 instance. Here's a long &lt;a href="http://d0.awsstatic.com/whitepapers/rdbms-in-the-cloud-sql-server-on-aws.pdf"&gt;white paper&lt;/a&gt; that talks about this.&lt;/p&gt;</content><category term="Cloud"></category><category term="AWS"></category><category term="Elastic Beanstalk"></category><category term="Python"></category><category term="Django"></category></entry></feed>

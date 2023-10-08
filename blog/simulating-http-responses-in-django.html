@@ -60,25 +60,26 @@ mode the server is in and depending on that, fiddles with the HTTP
 request and produces an error HTTP response.</p>
 <p></p>
 Here's how a very simple middleware class would look like:</p>
-<p></p>
+</p>
 <p>
 <script src="https://gist.github.com/1359978.js"> </script>
 Notice how that middleware class ignores requests which go to the view
 that switches to error mode. You want to be able to switch back to
-normal mode once you switch to error mode.</p>
-<p></p>
-The second part you need is a view that switches the <code>IN_ERROR_MODE</code>
+normal mode once you switch to error mode.
+
+</p>
+<p>The second part you need is a view that switches the <code>IN_ERROR_MODE</code>
 variable.</p>
-<p></p>
+</p>
 <p>
 <script src="https://gist.github.com/1359984.js"> </script>
 After you have this code, you can just create a simple Django
 application and install that middleware in your settings.py file. Be
-careful to not have that turned on in your production environment.</p>
-<p></p>
-There are also many ways in which this can be extended:</p>
-</p>
+careful to not have that turned on in your production environment.
 
+</p>
+<p>There are also many ways in which this can be extended:</p>
+</p>
 <ul>
 <li>Support for different error codes.</li>
 <li>Support for slow connections by sleeping before sending the

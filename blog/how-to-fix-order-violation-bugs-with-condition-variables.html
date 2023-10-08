@@ -41,112 +41,107 @@ in <a href="http://pminkov.github.io/blog/category/linux.html">Linux</a>
 </div><!-- /.post-info -->    </div>
     <div>
       <p>Let's look at the following code and try to find the bug in it.</p>
-<div class="highlight"><pre><span></span>Thread 1:
-void init() {
-  ...
-  mThread = PR_CreateThread(mMain, ...)
-  ...
-}
+<div class="highlight"><pre><span></span><code><span class="nt">Thread</span><span class="w"> </span><span class="nt">1</span><span class="o">:</span>
+<span class="nt">void</span><span class="w"> </span><span class="nt">init</span><span class="o">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="err">...</span>
+<span class="w">  </span><span class="err">mThread</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">PR_CreateThread(mMain,</span><span class="w"> </span><span class="err">...)</span>
+<span class="w">  </span><span class="err">...</span>
+<span class="p">}</span>
 
-Thread 2:
-void mMain(...) {
-  ...
-  mState = mThread-&gt;State;
-  ...
-}
-</pre></div>
-
+<span class="nt">Thread</span><span class="w"> </span><span class="nt">2</span><span class="o">:</span>
+<span class="nt">void</span><span class="w"> </span><span class="nt">mMain</span><span class="o">(...)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="err">...</span>
+<span class="w">  </span><span class="err">mState</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">mThread-&gt;State</span><span class="p">;</span>
+<span class="w">  </span><span class="err">...</span>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>The problem is that if thread two executes before thread one, it can access <code>mThread</code> which is not initialized. We need to make thread two wait for thread one. This is done with condition variables. But let's see how we're going to implement it.</p>
 <h3 id="solution-1-incorrect-simple-wait-and-signal">Solution 1 (Incorrect) - Simple wait and signal</h3>
 <p>Let's say that we're not giving this a lot of thought and just put a wait and signal in the code. We have this code:</p>
-<div class="highlight"><pre><span></span>pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;
+<div class="highlight"><pre><span></span><code><span class="n">pthread_mutex_t</span><span class="w"> </span><span class="n">mtLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
+<span class="n">pthread_cond_t</span><span class="w"> </span><span class="n">mtCond</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTHREAD_COND_INITIALIZER</span><span class="p">;</span>
 
-Thread 1:
-void init() {
-  ...
-  mThread = PR_CreateThread(mMain, ...)
-  pthread_mutex_lock(&amp;mtLock);
-  pthread_cond_signal(&amp;mtCond);
-  pthread_mutex_unlock(&amp;mtLock);
-  ...
-}
+<span class="n">Thread</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span>
+<span class="nb nb-Type">void</span><span class="w"> </span><span class="n">init</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="o">...</span>
+<span class="w">  </span><span class="n">mThread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PR_CreateThread</span><span class="p">(</span><span class="n">mMain</span><span class="p">,</span><span class="w"> </span><span class="o">...</span><span class="p">)</span>
+<span class="w">  </span><span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="w">  </span><span class="n">pthread_cond_signal</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtCond</span><span class="p">);</span>
+<span class="w">  </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="w">  </span><span class="o">...</span>
+<span class="p">}</span>
 
-Thread 2:
-void mMain(...) {
-  ...
-  pthread_mutex_lock(&amp;mtLock);
-  pthread_cond_wait(&amp;mtCond, &amp;mtLock);
-  pthread_mutex_unlock(&amp;mtLock);
-  mState = mThread-&gt;State;
-  ...
-}
-</pre></div>
-
+<span class="n">Thread</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span>
+<span class="nb nb-Type">void</span><span class="w"> </span><span class="n">mMain</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="o">...</span>
+<span class="w">  </span><span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="w">  </span><span class="n">pthread_cond_wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtCond</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="w">  </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="w">  </span><span class="n">mState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mThread</span><span class="o">-&gt;</span><span class="n">State</span><span class="p">;</span>
+<span class="w">  </span><span class="o">...</span>
+<span class="p">}</span>
+</code></pre></div>
 
 <p>The problem here is that thread one can execute before thread two. In this case, thread one will signal on the condition variable, but nobody is waiting on it. Once thread two executes, it will start waiting and nobody is going to signal on the condition variable. Thus, thread two will stay in block state.</p>
 <h3 id="solution-2-correct-using-a-synchronization-variable">Solution 2 (Correct) - Using a synchronization variable.</h3>
-<div class="highlight"><pre><span></span>  pthread_mutex_t mtLock = PTHREAD_MUTEX_INITIALIZER;
-  pthread_cond_t mtCond = PTHREAD_COND_INITIALIZER;
-  int mtInit = 0;
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="n">pthread_mutex_t</span><span class="w"> </span><span class="n">mtLock</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTHREAD_MUTEX_INITIALIZER</span><span class="p">;</span>
+<span class="w">  </span><span class="n">pthread_cond_t</span><span class="w"> </span><span class="n">mtCond</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PTHREAD_COND_INITIALIZER</span><span class="p">;</span>
+<span class="w">  </span><span class="nb nb-Type">int</span><span class="w"> </span><span class="n">mtInit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
 
-  Thread 1:
-  void init() {
-    ...
-1   mThread = PR_CreateThread(mMain, ...)
-2   pthread_mutex_lock(&amp;mtLock);
-3   mtInit = 1;
-4   pthread_cond_signal(&amp;mtCond);
-5   pthread_mutex_unlock(&amp;mtLock);
-    ...
-  }
+<span class="w">  </span><span class="n">Thread</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span>
+<span class="w">  </span><span class="nb nb-Type">void</span><span class="w"> </span><span class="n">init</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="mi">1</span><span class="w">   </span><span class="n">mThread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PR_CreateThread</span><span class="p">(</span><span class="n">mMain</span><span class="p">,</span><span class="w"> </span><span class="o">...</span><span class="p">)</span>
+<span class="mi">2</span><span class="w">   </span><span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="mi">3</span><span class="w">   </span><span class="n">mtInit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="mi">4</span><span class="w">   </span><span class="n">pthread_cond_signal</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtCond</span><span class="p">);</span>
+<span class="mi">5</span><span class="w">   </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="w">  </span><span class="p">}</span>
 
-  Thread 2:
-  void mMain(...) {
-    ...
-6   pthread_mutex_lock(&amp;mtLock);
-7   if (mtInit == 0)
-8     pthread_cond_wait(&amp;mtCond, &amp;mtLock);
-9   pthread_mutex_unlock(&amp;mtLock);
-10  mState = mThread-&gt;State;
-    ...
-  }
-</pre></div>
-
+<span class="w">  </span><span class="n">Thread</span><span class="w"> </span><span class="mi">2</span><span class="p">:</span>
+<span class="w">  </span><span class="nb nb-Type">void</span><span class="w"> </span><span class="n">mMain</span><span class="p">(</span><span class="o">...</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="mi">6</span><span class="w">   </span><span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="mi">7</span><span class="w">   </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">mtInit</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="mi">8</span><span class="w">     </span><span class="n">pthread_cond_wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtCond</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="mi">9</span><span class="w">   </span><span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">mtLock</span><span class="p">);</span>
+<span class="mi">10</span><span class="w">  </span><span class="n">mState</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mThread</span><span class="o">-&gt;</span><span class="n">State</span><span class="p">;</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div>
 
 <p>Here we have used the <code>mtInit</code> variable to prevent the bug in Solution 1 from hapenning. Let's try to reproduce the conditions that led to a bug in out first solution. Let's say thread one executes before thread two. When thread two runs, it will see that <code>mtInit</code> is 1 and it won't wait. That basically solves our problem. Let's trace things more carfully with two possible scenarios. Of course, there are other possibilities too, but with these two I have enough confidence in the correctness of the solution.</p>
-<div class="highlight"><pre><span></span>Scenario 1 - Thread 1 before Thread 2.
+<div class="highlight"><pre><span></span><code><span class="n">Scenario</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Thread</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">before</span><span class="w"> </span><span class="n">Thread</span><span class="w"> </span><span class="mf">2.</span>
 
-Line   T1    T2   COMMENT
-       1
-       2          Locked mutex
-             6    Blocked, because mutex is locked.
-       3
-       4          Signals on the condition variable.
-       5          Unblocks mutex.
-             6    Continues, mutex was unblocked.
-             7    False, jump to line 9.
-             9    Unlock mutex, done
-</pre></div>
-
+<span class="n">Line</span><span class="w">   </span><span class="n">T1</span><span class="w">    </span><span class="n">T2</span><span class="w">   </span><span class="n">COMMENT</span>
+<span class="w">       </span><span class="mi">1</span>
+<span class="w">       </span><span class="mi">2</span><span class="w">          </span><span class="n">Locked</span><span class="w"> </span><span class="n">mutex</span>
+<span class="w">             </span><span class="mi">6</span><span class="w">    </span><span class="n">Blocked</span><span class="p">,</span><span class="w"> </span><span class="n">because</span><span class="w"> </span><span class="n">mutex</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">locked</span><span class="o">.</span>
+<span class="w">       </span><span class="mi">3</span>
+<span class="w">       </span><span class="mi">4</span><span class="w">          </span><span class="n">Signals</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">condition</span><span class="w"> </span><span class="n">variable</span><span class="o">.</span>
+<span class="w">       </span><span class="mi">5</span><span class="w">          </span><span class="n">Unblocks</span><span class="w"> </span><span class="n">mutex</span><span class="o">.</span>
+<span class="w">             </span><span class="mi">6</span><span class="w">    </span><span class="n">Continues</span><span class="p">,</span><span class="w"> </span><span class="n">mutex</span><span class="w"> </span><span class="n">was</span><span class="w"> </span><span class="n">unblocked</span><span class="o">.</span>
+<span class="w">             </span><span class="mi">7</span><span class="w">    </span><span class="n">False</span><span class="p">,</span><span class="w"> </span><span class="n">jump</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="mf">9.</span>
+<span class="w">             </span><span class="mi">9</span><span class="w">    </span><span class="n">Unlock</span><span class="w"> </span><span class="n">mutex</span><span class="p">,</span><span class="w"> </span><span class="n">done</span>
+</code></pre></div>
 
 <p>So in this scenario, thread one obtains the lock first and the solution is correct.</p>
-<div class="highlight"><pre><span></span>Scenario 2 - Thread 2 before Thread 1.
+<div class="highlight"><pre><span></span><code><span class="n">Scenario</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Thread</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">before</span><span class="w"> </span><span class="n">Thread</span><span class="w"> </span><span class="mf">1.</span>
 
-Line   T1    T2   COMMENT
-             6    Locked mutex.
-             7
-             8    Unlocks mutex, waiting on condition variable.
-       1      
-       2          Locks mutex.
-       3      
-       4          Signals, but mutex is still locked, so thread two doesn&#39;t do anything.
-       5          Unlocks mutex. Now thread two can continue.
-             8    Returns from wait(), locks mutex.
-             9    Unlocks mutex.
-</pre></div>
-
+<span class="n">Line</span><span class="w">   </span><span class="n">T1</span><span class="w">    </span><span class="n">T2</span><span class="w">   </span><span class="n">COMMENT</span>
+<span class="w">             </span><span class="mi">6</span><span class="w">    </span><span class="n">Locked</span><span class="w"> </span><span class="n">mutex</span><span class="o">.</span>
+<span class="w">             </span><span class="mi">7</span>
+<span class="w">             </span><span class="mi">8</span><span class="w">    </span><span class="n">Unlocks</span><span class="w"> </span><span class="n">mutex</span><span class="p">,</span><span class="w"> </span><span class="n">waiting</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">condition</span><span class="w"> </span><span class="n">variable</span><span class="o">.</span>
+<span class="w">       </span><span class="mi">1</span><span class="w">      </span>
+<span class="w">       </span><span class="mi">2</span><span class="w">          </span><span class="n">Locks</span><span class="w"> </span><span class="n">mutex</span><span class="o">.</span>
+<span class="w">       </span><span class="mi">3</span><span class="w">      </span>
+<span class="w">       </span><span class="mi">4</span><span class="w">          </span><span class="n">Signals</span><span class="p">,</span><span class="w"> </span><span class="n">but</span><span class="w"> </span><span class="n">mutex</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">still</span><span class="w"> </span><span class="n">locked</span><span class="p">,</span><span class="w"> </span><span class="n">so</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="n">two</span><span class="w"> </span><span class="n">doesn</span><span class="s1">&#39;t do anything.</span>
+<span class="w">       </span><span class="mi">5</span><span class="w">          </span><span class="n">Unlocks</span><span class="w"> </span><span class="n">mutex</span><span class="o">.</span><span class="w"> </span><span class="n">Now</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="n">two</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="k">continue</span><span class="o">.</span>
+<span class="w">             </span><span class="mi">8</span><span class="w">    </span><span class="n">Returns</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">wait</span><span class="p">(),</span><span class="w"> </span><span class="n">locks</span><span class="w"> </span><span class="n">mutex</span><span class="o">.</span>
+<span class="w">             </span><span class="mi">9</span><span class="w">    </span><span class="n">Unlocks</span><span class="w"> </span><span class="n">mutex</span><span class="o">.</span>
+</code></pre></div>
 
 <p>This scenario works too.</p>
 <p>There's one change that we should do though. Instead of an if statement in line 7, we should use a while. Why? Because when thread two wakes up in line 7 and obtains a lock on the mutex, it should re-verify that the condition that made it wait is not true anymore. While not a problem in this code segment, this can be a problem in other cases.</p>

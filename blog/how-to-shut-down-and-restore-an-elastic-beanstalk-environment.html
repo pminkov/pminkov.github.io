@@ -53,32 +53,31 @@ in <a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a>
 <p>So let's get started.</p>
 <h2 id="backing-up-your-environment">Backing up your environment.</h2>
 <p>First, get the name of your environment. Mine is <code>neatlinks-dev</code>. Run the following commands after that:</p>
-<div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">EB_DATE_LABEL</span><span class="o">=</span><span class="sb">`</span>date +<span class="s2">&quot;D%F-T%H-%M-%S&quot;</span><span class="sb">`</span>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">EB_DATE_LABEL</span><span class="o">=</span><span class="sb">`</span>date<span class="w"> </span>+<span class="s2">&quot;D%F-T%H-%M-%S&quot;</span><span class="sb">`</span>
 
 <span class="c1"># Name of saved config.</span>
-<span class="nb">export</span> <span class="nv">EB_CONFIG</span><span class="o">=</span>saved-<span class="nv">$EB_DATE_LABEL</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EB_CONFIG</span><span class="o">=</span>saved-<span class="nv">$EB_DATE_LABEL</span>
 
 <span class="c1"># Name of database snapshot.</span>
-<span class="nb">export</span> <span class="nv">EB_SNAPSHOT_NAME</span><span class="o">=</span>snapshot-<span class="nv">$EB_DATE_LABEL</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EB_SNAPSHOT_NAME</span><span class="o">=</span>snapshot-<span class="nv">$EB_DATE_LABEL</span>
 
 <span class="c1"># Instance id for our current database.</span>
-<span class="nb">export</span> <span class="nv">EB_DB</span><span class="o">=</span><span class="s2">&quot;aaeag9ndvxonft&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EB_DB</span><span class="o">=</span><span class="s2">&quot;aaeag9ndvxonft&quot;</span>
 
 <span class="c1"># Save the environment cname, we&#39;ll need it later.</span>
-<span class="nb">export</span> <span class="nv">EB_CNAME</span><span class="o">=</span><span class="s1">&#39;neatlinks-dev-www&#39;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EB_CNAME</span><span class="o">=</span><span class="s1">&#39;neatlinks-dev-www&#39;</span>
 
 <span class="c1"># Save current config.</span>
-eb config save neatlinks-dev --cfg <span class="nv">$EB_CONFIG</span>
+eb<span class="w"> </span>config<span class="w"> </span>save<span class="w"> </span>neatlinks-dev<span class="w"> </span>--cfg<span class="w"> </span><span class="nv">$EB_CONFIG</span>
 
 <span class="c1"># Create and wait for database snapshot.</span>
-aws rds create-db-snapshot <span class="se">\</span>
-    --db-instance-identifier <span class="nv">$EB_DB</span> <span class="se">\</span>
-    --db-snapshot-identifier <span class="nv">$EB_SNAPSHOT_NAME</span>
-<span class="nb">time</span> aws rds <span class="nb">wait</span> db-snapshot-completed <span class="se">\</span>
-    --db-instance-identifier <span class="nv">$EB_DB</span> <span class="se">\</span>
-    --db-snapshot-identifier <span class="nv">$EB_SNAPSHOT_NAME</span>
-</pre></div>
-
+aws<span class="w"> </span>rds<span class="w"> </span>create-db-snapshot<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--db-instance-identifier<span class="w"> </span><span class="nv">$EB_DB</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--db-snapshot-identifier<span class="w"> </span><span class="nv">$EB_SNAPSHOT_NAME</span>
+<span class="nb">time</span><span class="w"> </span>aws<span class="w"> </span>rds<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>db-snapshot-completed<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--db-instance-identifier<span class="w"> </span><span class="nv">$EB_DB</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--db-snapshot-identifier<span class="w"> </span><span class="nv">$EB_SNAPSHOT_NAME</span>
+</code></pre></div>
 
 <p>So we did two things:</p>
 <ol>
@@ -90,25 +89,24 @@ aws rds create-db-snapshot <span class="se">\</span>
 <p>Now, your application is sitting safely saved for a while and you decide to restore it.</p>
 <h2 id="restoring-your-environment">Restoring your environment.</h2>
 <p>If you have deleted your application, you'll need to run <code>eb init</code>. After that, we'll run the following commands:</p>
-<div class="highlight"><pre><span></span><span class="c1"># Create environment. It&#39;s important to specify a cname, so that we don&#39;t have to</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create environment. It&#39;s important to specify a cname, so that we don&#39;t have to</span>
 <span class="c1"># change our DNS config. This takes a lot of time, so I bump the timeout.</span>
 <span class="c1"># This command will print the name of your new database instance.</span>
-<span class="nb">time</span> eb create neatlinks-dev --cfg <span class="nv">$EB_CONFIG</span> --cname <span class="nv">$EB_CNAME</span> --timeout <span class="m">30</span>
+<span class="nb">time</span><span class="w"> </span>eb<span class="w"> </span>create<span class="w"> </span>neatlinks-dev<span class="w"> </span>--cfg<span class="w"> </span><span class="nv">$EB_CONFIG</span><span class="w"> </span>--cname<span class="w"> </span><span class="nv">$EB_CNAME</span><span class="w"> </span>--timeout<span class="w"> </span><span class="m">30</span>
 
 <span class="c1"># Get this id from the printed output of &quot;eb create&quot;.</span>
-<span class="nb">export</span> <span class="nv">EB_NEW_DB</span><span class="o">=</span><span class="s2">&quot;aa1q3no37rzd407&quot;</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">EB_NEW_DB</span><span class="o">=</span><span class="s2">&quot;aa1q3no37rzd407&quot;</span>
 
 <span class="c1"># Delete DB instance. We&#39;ll replace it with the snapshot.</span>
-aws rds delete-db-instance --db-instance-identifier <span class="nv">$EB_NEW_DB</span> --skip-final-snapshot
-aws rds <span class="nb">wait</span> db-instance-deleted --db-instance-identifier <span class="nv">$EB_NEW_DB</span>
+aws<span class="w"> </span>rds<span class="w"> </span>delete-db-instance<span class="w"> </span>--db-instance-identifier<span class="w"> </span><span class="nv">$EB_NEW_DB</span><span class="w"> </span>--skip-final-snapshot
+aws<span class="w"> </span>rds<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>db-instance-deleted<span class="w"> </span>--db-instance-identifier<span class="w"> </span><span class="nv">$EB_NEW_DB</span>
 
 <span class="c1"># Restore from snapshot.</span>
-aws rds restore-db-instance-from-db-snapshot <span class="se">\</span>
-        --db-instance-identifier <span class="nv">$EB_NEW_DB</span> <span class="se">\</span>
-        --db-snapshot-identifier <span class="nv">$EB_SNAPSHOT_NAME</span>
-aws rds <span class="nb">wait</span> db-instance-available --db-instance-identifier <span class="nv">$EB_NEW_DB</span>
-</pre></div>
-
+aws<span class="w"> </span>rds<span class="w"> </span>restore-db-instance-from-db-snapshot<span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--db-instance-identifier<span class="w"> </span><span class="nv">$EB_NEW_DB</span><span class="w"> </span><span class="se">\</span>
+<span class="w">        </span>--db-snapshot-identifier<span class="w"> </span><span class="nv">$EB_SNAPSHOT_NAME</span>
+aws<span class="w"> </span>rds<span class="w"> </span><span class="nb">wait</span><span class="w"> </span>db-instance-available<span class="w"> </span>--db-instance-identifier<span class="w"> </span><span class="nv">$EB_NEW_DB</span>
+</code></pre></div>
 
 <p>Your production setup is ready now! Your application probably won't work though, because your DB endpoint is different. Edit your source code or your own configuration files so that your application connects to the new database. Once done, call <code>eb deploy</code>.</p>
 <p>That's it. Your application should be running now. You can use this procedure to rename your Elastic Beanstalk application and environment as well, which is a feature that's missing from the <code>eb</code> CLI app.</p>

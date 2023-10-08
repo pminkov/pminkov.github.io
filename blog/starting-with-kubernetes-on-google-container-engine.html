@@ -61,212 +61,192 @@ in <a href="http://pminkov.github.io/blog/category/cloud.html">Cloud</a>
 <li>Initialize gcloud by running <code>gcloud init</code>. You'll be asked for the name of your project.</li>
 <li>Set a <a href="https://cloud.google.com/compute/docs/regions-zones/regions-zones#available">Compute Engine zone</a>, like this:</li>
 </ol>
-<div class="highlight"><pre><span></span>gcloud config <span class="nb">set</span> compute/zone us-central1-b
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>compute/zone<span class="w"> </span>us-central1-b
+</code></pre></div>
 
 <p>That's it. You can view your configuration:</p>
-<div class="highlight"><pre><span></span>$ gcloud config list
-Your active configuration is: <span class="o">[</span>mykube<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gcloud<span class="w"> </span>config<span class="w"> </span>list
+Your<span class="w"> </span>active<span class="w"> </span>configuration<span class="w"> </span>is:<span class="w"> </span><span class="o">[</span>mykube<span class="o">]</span>
 
 <span class="o">[</span>compute<span class="o">]</span>
-<span class="nv">zone</span> <span class="o">=</span> us-central1-b
+<span class="nv">zone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>us-central1-b
 <span class="o">[</span>core<span class="o">]</span>
-<span class="nv">account</span> <span class="o">=</span> pminkov@gmail.com
-<span class="nv">disable_usage_reporting</span> <span class="o">=</span> False
-<span class="nv">project</span> <span class="o">=</span> mykube-160819
-</pre></div>
-
+<span class="nv">account</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>pminkov@gmail.com
+<span class="nv">disable_usage_reporting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>False
+<span class="nv">project</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>mykube-160819
+</code></pre></div>
 
 <p>Let's authenticate gcloud too:</p>
-<div class="highlight"><pre><span></span>gcloud auth application-default login
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>auth<span class="w"> </span>application-default<span class="w"> </span>login
+</code></pre></div>
 
 <h3 id="run-a-container-image">Run a container image.</h3>
 <p>Our container is going to be a node.js application that we'll build ourselves. I wanted to experiment with an app that takes a bit more memory, so here's how my code looks like:</p>
-<div class="highlight"><pre><span></span><span class="nx">$</span> <span class="nx">cat</span> <span class="p">.</span><span class="o">/</span><span class="nx">server</span><span class="p">.</span><span class="nx">js</span> 
-<span class="kd">function</span> <span class="nx">randomInt</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="nx">n</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="nx">$</span><span class="w"> </span><span class="nx">cat</span><span class="w"> </span><span class="p">.</span><span class="o">/</span><span class="nx">server</span><span class="p">.</span><span class="nx">js</span><span class="w"> </span>
+<span class="kd">function</span><span class="w"> </span><span class="nx">randomInt</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">n</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">);</span>
+<span class="kd">var</span><span class="w"> </span><span class="nx">http</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">);</span>
 
-<span class="kd">var</span> <span class="nx">N</span> <span class="o">=</span> <span class="mi">20000000</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">nums</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Array</span><span class="p">(</span><span class="nx">N</span><span class="p">);</span>
+<span class="kd">var</span><span class="w"> </span><span class="nx">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">20000000</span><span class="p">;</span>
+<span class="kd">var</span><span class="w"> </span><span class="nx">nums</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Array</span><span class="p">(</span><span class="nx">N</span><span class="p">);</span>
 
-<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">N</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">nums</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">randomInt</span><span class="p">(</span><span class="nx">N</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">;</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">N</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">nums</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">randomInt</span><span class="p">(</span><span class="nx">N</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">10</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kd">var</span> <span class="nx">handleRequest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Received request for URL: &#39;</span> <span class="o">+</span> <span class="nx">request</span><span class="p">.</span><span class="nx">url</span><span class="p">);</span>
-  <span class="nx">response</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">index</span> <span class="o">=</span> <span class="nx">randomInt</span><span class="p">(</span><span class="nx">N</span><span class="p">);</span>
-  <span class="nx">response</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;Returning element at index &#39;</span> <span class="o">+</span> <span class="nx">index</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="nx">nums</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;\n&#39;</span><span class="p">);</span>
-  <span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">);</span>
+<span class="kd">var</span><span class="w"> </span><span class="nx">handleRequest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span><span class="w"> </span><span class="nx">response</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Received request for URL: &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">response</span><span class="p">.</span><span class="nx">writeHead</span><span class="p">(</span><span class="mf">200</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">randomInt</span><span class="p">(</span><span class="nx">N</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">response</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;Returning element at index &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;: &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">nums</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;\n&#39;</span><span class="p">);</span>
+<span class="w">  </span><span class="nx">response</span><span class="p">.</span><span class="nx">end</span><span class="p">(</span><span class="s1">&#39;Hello World!&#39;</span><span class="p">);</span>
 <span class="p">};</span>
-<span class="kd">var</span> <span class="nx">www</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">handleRequest</span><span class="p">);</span>
+<span class="kd">var</span><span class="w"> </span><span class="nx">www</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">handleRequest</span><span class="p">);</span>
 
 <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Listening on port 8080&#39;</span><span class="p">);</span>
-<span class="nx">www</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">8080</span><span class="p">);</span>
-</pre></div>
-
+<span class="nx">www</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mf">8080</span><span class="p">);</span>
+</code></pre></div>
 
 <p>We also need a Dockerfile:</p>
-<div class="highlight"><pre><span></span>$ cat ./Dockerfile 
-FROM node:4
-EXPOSE <span class="m">8080</span>
-COPY server.js .
-CMD node server.js
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>cat<span class="w"> </span>./Dockerfile<span class="w"> </span>
+FROM<span class="w"> </span>node:4
+EXPOSE<span class="w"> </span><span class="m">8080</span>
+COPY<span class="w"> </span>server.js<span class="w"> </span>.
+CMD<span class="w"> </span>node<span class="w"> </span>server.js
+</code></pre></div>
 
 <p>In order to run a container on GKE, we need to upload it to <a href="https://cloud.google.com/container-registry/">Google Container Registry</a>. Let's do it:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PROJECT_ID</span><span class="o">=</span>mykube-160819
-$ docker build -t gcr.io/<span class="nv">$PROJECT_ID</span>/myserver .
-Sending build context to Docker daemon <span class="m">3</span>.584 kB
-Step <span class="m">1</span>/4 : FROM node:4
- ---&gt; d7efee1f035d
-Step <span class="m">2</span>/4 : EXPOSE <span class="m">8080</span>
- ---&gt; Using cache
- ---&gt; 147e7888542d
-Step <span class="m">3</span>/4 : COPY server.js .
- ---&gt; Using cache
- ---&gt; b610e7975d20
-Step <span class="m">4</span>/4 : CMD node server.js
- ---&gt; Using cache
- ---&gt; 4e15133cdab2
-Successfully built 4e15133cdab2
-$ gcloud docker -- push gcr.io/<span class="nv">$PROJECT_ID</span>/myserver
-The push refers to a repository <span class="o">[</span>gcr.io/mykube-160819/myserver<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PROJECT_ID</span><span class="o">=</span>mykube-160819
+$<span class="w"> </span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>gcr.io/<span class="nv">$PROJECT_ID</span>/myserver<span class="w"> </span>.
+Sending<span class="w"> </span>build<span class="w"> </span>context<span class="w"> </span>to<span class="w"> </span>Docker<span class="w"> </span>daemon<span class="w"> </span><span class="m">3</span>.584<span class="w"> </span>kB
+Step<span class="w"> </span><span class="m">1</span>/4<span class="w"> </span>:<span class="w"> </span>FROM<span class="w"> </span>node:4
+<span class="w"> </span>---&gt;<span class="w"> </span>d7efee1f035d
+Step<span class="w"> </span><span class="m">2</span>/4<span class="w"> </span>:<span class="w"> </span>EXPOSE<span class="w"> </span><span class="m">8080</span>
+<span class="w"> </span>---&gt;<span class="w"> </span>Using<span class="w"> </span>cache
+<span class="w"> </span>---&gt;<span class="w"> </span>147e7888542d
+Step<span class="w"> </span><span class="m">3</span>/4<span class="w"> </span>:<span class="w"> </span>COPY<span class="w"> </span>server.js<span class="w"> </span>.
+<span class="w"> </span>---&gt;<span class="w"> </span>Using<span class="w"> </span>cache
+<span class="w"> </span>---&gt;<span class="w"> </span>b610e7975d20
+Step<span class="w"> </span><span class="m">4</span>/4<span class="w"> </span>:<span class="w"> </span>CMD<span class="w"> </span>node<span class="w"> </span>server.js
+<span class="w"> </span>---&gt;<span class="w"> </span>Using<span class="w"> </span>cache
+<span class="w"> </span>---&gt;<span class="w"> </span>4e15133cdab2
+Successfully<span class="w"> </span>built<span class="w"> </span>4e15133cdab2
+$<span class="w"> </span>gcloud<span class="w"> </span>docker<span class="w"> </span>--<span class="w"> </span>push<span class="w"> </span>gcr.io/<span class="nv">$PROJECT_ID</span>/myserver
+The<span class="w"> </span>push<span class="w"> </span>refers<span class="w"> </span>to<span class="w"> </span>a<span class="w"> </span>repository<span class="w"> </span><span class="o">[</span>gcr.io/mykube-160819/myserver<span class="o">]</span>
 <span class="c1"># Note that I already have a project called &quot;hikube&quot; which has the same docker image.</span>
 <span class="c1"># The &quot;mykube&quot; project is something I created for this tutorial.</span>
-1bcf3881e79d: Mounted from hikube-160719/myserver 
-65e403c25ee9: Mounted from hikube-160719/myserver 
-4732c3666dd7: Mounted from hikube-160719/myserver 
-a1fbf6fa923f: Mounted from hikube-160719/myserver 
-1b8ef9ac5116: Mounted from hikube-160719/myserver 
-41ef8cc0bccb: Mounted from hikube-160719/myserver 
-100396c46221: Mounted from hikube-160719/myserver 
-7b4b54c74241: Mounted from hikube-160719/myserver 
-d17d48b2382a: Mounted from hikube-160719/myserver 
-latest: digest: sha256:4ad68f056e870938823f6c9555355c149cf7c42a213d7243d915f1a4bcfb9cb1 size: <span class="m">2213</span>
-</pre></div>
-
+1bcf3881e79d:<span class="w"> </span>Mounted<span class="w"> </span>from<span class="w"> </span>hikube-160719/myserver<span class="w"> </span>
+65e403c25ee9:<span class="w"> </span>Mounted<span class="w"> </span>from<span class="w"> </span>hikube-160719/myserver<span class="w"> </span>
+4732c3666dd7:<span class="w"> </span>Mounted<span class="w"> </span>from<span class="w"> </span>hikube-160719/myserver<span class="w"> </span>
+a1fbf6fa923f:<span class="w"> </span>Mounted<span class="w"> </span>from<span class="w"> </span>hikube-160719/myserver<span class="w"> </span>
+1b8ef9ac5116:<span class="w"> </span>Mounted<span class="w"> </span>from<span class="w"> </span>hikube-160719/myserver<span class="w"> </span>
+41ef8cc0bccb:<span class="w"> </span>Mounted<span class="w"> </span>from<span class="w"> </span>hikube-160719/myserver<span class="w"> </span>
+100396c46221:<span class="w"> </span>Mounted<span class="w"> </span>from<span class="w"> </span>hikube-160719/myserver<span class="w"> </span>
+7b4b54c74241:<span class="w"> </span>Mounted<span class="w"> </span>from<span class="w"> </span>hikube-160719/myserver<span class="w"> </span>
+d17d48b2382a:<span class="w"> </span>Mounted<span class="w"> </span>from<span class="w"> </span>hikube-160719/myserver<span class="w"> </span>
+latest:<span class="w"> </span>digest:<span class="w"> </span>sha256:4ad68f056e870938823f6c9555355c149cf7c42a213d7243d915f1a4bcfb9cb1<span class="w"> </span>size:<span class="w"> </span><span class="m">2213</span>
+</code></pre></div>
 
 <p>If you go to the Google Cloud Console and open the Google Container Registry, you'll see the container uploaded:</p>
 <p><center><img alt="Google Container Registry" src="http://pminkov.github.io/blog/images/k8s-intro/k1-registry.png"></center></p>
 <p>Now let's create a cluster that we'll be deploying our server to:</p>
-<div class="highlight"><pre><span></span>$ gcloud container clusters create example-cluster
-Creating cluster example-cluster...done.                                                                                                                                               
-Created <span class="o">[</span>https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster<span class="o">]</span>.
-kubeconfig entry generated <span class="k">for</span> example-cluster.
-NAME             ZONE           MASTER_VERSION  MASTER_IP       MACHINE_TYPE   NODE_VERSION  NUM_NODES  STATUS
-example-cluster  us-central1-b  <span class="m">1</span>.5.3           <span class="m">104</span>.198.190.52  n1-standard-1  <span class="m">1</span>.5.3         <span class="m">3</span>          RUNNING
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gcloud<span class="w"> </span>container<span class="w"> </span>clusters<span class="w"> </span>create<span class="w"> </span>example-cluster
+Creating<span class="w"> </span>cluster<span class="w"> </span>example-cluster...done.<span class="w">                                                                                                                                               </span>
+Created<span class="w"> </span><span class="o">[</span>https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster<span class="o">]</span>.
+kubeconfig<span class="w"> </span>entry<span class="w"> </span>generated<span class="w"> </span><span class="k">for</span><span class="w"> </span>example-cluster.
+NAME<span class="w">             </span>ZONE<span class="w">           </span>MASTER_VERSION<span class="w">  </span>MASTER_IP<span class="w">       </span>MACHINE_TYPE<span class="w">   </span>NODE_VERSION<span class="w">  </span>NUM_NODES<span class="w">  </span>STATUS
+example-cluster<span class="w">  </span>us-central1-b<span class="w">  </span><span class="m">1</span>.5.3<span class="w">           </span><span class="m">104</span>.198.190.52<span class="w">  </span>n1-standard-1<span class="w">  </span><span class="m">1</span>.5.3<span class="w">         </span><span class="m">3</span><span class="w">          </span>RUNNING
+</code></pre></div>
 
 <p>Congratulations! We have a cluster running.</p>
 <p>A little segway. kubectl has a config that determines which cluster you're working with. You can switch between different clusters. Try it:</p>
-<div class="highlight"><pre><span></span>$ kubectl config current-context
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>config<span class="w"> </span>current-context
 gke_mykube-160819_us-central1-b_example-cluster
-</pre></div>
-
+</code></pre></div>
 
 <p>We're good here - our context is for the "mykube" cluster. The cluster is empty, we can verify it like this:</p>
-<div class="highlight"><pre><span></span>$ kubectl get pods
-No resources found.
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>pods
+No<span class="w"> </span>resources<span class="w"> </span>found.
+</code></pre></div>
 
 <p>Now let's start out server finally:</p>
-<div class="highlight"><pre><span></span>$ kubectl run myserver --image<span class="o">=</span>gcr.io/<span class="nv">$PROJECT_ID</span>/myserver --port<span class="o">=</span><span class="m">8080</span>
-deployment <span class="s2">&quot;myserver&quot;</span> created
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>run<span class="w"> </span>myserver<span class="w"> </span>--image<span class="o">=</span>gcr.io/<span class="nv">$PROJECT_ID</span>/myserver<span class="w"> </span>--port<span class="o">=</span><span class="m">8080</span>
+deployment<span class="w"> </span><span class="s2">&quot;myserver&quot;</span><span class="w"> </span>created
+</code></pre></div>
 
 <p>We have created a deployment that contains a pod. Let's see what pods we have now:</p>
-<div class="highlight"><pre><span></span>$ kubectl get pods
-NAME                        READY     STATUS              RESTARTS   AGE
-myserver-3430466764-04b36   <span class="m">0</span>/1       ContainerCreating   <span class="m">0</span>          17s
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>pods
+NAME<span class="w">                        </span>READY<span class="w">     </span>STATUS<span class="w">              </span>RESTARTS<span class="w">   </span>AGE
+myserver-3430466764-04b36<span class="w">   </span><span class="m">0</span>/1<span class="w">       </span>ContainerCreating<span class="w">   </span><span class="m">0</span><span class="w">          </span>17s
+</code></pre></div>
 
 <p>Nice, our container is getting spinned. We wait for a bit and we see:</p>
-<div class="highlight"><pre><span></span>$ kubectl get pods
-NAME                        READY     STATUS    RESTARTS   AGE
-myserver-3430466764-04b36   <span class="m">1</span>/1       Running   <span class="m">0</span>          58s
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>pods
+NAME<span class="w">                        </span>READY<span class="w">     </span>STATUS<span class="w">    </span>RESTARTS<span class="w">   </span>AGE
+myserver-3430466764-04b36<span class="w">   </span><span class="m">1</span>/1<span class="w">       </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>58s
+</code></pre></div>
 
 <p>We can now expose the container:</p>
-<div class="highlight"><pre><span></span>$ kubectl expose deployment myserver --type<span class="o">=</span><span class="s2">&quot;LoadBalancer&quot;</span>
-service <span class="s2">&quot;myserver&quot;</span> exposed
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>expose<span class="w"> </span>deployment<span class="w"> </span>myserver<span class="w"> </span>--type<span class="o">=</span><span class="s2">&quot;LoadBalancer&quot;</span>
+service<span class="w"> </span><span class="s2">&quot;myserver&quot;</span><span class="w"> </span>exposed
+</code></pre></div>
 
 <p>This will also take some time:</p>
-<div class="highlight"><pre><span></span>$ kubectl get service myserver
-NAME       CLUSTER-IP   EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>          AGE
-myserver   <span class="m">10</span>.3.247.6   &lt;pending&gt;     <span class="m">8080</span>:31574/TCP   34s
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>service<span class="w"> </span>myserver
+NAME<span class="w">       </span>CLUSTER-IP<span class="w">   </span>EXTERNAL-IP<span class="w">   </span>PORT<span class="o">(</span>S<span class="o">)</span><span class="w">          </span>AGE
+myserver<span class="w">   </span><span class="m">10</span>.3.247.6<span class="w">   </span>&lt;pending&gt;<span class="w">     </span><span class="m">8080</span>:31574/TCP<span class="w">   </span>34s
+</code></pre></div>
 
 <p>Aaand, it's done:</p>
-<div class="highlight"><pre><span></span>$ kubectl get service myserver
-NAME       CLUSTER-IP   EXTERNAL-IP      PORT<span class="o">(</span>S<span class="o">)</span>          AGE
-myserver   <span class="m">10</span>.3.247.6   <span class="m">104</span>.155.177.47   <span class="m">8080</span>:31574/TCP   1m
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>service<span class="w"> </span>myserver
+NAME<span class="w">       </span>CLUSTER-IP<span class="w">   </span>EXTERNAL-IP<span class="w">      </span>PORT<span class="o">(</span>S<span class="o">)</span><span class="w">          </span>AGE
+myserver<span class="w">   </span><span class="m">10</span>.3.247.6<span class="w">   </span><span class="m">104</span>.155.177.47<span class="w">   </span><span class="m">8080</span>:31574/TCP<span class="w">   </span>1m
+</code></pre></div>
 
 <p>If we go to <code>http://104.155.177.47:8080/</code>, we'll see:</p>
-<div class="highlight"><pre><span></span>Returning element at index <span class="m">6110645</span>: <span class="m">116527640</span>
-Hello World!
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>Returning<span class="w"> </span>element<span class="w"> </span>at<span class="w"> </span>index<span class="w"> </span><span class="m">6110645</span>:<span class="w"> </span><span class="m">116527640</span>
+Hello<span class="w"> </span>World!
+</code></pre></div>
 
 <p>Now, the tedious part is over. Let's have some fun. We can monitor our cluster through the Kubernetes dashboard. For a reason unclear to me, this dashboard is not available on the Google website. You have to run a proxy to do it. Like this:</p>
-<div class="highlight"><pre><span></span>$ kubectl proxy
-Starting to serve on <span class="m">127</span>.0.0.1:8001
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>proxy
+Starting<span class="w"> </span>to<span class="w"> </span>serve<span class="w"> </span>on<span class="w"> </span><span class="m">127</span>.0.0.1:8001
+</code></pre></div>
 
 <p>We can see the dashboard at <code>localhost:8001/ui</code>. It looks like this:</p>
 <p><center><img alt="Kubernetes Dashboard" src="http://pminkov.github.io/blog/images/k8s-intro/k2-dashboard.png"></center></p>
 <p>This dashboard is a lot of fun. You can dig into everything available in it. You can probably see everything it shows through kubectl as well, but it's easier to do it by using an UI.</p>
 <p>Here's something else that's fun. Your cluster doesn't run on thin air. It runs on Google Compute Engine instances (I believe this is equivalent to AWS' EC2). In your cloud console, you can navigate to your instances and you can even SSH to an instance from the web UI (I wow-ed the first time I did this, much easier than setting up ssh access on AWS).</p>
 <p>Our cluster has three nodes.</p>
-<div class="highlight"><pre><span></span>$ kubectl get nodes
-NAME                                             STATUS    AGE
-gke-example-cluster-default-pool-2567fc65-1h40   Ready     21m
-gke-example-cluster-default-pool-2567fc65-g7lc   Ready     21m
-gke-example-cluster-default-pool-2567fc65-n0cp   Ready     21m
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+NAME<span class="w">                                             </span>STATUS<span class="w">    </span>AGE
+gke-example-cluster-default-pool-2567fc65-1h40<span class="w">   </span>Ready<span class="w">     </span>21m
+gke-example-cluster-default-pool-2567fc65-g7lc<span class="w">   </span>Ready<span class="w">     </span>21m
+gke-example-cluster-default-pool-2567fc65-n0cp<span class="w">   </span>Ready<span class="w">     </span>21m
+</code></pre></div>
 
 <p>These are three GCE instances. Where is our pod running at?</p>
-<div class="highlight"><pre><span></span>$ kubectl get pods -o wide
-NAME                        READY     STATUS    RESTARTS   AGE       IP         NODE
-myserver-3430466764-04b36   <span class="m">1</span>/1       Running   <span class="m">0</span>          18m       <span class="m">10</span>.0.1.5   gke-example-cluster-default-pool-2567fc65-g7lc
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-o<span class="w"> </span>wide
+NAME<span class="w">                        </span>READY<span class="w">     </span>STATUS<span class="w">    </span>RESTARTS<span class="w">   </span>AGE<span class="w">       </span>IP<span class="w">         </span>NODE
+myserver-3430466764-04b36<span class="w">   </span><span class="m">1</span>/1<span class="w">       </span>Running<span class="w">   </span><span class="m">0</span><span class="w">          </span>18m<span class="w">       </span><span class="m">10</span>.0.1.5<span class="w">   </span>gke-example-cluster-default-pool-2567fc65-g7lc
+</code></pre></div>
 
 <p>It's running on <code>gke-example-cluster-default-pool-2567fc65-g7lc</code>. Now I can navigate to the web page for this instance and ssh to it. Here's a screenshot of how that looks like:</p>
 <p><center><img alt="Compute Engine SSH" src="http://pminkov.github.io/blog/images/k8s-intro/k3-compute-engine.png"></center></p>
 <p>I ran <code>ps aux --sort '%mem'</code> to see which process takes most memory. Since my server uses a lot of memory, it's at the top. It's using 179MB of resident memory.</p>
 <p>It's pretty nice that you're able to nagivate from a high level system like Kubernetes all the way down to ssh-ing to a machine that runs your containers. When you're ssh-ed you can execute <code>docker ps</code> to see what containers are running, run <code>top</code> to see what's going on on the machine and do all of the other systems debugging tasks that you can think of.</p>
 <p>And finally, let's delete our cluster:</p>
-<div class="highlight"><pre><span></span>$ gcloud container clusters delete example-cluster
-The following clusters will be deleted.
- - <span class="o">[</span>example-cluster<span class="o">]</span> in <span class="o">[</span>us-central1-b<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>gcloud<span class="w"> </span>container<span class="w"> </span>clusters<span class="w"> </span>delete<span class="w"> </span>example-cluster
+The<span class="w"> </span>following<span class="w"> </span>clusters<span class="w"> </span>will<span class="w"> </span>be<span class="w"> </span>deleted.
+<span class="w"> </span>-<span class="w"> </span><span class="o">[</span>example-cluster<span class="o">]</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">[</span>us-central1-b<span class="o">]</span>
 
-Do you want to <span class="k">continue</span> <span class="o">(</span>Y/n<span class="o">)</span>?  
+Do<span class="w"> </span>you<span class="w"> </span>want<span class="w"> </span>to<span class="w"> </span><span class="k">continue</span><span class="w"> </span><span class="o">(</span>Y/n<span class="o">)</span>?<span class="w">  </span>
 
-Deleting cluster example-cluster...done.                                                                                                                                               
-Deleted <span class="o">[</span>https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster<span class="o">]</span>.
-</pre></div>
-
+Deleting<span class="w"> </span>cluster<span class="w"> </span>example-cluster...done.<span class="w">                                                                                                                                               </span>
+Deleted<span class="w"> </span><span class="o">[</span>https://container.googleapis.com/v1/projects/mykube-160819/zones/us-central1-b/clusters/example-cluster<span class="o">]</span>.
+</code></pre></div>
 
 <p>That's all for today - enjoy.</p>
     </div><!-- /.entry-content -->

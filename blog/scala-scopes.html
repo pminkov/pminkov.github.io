@@ -44,23 +44,13 @@ in <a href="http://pminkov.github.io/blog/category/misc.html">Misc</a>
 features which I really like. One of them is scopes that can evaluate to
 a value. How does that look like:</p>
 <p>
-<script src="https://gist.github.com/2516506.js" type="text/javascript"><![CDATA[// <![CDATA[</p>
-
-<p>// <![CDATA[</p>
-
-<p> </p>
-
-<p>// ]]]]]]><![CDATA[><![CDATA[></p>
-
-<p>// ]]]]><![CDATA[>]]></script>
+<script src="https://gist.github.com/2516506.js" type="text/javascript"><![CDATA[// <![CDATA[</p><p>// <![CDATA[</p><p> </p><p>// ]]]]]]><![CDATA[><![CDATA[></p><p>// ]]]]><![CDATA[>]]></script>
 </p>
-
 <p></p>
 Ignore the obvious inefficiencies of the code and take a look at how you
 can put a block of code inside the inner scope. What's good about that?
 This inner scope is like a lighweight function. The benefits are:</p>
 </p>
-
 <ul>
 <li>
 <p>Variables in the function are not seen outside of the scope. Great,
