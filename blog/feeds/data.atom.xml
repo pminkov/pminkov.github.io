@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog - Data</title><link href="https://pminkov.github.io/blog/" rel="alternate"></link><link href="https://pminkov.github.io/blog/feeds/data.atom.xml" rel="self"></link><id>https://pminkov.github.io/blog/</id><updated>2023-10-08T15:36:00-07:00</updated><entry><title>Learning Parquet with DuckDB</title><link href="https://pminkov.github.io/blog/learning-parquet-with-duckdb.html" rel="alternate"></link><published>2023-10-08T15:36:00-07:00</published><updated>2023-10-08T15:36:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2023-10-08:/blog/learning-parquet-with-duckdb.html</id><summary type="html">&lt;p&gt;I was interested in learning more about &lt;a href="https://parquet.apache.org/"&gt;Parquet&lt;/a&gt;
 and picked DuckDB as a tool to explore Parquet datasets.&lt;/p&gt;
-&lt;p&gt;It wasn't easy to find good Parquet datasets, but these two blog posts from MotherDuck (post &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-1/"&gt;one&lt;/a&gt; and &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-2/"&gt;two&lt;/a&gt;)
-helped with that. MotherDuck has posted a Stack Overflow dataset in Parquet publicly …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I was interested in learning more about &lt;a href="https://parquet.apache.org/"&gt;Parquet&lt;/a&gt;
+&lt;p&gt;It wasn't easy to find good Parquet datasets, but I found two blog posts from MotherDuck
+(post &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-1/"&gt;one&lt;/a&gt;
+and &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-2/"&gt;two&lt;/a&gt;)
+which helped with that. These posts contain links to a Stack Overflow …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I was interested in learning more about &lt;a href="https://parquet.apache.org/"&gt;Parquet&lt;/a&gt;
 and picked DuckDB as a tool to explore Parquet datasets.&lt;/p&gt;
-&lt;p&gt;It wasn't easy to find good Parquet datasets, but these two blog posts from MotherDuck (post &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-1/"&gt;one&lt;/a&gt; and &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-2/"&gt;two&lt;/a&gt;)
-helped with that. MotherDuck has posted a Stack Overflow dataset in Parquet publicly and
-you can easily explore it with DuckDB.&lt;/p&gt;
-&lt;p&gt;To do what's described in this blog post, you'd need to install the AWS CLI and DuckDB. To use the AWS CLI
+&lt;p&gt;It wasn't easy to find good Parquet datasets, but I found two blog posts from MotherDuck
+(post &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-1/"&gt;one&lt;/a&gt;
+and &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-2/"&gt;two&lt;/a&gt;)
+which helped with that. These posts contain links to a Stack Overflow dataset, which you
+can easily explore with DuckDB.&lt;/p&gt;
+&lt;p&gt;To do what's described in this blog post, you'll need to install the AWS CLI and DuckDB. To use the AWS CLI
 you'll need an AWS account. Once you're done with that, you can immediately start
 to explore the datasets:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;aws&lt;span class="w"&gt; &lt;/span&gt;s3&lt;span class="w"&gt; &lt;/span&gt;ls&lt;span class="w"&gt; &lt;/span&gt;s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/&lt;span class="w"&gt; &lt;/span&gt;--human-readable
@@ -22,7 +26,7 @@ to explore the datasets:&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;I'm interested in the times of the queries I'll be trying, so before
-starting to run them, I turn DuckDB's timing with:&lt;/p&gt;
+starting to run them, I turn on DuckDB's timer with:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;.timer on
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -45,7 +49,7 @@ starting to run them, I turn DuckDB's timing with:&lt;/p&gt;
 Run Time (s): real 0.793 user 0.015590 sys 0.007591
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;Running queries over S3 is going to be slow, so I copied the dataset locally. &lt;code&gt;users.parquet&lt;/code&gt; is 734MB.&lt;/p&gt;
+&lt;p&gt;Running queries over S3 is going to be slow, especially from my laptop, so I copied the dataset locally. &lt;code&gt;users.parquet&lt;/code&gt; is 734MB.&lt;/p&gt;
 &lt;p&gt;Let's run a simple query:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D select SUM(Views) from &amp;#39;users.parquet&amp;#39; where DisplayName like &amp;#39;Petko%&amp;#39;;
 ┌──────────────┐
@@ -57,10 +61,16 @@ Run Time (s): real 0.793 user 0.015590 sys 0.007591
 Run Time (s): real 0.207 user 1.364285 sys 0.099568
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
+&lt;p&gt;To talk in more depth about this query, I need to mention that Parquet
+files are organized in row groups. Row groups contain rows of data.
+The data inside row group is stored in column chunks and Parquet keeps
+track of statistics for each column chunk like min and max values.&lt;/p&gt;
 &lt;p&gt;This query took &lt;code&gt;0.207s&lt;/code&gt;. Note that the &lt;code&gt;user&lt;/code&gt; + &lt;code&gt;sys&lt;/code&gt; time is more than this number.
-That's because the query was running on multiple threads.&lt;/p&gt;
+That's because the query was running on multiple threads, which is possible
+due to the data being stored in separate row groups.&lt;/p&gt;
 &lt;p&gt;We can explain this query too:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D explain analyze select SUM(Views) from &amp;#39;users.parquet&amp;#39; where DisplayName like &amp;#39;Petko%&amp;#39;;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D explain analyze select SUM(Views) from &amp;#39;users.parquet&amp;#39;
+    where DisplayName like &amp;#39;Petko%&amp;#39;;
 
 ┌─────────────────────────────┐
 │┌───────────────────────────┐│
@@ -128,10 +138,6 @@ explain analyze select SUM(Views) from &amp;#39;users.parquet&amp;#39; where Dis
 Run Time (s): real 0.209 user 1.357049 sys 0.104349
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;To talk in more depth about this query, I need to mention that Parquet
-files are organized in row groups. Row groups contain rows of data.
-The data inside row group is stored in column chunks and Parquet keeps
-track of statistics for each column chunk like min and max values.&lt;/p&gt;
 &lt;p&gt;Look at this section:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;┌─────────────┴─────────────┐
 │       PARQUET_SCAN        │
@@ -150,11 +156,12 @@ track of statistics for each column chunk like min and max values.&lt;/p&gt;
 └───────────────────────────┘      
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;To understand how DuckDB queries Parquet, it'll be helpful to read &lt;a href="https://duckdb.org/2021/06/25/querying-parquet.html"&gt;Querying Parquet with Precision using DuckDB&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To understand what's going on here and how DuckDB queries Parquet, it'll be helpful to read &lt;a href="https://duckdb.org/2021/06/25/querying-parquet.html"&gt;Querying Parquet with Precision using DuckDB&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;What we see here is a projection and filter pushdown, as described &lt;a href="https://duckdb.org/2021/06/25/querying-parquet.html#automatic-filter--projection-pushdown"&gt;here&lt;/a&gt;.
 DuckDB is not going to fetch the entire Parquet file, it will only fetch two
-columns. It can also use min/max statistics and skip certain row groups.&lt;/p&gt;
-&lt;p&gt;After it has applied these pushdowns, it will run a &lt;code&gt;FILTER&lt;/code&gt; and &lt;code&gt;PROJECTION&lt;/code&gt;, which
+columns (projection pushdown). It can also use min/max statistics and
+skip certain row groups (filter pushdown).&lt;/p&gt;
+&lt;p&gt;After it has applied these pushdowns, it will execute a &lt;code&gt;FILTER&lt;/code&gt; and &lt;code&gt;PROJECTION&lt;/code&gt;, which
 happen within DuckDB.&lt;/p&gt;
 &lt;p&gt;This query however doesn't benefit much from the filter pushdown, since the data
 is not sorted by DisplayName so the filter probably returns most of the data. The data
@@ -180,7 +187,8 @@ Run Time (s): real 0.009 user 0.016330 sys 0.003842
 
 &lt;p&gt;You can also explore the Parquet Metadata to see this as well. 
 DuckDB offers a way to query the Parquet Metadata (&lt;a href="https://duckdb.org/docs/data/parquet/metadata.html"&gt;link&lt;/a&gt;).&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D select path_in_schema, row_group_id, stats_min_value, stats_max_value from parquet_metadata(&amp;#39;users.parquet&amp;#39;) where (path_in_schema=&amp;#39;Id&amp;#39;) limit 10;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D select path_in_schema, row_group_id, stats_min_value, stats_max_value
+  from parquet_metadata(&amp;#39;users.parquet&amp;#39;) where (path_in_schema=&amp;#39;Id&amp;#39;) limit 10;
 ┌────────────────┬──────────────┬─────────────────┬─────────────────┐
 │ path_in_schema │ row_group_id │ stats_min_value │ stats_max_value │
 │    varchar     │    int64     │     varchar     │     varchar     │
