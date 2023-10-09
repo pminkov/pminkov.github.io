@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>Learning Parquet with DuckDB</title>
+        <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css" />
+        <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
+
+        <!--[if IE]>
+            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="https://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
+                <nav><ul>
+                    <li><a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
+                    <li class="active"><a href="https://pminkov.github.io/blog/category/data.html">Data</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/django.html">Django</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/misc.html">Misc</a></li>
+                    <li><a href="https://pminkov.github.io/blog/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="https://pminkov.github.io/blog/learning-parquet-with-duckdb.html" rel="bookmark"
+           title="Permalink to Learning Parquet with DuckDB">Learning Parquet with DuckDB</a></h1>
+    </header>
+
+    <div class="entry-content">
+<div class="post-info">
+        <div class="published" title="2023-10-08T15:36:00-07:00">
+                Published: Sun 08 October 2023
+in <a href="https://pminkov.github.io/blog/category/data.html">Data</a>
+        </div>
+
+</div><!-- /.post-info -->    </div>
+    <div>
+      <p>I was interested in learning more about <a href="https://parquet.apache.org/">Parquet</a>
+and picked DuckDB as a tool to explore Parquet datasets.</p>
+<p>It wasn't easy to find good Parquet datasets, but these two blog posts from MotherDuck (post <a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-1/">one</a> and <a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-2/">two</a>)
+helped with that. MotherDuck has posted a Stack Overflow dataset in Parquet publicly and
+you can easily explore it with DuckDB.</p>
+<p>To do what's described in this blog post, you'd need to install the AWS CLI and DuckDB. To use the AWS CLI
+you'll need an AWS account. Once you're done with that, you can immediately start
+to explore the datasets:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>aws<span class="w"> </span>s3<span class="w"> </span>ls<span class="w"> </span>s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/<span class="w"> </span>--human-readable
+<span class="m">2023</span>-07-15<span class="w"> </span><span class="m">07</span>:01:48<span class="w">    </span><span class="m">0</span><span class="w"> </span>Bytes<span class="w"> </span>
+<span class="m">2023</span>-07-15<span class="w"> </span><span class="m">11</span>:16:11<span class="w">  </span><span class="m">517</span>.2<span class="w"> </span>MiB<span class="w"> </span>badges.parquet
+<span class="m">2023</span>-07-15<span class="w"> </span><span class="m">11</span>:16:11<span class="w">    </span><span class="m">6</span>.9<span class="w"> </span>GiB<span class="w"> </span>comments.parquet
+<span class="m">2023</span>-07-15<span class="w"> </span><span class="m">11</span>:16:11<span class="w">  </span><span class="m">163</span>.3<span class="w"> </span>MiB<span class="w"> </span>post_links.parquet
+<span class="m">2023</span>-08-16<span class="w"> </span><span class="m">07</span>:55:13<span class="w">    </span><span class="m">4</span>.1<span class="w"> </span>GiB<span class="w"> </span>posts.parquet
+<span class="m">2023</span>-07-15<span class="w"> </span><span class="m">11</span>:16:11<span class="w">    </span><span class="m">1</span>.5<span class="w"> </span>MiB<span class="w"> </span>tags.parquet
+<span class="m">2023</span>-07-15<span class="w"> </span><span class="m">11</span>:17:01<span class="w">  </span><span class="m">733</span>.7<span class="w"> </span>MiB<span class="w"> </span>users.parquet
+<span class="m">2023</span>-07-15<span class="w"> </span><span class="m">11</span>:23:34<span class="w">    </span><span class="m">2</span>.2<span class="w"> </span>GiB<span class="w"> </span>votes.parquet
+</code></pre></div>
+
+<p>I'm interested in the times of the queries I'll be trying, so before
+starting to run them, I turn DuckDB's timing with:</p>
+<div class="highlight"><pre><span></span><code><span class="na">.timer</span><span class="w"> </span><span class="no">on</span>
+</code></pre></div>
+
+<p>Let's use the <code>users.parquet</code> dataset. You can see its schema like this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">describe</span><span class="w"> </span><span class="p">(</span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="s1">&#39;s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/users.parquet&#39;</span><span class="p">);</span>
+<span class="err">┌────────────────┬─────────────┬─────────┬─────────┬─────────┬─────────┐</span>
+<span class="err">│</span><span class="w">  </span><span class="k">column_name</span><span class="w">   </span><span class="err">│</span><span class="w"> </span><span class="n">column_type</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="k">null</span><span class="w">   </span><span class="err">│</span><span class="w">   </span><span class="k">key</span><span class="w">   </span><span class="err">│</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="err">│</span><span class="w">  </span><span class="n">extra</span><span class="w">  </span><span class="err">│</span>
+<span class="err">│</span><span class="w">    </span><span class="nb">varchar</span><span class="w">     </span><span class="err">│</span><span class="w">   </span><span class="nb">varchar</span><span class="w">   </span><span class="err">│</span><span class="w"> </span><span class="nb">varchar</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="nb">varchar</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="nb">varchar</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="nb">varchar</span><span class="w"> </span><span class="err">│</span>
+<span class="err">├────────────────┼─────────────┼─────────┼─────────┼─────────┼─────────┤</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w">      </span><span class="err">│</span><span class="w"> </span><span class="n">YES</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Reputation</span><span class="w">     </span><span class="err">│</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w">      </span><span class="err">│</span><span class="w"> </span><span class="n">YES</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">CreationDate</span><span class="w">   </span><span class="err">│</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w">   </span><span class="err">│</span><span class="w"> </span><span class="n">YES</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">DisplayName</span><span class="w">    </span><span class="err">│</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="w">     </span><span class="err">│</span><span class="w"> </span><span class="n">YES</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">LastAccessDate</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w">   </span><span class="err">│</span><span class="w"> </span><span class="n">YES</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">AboutMe</span><span class="w">        </span><span class="err">│</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="w">     </span><span class="err">│</span><span class="w"> </span><span class="n">YES</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Views</span><span class="w">          </span><span class="err">│</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w">      </span><span class="err">│</span><span class="w"> </span><span class="n">YES</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">UpVotes</span><span class="w">        </span><span class="err">│</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w">      </span><span class="err">│</span><span class="w"> </span><span class="n">YES</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">DownVotes</span><span class="w">      </span><span class="err">│</span><span class="w"> </span><span class="nb">BIGINT</span><span class="w">      </span><span class="err">│</span><span class="w"> </span><span class="n">YES</span><span class="w">     </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span><span class="w">         </span><span class="err">│</span>
+<span class="err">└────────────────┴─────────────┴─────────┴─────────┴─────────┴─────────┘</span>
+<span class="n">Run</span><span class="w"> </span><span class="k">Time</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">):</span><span class="w"> </span><span class="nb">real</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">793</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">015590</span><span class="w"> </span><span class="n">sys</span><span class="w"> </span><span class="mi">0</span><span class="p">.</span><span class="mi">007591</span>
+</code></pre></div>
+
+<p>Running queries over S3 is going to be slow, so I copied the dataset locally. <code>users.parquet</code> is 734MB.</p>
+<p>Let's run a simple query:</p>
+<div class="highlight"><pre><span></span><code>D select SUM(Views) from &#39;users.parquet&#39; where DisplayName like &#39;Petko%&#39;;
+┌──────────────┐
+│ sum(&quot;Views&quot;) │
+│    int128    │
+├──────────────┤
+│          573 │
+└──────────────┘
+Run Time (s): real 0.207 user 1.364285 sys 0.099568
+</code></pre></div>
+
+<p>This query took <code>0.207s</code>. Note that the <code>user</code> + <code>sys</code> time is more than this number.
+That's because the query was running on multiple threads.</p>
+<p>We can explain this query too:</p>
+<div class="highlight"><pre><span></span><code>D explain analyze select SUM(Views) from &#39;users.parquet&#39; where DisplayName like &#39;Petko%&#39;;
+
+┌─────────────────────────────┐
+│┌───────────────────────────┐│
+│└───────────────────────────┘│
+└─────────────────────────────┘
+┌─────────────────────────────────────┐
+│┌───────────────────────────────────┐│
+││    Query Profiling Information    ││
+│└───────────────────────────────────┘│
+└─────────────────────────────────────┘
+explain analyze select SUM(Views) from &#39;users.parquet&#39; where DisplayName like &#39;Petko%&#39;;
+┌─────────────────────────────────────┐
+│┌───────────────────────────────────┐│
+││         Total Time: 0.202s        ││
+│└───────────────────────────────────┘│
+└─────────────────────────────────────┘
+┌───────────────────────────┐
+│      EXPLAIN_ANALYZE      │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│             0             │
+│          (0.00s)          │
+└─────────────┬─────────────┘                             
+┌─────────────┴─────────────┐
+│    UNGROUPED_AGGREGATE    │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│          sum(#0)          │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│             1             │
+│          (0.00s)          │
+└─────────────┬─────────────┘                             
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│           Views           │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            119            │
+│          (0.00s)          │
+└─────────────┬─────────────┘                             
+┌─────────────┴─────────────┐
+│           FILTER          │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│prefix(DisplayName, &#39;Petko&#39;│
+│             )             │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        EC: 3988557        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            119            │
+│          (0.01s)          │
+└─────────────┬─────────────┘                             
+┌─────────────┴─────────────┐
+│       PARQUET_SCAN        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        DisplayName        │
+│           Views           │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│Filters: DisplayName&gt;=Petko│
+│  AND DisplayName&lt;Petkp AND│
+│   DisplayName IS NOT NULL │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        EC: 3988557        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            119            │
+│          (1.57s)          │
+└───────────────────────────┘                             
+Run Time (s): real 0.209 user 1.357049 sys 0.104349
+</code></pre></div>
+
+<p>To talk in more depth about this query, I need to mention that Parquet
+files are organized in row groups. Row groups contain rows of data.
+The data inside row group is stored in column chunks and Parquet keeps
+track of statistics for each column chunk like min and max values.</p>
+<p>Look at this section:</p>
+<div class="highlight"><pre><span></span><code>┌─────────────┴─────────────┐
+│       PARQUET_SCAN        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        DisplayName        │
+│           Views           │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│Filters: DisplayName&gt;=Petko│
+│  AND DisplayName&lt;Petkp AND│
+│   DisplayName IS NOT NULL │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        EC: 3988557        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            119            │
+│          (1.57s)          │
+└───────────────────────────┘      
+</code></pre></div>
+
+<p>To understand how DuckDB queries Parquet, it'll be helpful to read <a href="https://duckdb.org/2021/06/25/querying-parquet.html">Querying Parquet with Precision using DuckDB</a>.</p>
+<p>What we see here is a projection and filter pushdown, as described <a href="https://duckdb.org/2021/06/25/querying-parquet.html#automatic-filter--projection-pushdown">here</a>.
+DuckDB is not going to fetch the entire Parquet file, it will only fetch two
+columns. It can also use min/max statistics and skip certain row groups.</p>
+<p>After it has applied these pushdowns, it will run a <code>FILTER</code> and <code>PROJECTION</code>, which
+happen within DuckDB.</p>
+<p>This query however doesn't benefit much from the filter pushdown, since the data
+is not sorted by DisplayName so the filter probably returns most of the data. The data
+for <code>users.parquet</code> is sorted by Id: </p>
+<div class="highlight"><pre><span></span><code>D select Id from read_parquet(&#39;users.parquet&#39;) limit 10 offset 2000;
+┌───────┐
+│  Id   │
+│ int64 │
+├───────┤
+│  2808 │
+│  2811 │
+│  2812 │
+│  2813 │
+│  2815 │
+│  2818 │
+│  2819 │
+│  2820 │
+│  2821 │
+│  2822 │
+└───────┘
+Run Time (s): real 0.009 user 0.016330 sys 0.003842
+</code></pre></div>
+
+<p>You can also explore the Parquet Metadata to see this as well. 
+DuckDB offers a way to query the Parquet Metadata (<a href="https://duckdb.org/docs/data/parquet/metadata.html">link</a>).</p>
+<div class="highlight"><pre><span></span><code><span class="n">D</span><span class="w"> </span><span class="n">select</span><span class="w"> </span><span class="n">path_in_schema</span><span class="p">,</span><span class="w"> </span><span class="n">row_group_id</span><span class="p">,</span><span class="w"> </span><span class="n">stats_min_value</span><span class="p">,</span><span class="w"> </span><span class="n">stats_max_value</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">parquet_metadata</span><span class="p">(</span><span class="s1">&#39;users.parquet&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">where</span><span class="w"> </span><span class="p">(</span><span class="n">path_in_schema</span><span class="o">=</span><span class="s1">&#39;Id&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">limit</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+<span class="err">┌────────────────┬──────────────┬─────────────────┬─────────────────┐</span>
+<span class="err">│</span><span class="w"> </span><span class="n">path_in_schema</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">row_group_id</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">stats_min_value</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="n">stats_max_value</span><span class="w"> </span><span class="err">│</span>
+<span class="err">│</span><span class="w">    </span><span class="n">varchar</span><span class="w">     </span><span class="err">│</span><span class="w">    </span><span class="n">int64</span><span class="w">     </span><span class="err">│</span><span class="w">     </span><span class="n">varchar</span><span class="w">     </span><span class="err">│</span><span class="w">     </span><span class="n">varchar</span><span class="w">     </span><span class="err">│</span>
+<span class="err">├────────────────┼──────────────┼─────────────────┼─────────────────┤</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">0</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="o">-</span><span class="mi">1014</span><span class="w">           </span><span class="err">│</span><span class="w"> </span><span class="mi">248850</span><span class="w">          </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">1</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="mi">248853</span><span class="w">          </span><span class="err">│</span><span class="w"> </span><span class="mi">412339</span><span class="w">          </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">2</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="mi">412342</span><span class="w">          </span><span class="err">│</span><span class="w"> </span><span class="mi">573874</span><span class="w">          </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">3</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="mi">573875</span><span class="w">          </span><span class="err">│</span><span class="w"> </span><span class="mi">735344</span><span class="w">          </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">4</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="mi">735345</span><span class="w">          </span><span class="err">│</span><span class="w"> </span><span class="mi">889114</span><span class="w">          </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">5</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="mi">889115</span><span class="w">          </span><span class="err">│</span><span class="w"> </span><span class="mi">1049570</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">6</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="mi">1049572</span><span class="w">         </span><span class="err">│</span><span class="w"> </span><span class="mi">1211500</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">7</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="mi">1211501</span><span class="w">         </span><span class="err">│</span><span class="w"> </span><span class="mi">1370352</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">8</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="mi">1370353</span><span class="w">         </span><span class="err">│</span><span class="w"> </span><span class="mi">1479833</span><span class="w">         </span><span class="err">│</span>
+<span class="err">│</span><span class="w"> </span><span class="n">Id</span><span class="w">             </span><span class="err">│</span><span class="w">            </span><span class="mi">9</span><span class="w"> </span><span class="err">│</span><span class="w"> </span><span class="mi">1479835</span><span class="w">         </span><span class="err">│</span><span class="w"> </span><span class="mi">1588348</span><span class="w">         </span><span class="err">│</span>
+<span class="err">├────────────────┴──────────────┴─────────────────┴─────────────────┤</span>
+<span class="err">│</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="n">rows</span><span class="w">                                                 </span><span class="mi">4</span><span class="w"> </span><span class="n">columns</span><span class="w"> </span><span class="err">│</span>
+<span class="err">└───────────────────────────────────────────────────────────────────┘</span>
+<span class="n">Run</span><span class="w"> </span><span class="n">Time</span><span class="w"> </span><span class="p">(</span><span class="n">s</span><span class="p">):</span><span class="w"> </span><span class="n">real</span><span class="w"> </span><span class="mf">0.025</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="mf">0.023375</span><span class="w"> </span><span class="n">sys</span><span class="w"> </span><span class="mf">0.000999</span>
+</code></pre></div>
+
+<p>Unsurprisingly queries which filter by Id are going to be much faster.</p>
+<p>Here's a query that returns 119 rows and filters on <code>DisplayName</code>:</p>
+<div class="highlight"><pre><span></span><code>D select count(*), sum(UpVotes) from &#39;users.parquet&#39; where DisplayName like &#39;Petko%&#39;;
+┌──────────────┬──────────────┐
+│ count_star() │ sum(UpVotes) │
+│    int64     │    int128    │
+├──────────────┼──────────────┤
+│          119 │          330 │
+└──────────────┴──────────────┘
+Run Time (s): real 0.201 user 1.363518 sys 0.100677
+</code></pre></div>
+
+<p>And here's a query that returns 3110 rows and filters on Id:</p>
+<div class="highlight"><pre><span></span><code>D select count(*), sum(UpVotes) from &#39;users.parquet&#39; where Id &gt;= 1000 * 1000 and Id &lt;= 1000 * 1000 + 5000;
+┌──────────────┬──────────────┐
+│ count_star() │ sum(UpVotes) │
+│    int64     │    int128    │
+├──────────────┼──────────────┤
+│         3110 │       235823 │
+└──────────────┴──────────────┘
+Run Time (s): real 0.012 user 0.014406 sys 0.003434
+</code></pre></div>
+
+<p>The latter is much faster. We can look at the <code>EXPLAIN</code> too:</p>
+<div class="highlight"><pre><span></span><code>┌─────────────┴─────────────┐
+│       PARQUET_SCAN        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│          UpVotes          │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│Filters: Id&gt;=1000000 AND Id│
+│  &lt;=1005000 AND Id IS NOT  │
+│            NULL           │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        EC: 3988557        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            3110           │
+│          (0.02s)          │
+└───────────────────────────┘    
+</code></pre></div>
+
+<p>As you can see this took only 0.02s. The Parquet reader likely skipped most row groups and picked one or two.</p>
+    </div><!-- /.entry-content -->
+    <div class="comments">
+      <div id="disqus_thread"></div>
+      <script type="text/javascript">
+        var disqus_shortname = 'pminkov-blog';
+        var disqus_identifier = 'learning-parquet-with-duckdb.html';
+        var disqus_url = 'https://pminkov.github.io/blog/learning-parquet-with-duckdb.html';
+        (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//pminkov-blog.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the comments.</noscript>
+    </div>
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <!--
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                  Blah blha blah
+                </address>
+        </footer>
+        -->
+        <!-- /#contentinfo -->
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-243631-7', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'pminkov-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+</html>

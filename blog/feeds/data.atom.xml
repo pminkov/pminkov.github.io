@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog - Data</title><link href="https://pminkov.github.io/blog/" rel="alternate"></link><link href="https://pminkov.github.io/blog/feeds/data.atom.xml" rel="self"></link><id>https://pminkov.github.io/blog/</id><updated>2023-10-08T15:36:00-07:00</updated><entry><title>Learning Parquet with DuckDB</title><link href="https://pminkov.github.io/blog/learning-parquet-with-duckdb.html" rel="alternate"></link><published>2023-10-08T15:36:00-07:00</published><updated>2023-10-08T15:36:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2023-10-08:/blog/learning-parquet-with-duckdb.html</id><summary type="html">&lt;p&gt;I was interested in learning more about &lt;a href="https://parquet.apache.org/"&gt;Parquet&lt;/a&gt;
+and picked DuckDB as a tool to explore Parquet datasets.&lt;/p&gt;
+&lt;p&gt;It wasn't easy to find good Parquet datasets, but these two blog posts from MotherDuck (post &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-1/"&gt;one&lt;/a&gt; and &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-2/"&gt;two&lt;/a&gt;)
+helped with that. MotherDuck has posted a Stack Overflow dataset in Parquet publicly …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I was interested in learning more about &lt;a href="https://parquet.apache.org/"&gt;Parquet&lt;/a&gt;
+and picked DuckDB as a tool to explore Parquet datasets.&lt;/p&gt;
+&lt;p&gt;It wasn't easy to find good Parquet datasets, but these two blog posts from MotherDuck (post &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-1/"&gt;one&lt;/a&gt; and &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-2/"&gt;two&lt;/a&gt;)
+helped with that. MotherDuck has posted a Stack Overflow dataset in Parquet publicly and
+you can easily explore it with DuckDB.&lt;/p&gt;
+&lt;p&gt;To do what's described in this blog post, you'd need to install the AWS CLI and DuckDB. To use the AWS CLI
+you'll need an AWS account. Once you're done with that, you can immediately start
+to explore the datasets:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$&lt;span class="w"&gt; &lt;/span&gt;aws&lt;span class="w"&gt; &lt;/span&gt;s3&lt;span class="w"&gt; &lt;/span&gt;ls&lt;span class="w"&gt; &lt;/span&gt;s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/&lt;span class="w"&gt; &lt;/span&gt;--human-readable
+&lt;span class="m"&gt;2023&lt;/span&gt;-07-15&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;07&lt;/span&gt;:01:48&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;Bytes&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="m"&gt;2023&lt;/span&gt;-07-15&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;11&lt;/span&gt;:16:11&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;517&lt;/span&gt;.2&lt;span class="w"&gt; &lt;/span&gt;MiB&lt;span class="w"&gt; &lt;/span&gt;badges.parquet
+&lt;span class="m"&gt;2023&lt;/span&gt;-07-15&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;11&lt;/span&gt;:16:11&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="m"&gt;6&lt;/span&gt;.9&lt;span class="w"&gt; &lt;/span&gt;GiB&lt;span class="w"&gt; &lt;/span&gt;comments.parquet
+&lt;span class="m"&gt;2023&lt;/span&gt;-07-15&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;11&lt;/span&gt;:16:11&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;163&lt;/span&gt;.3&lt;span class="w"&gt; &lt;/span&gt;MiB&lt;span class="w"&gt; &lt;/span&gt;post_links.parquet
+&lt;span class="m"&gt;2023&lt;/span&gt;-08-16&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;07&lt;/span&gt;:55:13&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="m"&gt;4&lt;/span&gt;.1&lt;span class="w"&gt; &lt;/span&gt;GiB&lt;span class="w"&gt; &lt;/span&gt;posts.parquet
+&lt;span class="m"&gt;2023&lt;/span&gt;-07-15&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;11&lt;/span&gt;:16:11&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;.5&lt;span class="w"&gt; &lt;/span&gt;MiB&lt;span class="w"&gt; &lt;/span&gt;tags.parquet
+&lt;span class="m"&gt;2023&lt;/span&gt;-07-15&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;11&lt;/span&gt;:17:01&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="m"&gt;733&lt;/span&gt;.7&lt;span class="w"&gt; &lt;/span&gt;MiB&lt;span class="w"&gt; &lt;/span&gt;users.parquet
+&lt;span class="m"&gt;2023&lt;/span&gt;-07-15&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;11&lt;/span&gt;:23:34&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;.2&lt;span class="w"&gt; &lt;/span&gt;GiB&lt;span class="w"&gt; &lt;/span&gt;votes.parquet
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;I'm interested in the times of the queries I'll be trying, so before
+starting to run them, I turn DuckDB's timing with:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="na"&gt;.timer&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;on&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Let's use the &lt;code&gt;users.parquet&lt;/code&gt; dataset. You can see its schema like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;describe&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;select&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;s3://us-prd-motherduck-open-datasets/stackoverflow/parquet/2023-05/users.parquet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="err"&gt;┌────────────────┬─────────────┬─────────┬─────────┬─────────┬─────────┐&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;column_name&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;column_type&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="k"&gt;null&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="k"&gt;key&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;default&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;extra&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;varchar&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;├────────────────┼─────────────┼─────────┼─────────┼─────────┼─────────┤&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;BIGINT&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;YES&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Reputation&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;BIGINT&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;YES&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;CreationDate&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TIMESTAMP&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;YES&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;DisplayName&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;VARCHAR&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;YES&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;LastAccessDate&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TIMESTAMP&lt;/span&gt;&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;YES&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;AboutMe&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;VARCHAR&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;YES&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Views&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;BIGINT&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;YES&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;UpVotes&lt;/span&gt;&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;BIGINT&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;YES&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;DownVotes&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;BIGINT&lt;/span&gt;&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;YES&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;└────────────────┴─────────────┴─────────┴─────────┴─────────┴─────────┘&lt;/span&gt;
+&lt;span class="n"&gt;Run&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;Time&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;real&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;793&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;user&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;015590&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;007591&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Running queries over S3 is going to be slow, so I copied the dataset locally. &lt;code&gt;users.parquet&lt;/code&gt; is 734MB.&lt;/p&gt;
+&lt;p&gt;Let's run a simple query:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D select SUM(Views) from &amp;#39;users.parquet&amp;#39; where DisplayName like &amp;#39;Petko%&amp;#39;;
+┌──────────────┐
+│ sum(&amp;quot;Views&amp;quot;) │
+│    int128    │
+├──────────────┤
+│          573 │
+└──────────────┘
+Run Time (s): real 0.207 user 1.364285 sys 0.099568
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;This query took &lt;code&gt;0.207s&lt;/code&gt;. Note that the &lt;code&gt;user&lt;/code&gt; + &lt;code&gt;sys&lt;/code&gt; time is more than this number.
+That's because the query was running on multiple threads.&lt;/p&gt;
+&lt;p&gt;We can explain this query too:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D explain analyze select SUM(Views) from &amp;#39;users.parquet&amp;#39; where DisplayName like &amp;#39;Petko%&amp;#39;;
+
+┌─────────────────────────────┐
+│┌───────────────────────────┐│
+│└───────────────────────────┘│
+└─────────────────────────────┘
+┌─────────────────────────────────────┐
+│┌───────────────────────────────────┐│
+││    Query Profiling Information    ││
+│└───────────────────────────────────┘│
+└─────────────────────────────────────┘
+explain analyze select SUM(Views) from &amp;#39;users.parquet&amp;#39; where DisplayName like &amp;#39;Petko%&amp;#39;;
+┌─────────────────────────────────────┐
+│┌───────────────────────────────────┐│
+││         Total Time: 0.202s        ││
+│└───────────────────────────────────┘│
+└─────────────────────────────────────┘
+┌───────────────────────────┐
+│      EXPLAIN_ANALYZE      │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│             0             │
+│          (0.00s)          │
+└─────────────┬─────────────┘                             
+┌─────────────┴─────────────┐
+│    UNGROUPED_AGGREGATE    │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│          sum(#0)          │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│             1             │
+│          (0.00s)          │
+└─────────────┬─────────────┘                             
+┌─────────────┴─────────────┐
+│         PROJECTION        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│           Views           │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            119            │
+│          (0.00s)          │
+└─────────────┬─────────────┘                             
+┌─────────────┴─────────────┐
+│           FILTER          │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│prefix(DisplayName, &amp;#39;Petko&amp;#39;│
+│             )             │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        EC: 3988557        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            119            │
+│          (0.01s)          │
+└─────────────┬─────────────┘                             
+┌─────────────┴─────────────┐
+│       PARQUET_SCAN        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        DisplayName        │
+│           Views           │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│Filters: DisplayName&amp;gt;=Petko│
+│  AND DisplayName&amp;lt;Petkp AND│
+│   DisplayName IS NOT NULL │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        EC: 3988557        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            119            │
+│          (1.57s)          │
+└───────────────────────────┘                             
+Run Time (s): real 0.209 user 1.357049 sys 0.104349
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To talk in more depth about this query, I need to mention that Parquet
+files are organized in row groups. Row groups contain rows of data.
+The data inside row group is stored in column chunks and Parquet keeps
+track of statistics for each column chunk like min and max values.&lt;/p&gt;
+&lt;p&gt;Look at this section:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;┌─────────────┴─────────────┐
+│       PARQUET_SCAN        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        DisplayName        │
+│           Views           │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│Filters: DisplayName&amp;gt;=Petko│
+│  AND DisplayName&amp;lt;Petkp AND│
+│   DisplayName IS NOT NULL │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        EC: 3988557        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            119            │
+│          (1.57s)          │
+└───────────────────────────┘      
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;To understand how DuckDB queries Parquet, it'll be helpful to read &lt;a href="https://duckdb.org/2021/06/25/querying-parquet.html"&gt;Querying Parquet with Precision using DuckDB&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;What we see here is a projection and filter pushdown, as described &lt;a href="https://duckdb.org/2021/06/25/querying-parquet.html#automatic-filter--projection-pushdown"&gt;here&lt;/a&gt;.
+DuckDB is not going to fetch the entire Parquet file, it will only fetch two
+columns. It can also use min/max statistics and skip certain row groups.&lt;/p&gt;
+&lt;p&gt;After it has applied these pushdowns, it will run a &lt;code&gt;FILTER&lt;/code&gt; and &lt;code&gt;PROJECTION&lt;/code&gt;, which
+happen within DuckDB.&lt;/p&gt;
+&lt;p&gt;This query however doesn't benefit much from the filter pushdown, since the data
+is not sorted by DisplayName so the filter probably returns most of the data. The data
+for &lt;code&gt;users.parquet&lt;/code&gt; is sorted by Id: &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D select Id from read_parquet(&amp;#39;users.parquet&amp;#39;) limit 10 offset 2000;
+┌───────┐
+│  Id   │
+│ int64 │
+├───────┤
+│  2808 │
+│  2811 │
+│  2812 │
+│  2813 │
+│  2815 │
+│  2818 │
+│  2819 │
+│  2820 │
+│  2821 │
+│  2822 │
+└───────┘
+Run Time (s): real 0.009 user 0.016330 sys 0.003842
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;You can also explore the Parquet Metadata to see this as well. 
+DuckDB offers a way to query the Parquet Metadata (&lt;a href="https://duckdb.org/docs/data/parquet/metadata.html"&gt;link&lt;/a&gt;).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;D&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;select&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;path_in_schema&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;row_group_id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;stats_min_value&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;stats_max_value&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;parquet_metadata&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;users.parquet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;where&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;path_in_schema&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Id&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;limit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="err"&gt;┌────────────────┬──────────────┬─────────────────┬─────────────────┐&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;path_in_schema&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;row_group_id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;stats_min_value&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;stats_max_value&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;varchar&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;int64&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;varchar&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="n"&gt;varchar&lt;/span&gt;&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;├────────────────┼──────────────┼─────────────────┼─────────────────┤&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1014&lt;/span&gt;&lt;span class="w"&gt;           &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;248850&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;248853&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;412339&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;412342&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;573874&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;573875&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;735344&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;735345&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;889114&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;889115&lt;/span&gt;&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1049570&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1049572&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1211500&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1211501&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1370352&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1370353&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1479833&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="mi"&gt;9&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1479835&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1588348&lt;/span&gt;&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;├────────────────┴──────────────┴─────────────────┴─────────────────┤&lt;/span&gt;
+&lt;span class="err"&gt;│&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;rows&lt;/span&gt;&lt;span class="w"&gt;                                                 &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;columns&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;│&lt;/span&gt;
+&lt;span class="err"&gt;└───────────────────────────────────────────────────────────────────┘&lt;/span&gt;
+&lt;span class="n"&gt;Run&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Time&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;real&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.025&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;user&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.023375&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.000999&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Unsurprisingly queries which filter by Id are going to be much faster.&lt;/p&gt;
+&lt;p&gt;Here's a query that returns 119 rows and filters on &lt;code&gt;DisplayName&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D select count(*), sum(UpVotes) from &amp;#39;users.parquet&amp;#39; where DisplayName like &amp;#39;Petko%&amp;#39;;
+┌──────────────┬──────────────┐
+│ count_star() │ sum(UpVotes) │
+│    int64     │    int128    │
+├──────────────┼──────────────┤
+│          119 │          330 │
+└──────────────┴──────────────┘
+Run Time (s): real 0.201 user 1.363518 sys 0.100677
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;And here's a query that returns 3110 rows and filters on Id:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;D select count(*), sum(UpVotes) from &amp;#39;users.parquet&amp;#39; where Id &amp;gt;= 1000 * 1000 and Id &amp;lt;= 1000 * 1000 + 5000;
+┌──────────────┬──────────────┐
+│ count_star() │ sum(UpVotes) │
+│    int64     │    int128    │
+├──────────────┼──────────────┤
+│         3110 │       235823 │
+└──────────────┴──────────────┘
+Run Time (s): real 0.012 user 0.014406 sys 0.003434
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;The latter is much faster. We can look at the &lt;code&gt;EXPLAIN&lt;/code&gt; too:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;┌─────────────┴─────────────┐
+│       PARQUET_SCAN        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│          UpVotes          │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│Filters: Id&amp;gt;=1000000 AND Id│
+│  &amp;lt;=1005000 AND Id IS NOT  │
+│            NULL           │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│        EC: 3988557        │
+│   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │
+│            3110           │
+│          (0.02s)          │
+└───────────────────────────┘    
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;As you can see this took only 0.02s. The Parquet reader likely skipped most row groups and picked one or two.&lt;/p&gt;</content><category term="Data"></category></entry></feed>
