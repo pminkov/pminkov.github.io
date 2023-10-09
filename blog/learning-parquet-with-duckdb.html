@@ -288,16 +288,20 @@ Run Time (s): real 0.012 user 0.014406 sys 0.003434
 
 <p>As you can see this took only 0.02s. The Parquet reader likely skipped most row groups and picked one or two.</p>
 <h1 id="conclusion">Conclusion</h1>
-<p>There are a few points here for me:
-* Querying Parquet is fastest when you filter on rows which are sorted (or at least mostly sorted).
-* Parquet queries can be quite fast even if they're done directly on the Parquet data.</p>
+<p>There are a few points here for me:</p>
+<ul>
+<li>Querying Parquet is fastest when you filter on rows which are sorted (or at least mostly sorted).</li>
+<li>Parquet queries can be quite fast even if they're done directly on the Parquet data.</li>
+</ul>
 <h1 id="todo">TODO</h1>
-<p>There are a couple of things I'm curious about exploring:
-* Can I achieve faster execution times for some queries by splitting the data into
+<p>There are a couple of things I'm curious about exploring:</p>
+<ul>
+<li>Can I achieve faster execution times for some queries by splitting the data into
 directories? For example, I can split by date and sort on <code>DisplayName</code>. This way queries
-which filter on date and a <code>DisplayName</code> prefix could possibly be made faster.
-* If I copy the Parquet file into a DuckDB table and <a href="https://duckdb.org/docs/sql/indexes.html">create indexes</a> on it, what kind of
-queries are going to become faster?</p>
+which filter on date and a <code>DisplayName</code> prefix could possibly be made faster.</li>
+<li>If I copy the Parquet file into a DuckDB table and <a href="https://duckdb.org/docs/sql/indexes.html">create indexes</a> on it, what kind of
+queries are going to become faster?</li>
+</ul>
     </div><!-- /.entry-content -->
     <div class="comments">
       <div id="disqus_thread"></div>

@@ -251,16 +251,20 @@ Run Time (s): real 0.012 user 0.014406 sys 0.003434
 
 &lt;p&gt;As you can see this took only 0.02s. The Parquet reader likely skipped most row groups and picked one or two.&lt;/p&gt;
 &lt;h1 id="conclusion"&gt;Conclusion&lt;/h1&gt;
-&lt;p&gt;There are a few points here for me:
-* Querying Parquet is fastest when you filter on rows which are sorted (or at least mostly sorted).
-* Parquet queries can be quite fast even if they're done directly on the Parquet data.&lt;/p&gt;
+&lt;p&gt;There are a few points here for me:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Querying Parquet is fastest when you filter on rows which are sorted (or at least mostly sorted).&lt;/li&gt;
+&lt;li&gt;Parquet queries can be quite fast even if they're done directly on the Parquet data.&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h1 id="todo"&gt;TODO&lt;/h1&gt;
-&lt;p&gt;There are a couple of things I'm curious about exploring:
-* Can I achieve faster execution times for some queries by splitting the data into
+&lt;p&gt;There are a couple of things I'm curious about exploring:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Can I achieve faster execution times for some queries by splitting the data into
 directories? For example, I can split by date and sort on &lt;code&gt;DisplayName&lt;/code&gt;. This way queries
-which filter on date and a &lt;code&gt;DisplayName&lt;/code&gt; prefix could possibly be made faster.
-* If I copy the Parquet file into a DuckDB table and &lt;a href="https://duckdb.org/docs/sql/indexes.html"&gt;create indexes&lt;/a&gt; on it, what kind of
-queries are going to become faster?&lt;/p&gt;</content><category term="Data"></category></entry><entry><title>In how many ways can you split a string into substrings?</title><link href="https://pminkov.github.io/blog/in-how-many-ways-can-you-split-a-string-into-substrings.html" rel="alternate"></link><published>2017-12-04T11:53:00-08:00</published><updated>2017-12-04T11:53:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-12-04:/blog/in-how-many-ways-can-you-split-a-string-into-substrings.html</id><content type="html">&lt;p&gt;I chatted with a friend, talking about the number of ways to split a string into all possible substrings. I like how elegantly this problem can be answered by using some basic mathematics and I sat down and wrote the idea. Here's the &lt;a href="https://github.com/pminkov/notebooks/blob/master/Number%20of%20ways%20to%20split%20a%20string%20into%20substrings.ipynb"&gt;Jupyter notebook&lt;/a&gt; for it.&lt;/p&gt;</content><category term="Misc"></category></entry><entry><title>Simple guide to SSH</title><link href="https://pminkov.github.io/blog/simple-guide-to-ssh.html" rel="alternate"></link><published>2017-08-09T17:30:00-07:00</published><updated>2017-08-09T17:30:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-08-09:/blog/simple-guide-to-ssh.html</id><summary type="html">&lt;div class="toc"&gt;&lt;span class="toctitle"&gt;Table of contents:&lt;/span&gt;&lt;ul&gt;
+which filter on date and a &lt;code&gt;DisplayName&lt;/code&gt; prefix could possibly be made faster.&lt;/li&gt;
+&lt;li&gt;If I copy the Parquet file into a DuckDB table and &lt;a href="https://duckdb.org/docs/sql/indexes.html"&gt;create indexes&lt;/a&gt; on it, what kind of
+queries are going to become faster?&lt;/li&gt;
+&lt;/ul&gt;</content><category term="Data"></category></entry><entry><title>In how many ways can you split a string into substrings?</title><link href="https://pminkov.github.io/blog/in-how-many-ways-can-you-split-a-string-into-substrings.html" rel="alternate"></link><published>2017-12-04T11:53:00-08:00</published><updated>2017-12-04T11:53:00-08:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-12-04:/blog/in-how-many-ways-can-you-split-a-string-into-substrings.html</id><content type="html">&lt;p&gt;I chatted with a friend, talking about the number of ways to split a string into all possible substrings. I like how elegantly this problem can be answered by using some basic mathematics and I sat down and wrote the idea. Here's the &lt;a href="https://github.com/pminkov/notebooks/blob/master/Number%20of%20ways%20to%20split%20a%20string%20into%20substrings.ipynb"&gt;Jupyter notebook&lt;/a&gt; for it.&lt;/p&gt;</content><category term="Misc"></category></entry><entry><title>Simple guide to SSH</title><link href="https://pminkov.github.io/blog/simple-guide-to-ssh.html" rel="alternate"></link><published>2017-08-09T17:30:00-07:00</published><updated>2017-08-09T17:30:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2017-08-09:/blog/simple-guide-to-ssh.html</id><summary type="html">&lt;div class="toc"&gt;&lt;span class="toctitle"&gt;Table of contents:&lt;/span&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#what-is-ssh-for"&gt;What is SSH for?&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#the-key-pair"&gt;The key pair&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#how-does-ssh-work"&gt;How does SSH work?&lt;/a&gt;&lt;/li&gt;
