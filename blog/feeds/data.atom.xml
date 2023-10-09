@@ -249,4 +249,15 @@ Run Time (s): real 0.012 user 0.014406 sys 0.003434
 └───────────────────────────┘    
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;As you can see this took only 0.02s. The Parquet reader likely skipped most row groups and picked one or two.&lt;/p&gt;</content><category term="Data"></category></entry></feed>
+&lt;p&gt;As you can see this took only 0.02s. The Parquet reader likely skipped most row groups and picked one or two.&lt;/p&gt;
+&lt;h1 id="conclusion"&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;There are a few points here for me:
+* Querying Parquet is fastest when you filter on rows which are sorted (or at least mostly sorted).
+* Parquet queries can be quite fast even if they're done directly on the Parquet data.&lt;/p&gt;
+&lt;h1 id="todo"&gt;TODO&lt;/h1&gt;
+&lt;p&gt;There are a couple of things I'm curious about exploring:
+* Can I achieve faster execution times for some queries by splitting the data into
+directories? For example, I can split by date and sort on &lt;code&gt;DisplayName&lt;/code&gt;. This way queries
+which filter on date and a &lt;code&gt;DisplayName&lt;/code&gt; prefix could possibly be made faster.
+* If I copy the Parquet file into a DuckDB table and &lt;a href="https://duckdb.org/docs/sql/indexes.html"&gt;create indexes&lt;/a&gt; on it, what kind of
+queries are going to become faster?&lt;/p&gt;</content><category term="Data"></category></entry></feed>
