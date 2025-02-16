@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <title>Fastrak CSV Parser</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <h1>Fastrak CSV Parser</h1>
+
+        <style>
+            body, table, h1, h3, p, textarea, button {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background-color: #1a1a1a;
+                color: #a0a0a0;
+            }
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-top: 20px;
+                background-color: #2d2d2d;
+                border: 1px solid #404040;
+            }
+            th, td {
+                border: 1px solid #404040;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #363636;
+                color: #b8b8b8;
+            }
+            .am-row {
+                background-color: #3b3b1d;
+            }
+            .pm-row {
+                background-color: #1f2d2d;
+            }
+            .am-row:hover {
+                background-color: #33331a;
+            }
+            .pm-row:hover {
+                background-color: #1f3333;
+            }
+            textarea {
+                width: 100%;
+                height: 200px;
+                margin: 10px 0;
+                background-color: #2d2d2d;
+                color: #a0a0a0;
+                border: 1px solid #404040;
+                padding: 10px;
+            }
+            button {
+                padding: 10px 20px;
+                background-color: #479cb8;
+                color: #e6e6e6;
+                border: none;
+                cursor: pointer;
+                border-radius: 4px;
+            }
+            button:hover {
+                background-color: #367a91;
+            }
+            .am-time, .pm-time {
+                position: relative;
+                padding-left: 25px;  /* Make room for the dot */
+            }
+            .am-time::before, .pm-time::before {
+                content: '';
+                position: absolute;
+                left: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+            }
+            .am-time::before {
+                background-color: #b3a725;  /* Yellow dot */
+            }
+            .pm-time::before {
+                background-color: #2596be;  /* Blue dot */
+            }
+        </style>
+        <script src="fastrak.js"></script>
+        <textarea id="csvInput" placeholder="Paste your CSV data here">
+POSTED DATE,TRANSACTION DATE,TRANSACTION TIME,TOLL TAG # / PLATE #,EXIT PLAZA,EXIT LANE,ENTRY DATE/TIME,ENTRY PLAZA,ENTRY LANE,DEBIT(-),CREDIT(+),BALANCE,,,,,,,,,,,,,,,,,
+12/30/2024,12/23/2024,09:20:08 AM,123456789,I-880 Alvarado-Niles SB,01,12/23/2024 09:16:44 AM,I-880 Tennyson Zone SB,01,$2.75,-,$21.00,
+12/27/2024,12/27/2024,02:40:59 AM,-,Payments,-,-,-,-,-,$25.00,$23.75,
+12/26/2024,12/19/2024,06:26:57 PM,123456789,I-880 Hesperian/238 NB,01,12/19/2024 06:26:19 PM,I-880 Hesperian/238 NB,01,$4.25,-,-$1.25,
+12/26/2024,12/19/2024,09:32:44 AM,123456789,I-880 Alvarado-Niles SB,01,12/19/2024 09:29:05 AM,I-880 Tennyson Zone SB,01,$5.25,-,$8.75,
+12/26/2024,12/19/2024,09:43:52 AM,123456789,Dumbarton Bridge,05,-,-,-,$8.00,-,$27.00,
+       </textarea>
+        <button onclick="parseCSV()">Submit</button>
+        <div id="tableOutput"></div>
+    </body>
+</html> 
