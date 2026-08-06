@@ -107,6 +107,12 @@ footer a {
   margin-top: 18px;
 }
 
+.hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 24px;
+}
+
 .blog-link span,
 footer a span {
   display: inline-block;
@@ -228,6 +234,109 @@ footer a {
   color: var(--ink);
 }
 
+.apps-header {
+  padding: 28px 0 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 42px;
+}
+
+.top-nav .eyebrow {
+  margin: 0;
+}
+
+.back-link {
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back-link span {
+  color: var(--accent);
+}
+
+.page-title {
+  font-size: clamp(3.2rem, 7vw, 5rem);
+}
+
+.apps-list {
+  padding: 24px 0 28px;
+}
+
+.app-card {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 24px;
+  align-items: center;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.app-mark {
+  width: 78px;
+  height: 78px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: var(--ink);
+  color: #7de08d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+  letter-spacing: -0.06em;
+}
+
+.app-copy .eyebrow {
+  margin-bottom: 6px;
+}
+
+.app-copy h2 {
+  font-size: 2rem;
+}
+
+.app-copy p {
+  max-width: 510px;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.app-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.app-actions a {
+  min-width: 116px;
+  padding: 9px 14px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.app-actions a:first-child,
+.app-actions a:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.app-actions a:first-child:hover {
+  background: transparent;
+  color: var(--ink);
+}
+
 @media (max-width: 720px) {
   main {
     width: min(100% - 32px, 920px);
@@ -286,6 +395,34 @@ footer a {
 
   footer {
     min-height: 66px;
+  }
+
+  .top-nav {
+    margin-bottom: 30px;
+  }
+
+  .app-card {
+    grid-template-columns: 64px 1fr;
+    gap: 14px;
+    align-items: start;
+    padding: 18px 0;
+  }
+
+  .app-mark {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+    font-size: 1.55rem;
+  }
+
+  .app-copy h2 {
+    font-size: 1.65rem;
+  }
+
+  .app-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
   }
 }
 
