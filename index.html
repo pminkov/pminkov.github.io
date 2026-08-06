@@ -1,69 +1,83 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-    <title>Petko Minkov - Homepage</title>
-    <meta charset="utf-8" />
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="index.css" rel="stylesheet" type="text/css"/>
-    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <script>
-      (adsbygoogle = window.adsbygoogle || []).push({
-        google_ad_client: "ca-pub-4402610208555767",
-        enable_page_level_ads: true
-      });
-    </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Petko Minkov — software engineer, writer, and builder.">
+  <title>Petko Minkov — Software Engineer</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
-<div id=main>
-    <div id=name>
-      <h1>Petko Minkov</h1>
-    </div>
+  <main>
+    <header class="hero">
+      <nav class="socials" aria-label="Social links">
+        <a href="https://github.com/pminkov" aria-label="GitHub">
+          <img src="icons/github.svg" alt="">
+        </a>
+        <a href="https://www.linkedin.com/in/petkominkov/" aria-label="LinkedIn">
+          <img src="icons/linkedin.svg" alt="">
+        </a>
+        <a href="https://twitter.com/xpty" aria-label="X / Twitter">
+          <img src="icons/twitter.svg" alt="">
+        </a>
+      </nav>
 
-    <div id="icons">
-      <a href="https://github.com/pminkov">
-        <img class="site" src="icons/github.svg"></img>
+      <p class="eyebrow">Software engineer · Bay Area</p>
+      <h1>Petko Minkov<span>.</span></h1>
+      <a class="blog-link" href="/blog">
+        Read my coding blog <span aria-hidden="true">↗</span>
       </a>
-      <a href="https://www.hackerrank.com/petko">
-        <img class="site" src="icons/hackerrank.svg"></img>
-      </a>
-      <a href="https://www.linkedin.com/in/petkominkov/">
-        <img class="site" src="icons/linkedin.svg"></img>
-      </a>
-      <a href="https://twitter.com/xpty">
-        <img class="site" src="icons/twitter.svg"></img>
-      </a>
-    </div>
+    </header>
 
-    <div id="content">
-      Check out my coding <a href="/blog">blog</a>.
-    </div>
+    <section class="projects" aria-labelledby="projects-heading">
+      <div class="section-heading">
+        <h2 id="projects-heading">Projects</h2>
+      </div>
 
-    <div id="projects">
-        <div>
-            Projects:
-        </div>
-        <ul>
-            <li><a href="https://github.com/pminkov/kubeutils">kubeutils</a> - Kubernetes command line utils.</li>
-            <li><a href="https://github.com/pminkov/jupyterhub-hashauthenticator">hashauthenticator</a> - Secure Hash Authenticator for JupyterHub</li>
-            <li><a href="/commute">Commute Times</a> - Show driving time between two locations.</li>
-            <li><a href="https://github.com/pminkov/threadpool">threadpool</a> - A threadpool library in C.</li>
-            <li><a href="https://rawgit.com/pminkov/wip/master/formatter/formatter.html">Text formatter</a>- Format text into lines which fit in 80 columns.</li>
-            <li><a href="http://nbviewer.jupyter.org/github/pminkov/notebooks/tree/master/">Jupyter Notebooks</a> - Various notebooks I made.</li>
-            <li><a href="https://github.com/pminkov/chrome-link-shortcuts">Link Shortcuts</a> - Type one word to get you to your favorite pages.</li>
-        </ul>
-    </div>
-    </div>
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      <div class="project-grid">
+        <a class="project" href="https://github.com/pminkov/kubeutils">
+          <span class="project-number">01</span>
+          <h3>kubeutils</h3>
+          <p>Kubernetes command-line utilities.</p>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="project" href="https://github.com/pminkov/jupyterhub-hashauthenticator">
+          <span class="project-number">02</span>
+          <h3>hashauthenticator</h3>
+          <p>A secure hash authenticator for JupyterHub.</p>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="project" href="/commute">
+          <span class="project-number">03</span>
+          <h3>Commute Times</h3>
+          <p>Driving times between two locations.</p>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="project" href="https://github.com/pminkov/threadpool">
+          <span class="project-number">04</span>
+          <h3>threadpool</h3>
+          <p>A lightweight thread pool library in C.</p>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="project" href="http://nbviewer.jupyter.org/github/pminkov/notebooks/tree/master/">
+          <span class="project-number">05</span>
+          <h3>Jupyter Notebooks</h3>
+          <p>Experiments, explorations, and useful snippets.</p>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="project" href="https://github.com/pminkov/chrome-link-shortcuts">
+          <span class="project-number">06</span>
+          <h3>Link Shortcuts</h3>
+          <p>One-word shortcuts for your favorite pages.</p>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
 
-      ga('create', 'UA-243631-7', 'auto');
-      ga('send', 'pageview');
-
-    </script>
+    <footer>
+      <a href="/blog">Read the blog <span aria-hidden="true">→</span></a>
+    </footer>
+  </main>
 </body>
 </html>
