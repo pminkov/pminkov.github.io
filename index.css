@@ -278,6 +278,10 @@ footer a {
   border-bottom: 1px solid var(--line);
 }
 
+.app-card + .app-card {
+  border-top: 0;
+}
+
 .app-mark {
   width: 78px;
   height: 78px;
@@ -293,10 +297,15 @@ footer a {
 
 .app-copy .eyebrow {
   margin-bottom: 6px;
+  letter-spacing: 0.04em;
+  text-transform: none;
 }
 
 .app-copy h2 {
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .app-copy p {
