@@ -285,14 +285,9 @@ footer a {
 .app-mark {
   width: 78px;
   height: 78px;
-  display: grid;
-  place-items: center;
+  display: block;
   border-radius: 18px;
-  background: var(--ink);
-  color: #7de08d;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 2rem;
-  letter-spacing: -0.06em;
+  object-fit: cover;
 }
 
 .app-copy .eyebrow {
