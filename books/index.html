@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Books by Petko Minkov.">
+  <meta property="og:title" content="Books — Petko Minkov">
+  <meta property="og:description" content="Books by Petko Minkov.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pminkov.github.io/books/">
+  <title>Books — Petko Minkov</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f0e7;
+      --paper-raised: #fbf8f1;
+      --ink: #20231f;
+      --muted: #666960;
+      --rule: #d2cec2;
+      --accent: #3d5b4f;
+      --accent-soft: #dce5df;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(circle at 84% 8%, rgba(61, 91, 79, 0.09), transparent 30rem),
+        var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      width: min(1040px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .site-nav a {
+      text-decoration: none;
+    }
+
+    .site-nav a:hover,
+    .site-nav a:focus-visible {
+      color: var(--accent);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(220px, 0.5fr);
+      gap: 48px;
+      align-items: end;
+      padding: clamp(64px, 11vw, 120px) 0 clamp(48px, 8vw, 88px);
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(3.6rem, 10vw, 7.4rem);
+      font-weight: 500;
+      letter-spacing: -0.055em;
+      line-height: 0.88;
+    }
+
+    .intro {
+      max-width: 31rem;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 2vw, 1.15rem);
+    }
+
+    .shelf-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: baseline;
+      margin-bottom: 18px;
+    }
+
+    .shelf-heading h2,
+    .shelf-heading p {
+      margin: 0;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .shelf-heading p {
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .book-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .book-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 40px;
+      min-height: 270px;
+      padding: clamp(28px, 5vw, 52px);
+      overflow: hidden;
+      background: color-mix(in srgb, var(--paper-raised) 92%, transparent);
+      border: 1px solid var(--rule);
+      border-radius: 14px;
+      transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .book-card::after {
+      position: absolute;
+      right: -4rem;
+      bottom: -8rem;
+      width: 20rem;
+      height: 20rem;
+      background: var(--accent-soft);
+      border-radius: 50%;
+      content: "";
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    .book-card:hover,
+    .book-card:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 18px 50px rgba(32, 35, 31, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .book-card-main {
+      position: relative;
+      z-index: 1;
+      max-width: 670px;
+    }
+
+    .book-number {
+      display: block;
+      margin-bottom: 48px;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .book-card h3 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .book-subtitle {
+      margin: 12px 0 0;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 750;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .book-description {
+      max-width: 590px;
+      margin: 22px 0 0;
+      color: var(--muted);
+    }
+
+    .book-link {
+      position: absolute;
+      z-index: 2;
+      inset: 0;
+      border-radius: inherit;
+    }
+
+    .book-link:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .book-action {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: flex-end;
+      align-self: end;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .book-action span {
+      display: grid;
+      width: 2.6rem;
+      height: 2.6rem;
+      margin-left: 12px;
+      place-items: center;
+      background: var(--accent);
+      border-radius: 50%;
+      color: var(--paper-raised);
+      font-size: 1.1rem;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      margin-top: 72px;
+      padding-top: 20px;
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    footer p {
+      margin: 0;
+    }
+
+    footer a {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    @media (max-width: 700px) {
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+
+      .book-card {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .book-number {
+        margin-bottom: 36px;
+      }
+
+      .book-action {
+        justify-self: start;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        width: min(100% - 28px, 1040px);
+        padding-top: 22px;
+      }
+
+      .site-nav span {
+        display: none;
+      }
+
+      .shelf-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .book-card {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="../">Petko Minkov</a>
+      <span>Books</span>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Petko Minkov</p>
+        <h1>Books.</h1>
+      </div>
+      <p class="intro">Writing about software and distributed systems.</p>
+    </header>
+
+    <section aria-labelledby="shelf-title">
+      <div class="shelf-heading">
+        <h2 id="shelf-title">Books</h2>
+        <p>1 book</p>
+      </div>
+
+      <ol class="book-list">
+        <li>
+          <article class="book-card">
+            <div class="book-card-main">
+              <span class="book-number">In progress</span>
+              <h3>Foundations of Distributed Systems</h3>
+              <p class="book-subtitle">Models, protocols, and limits</p>
+              <p class="book-description">An introduction to system models, time, causality, and distributed computing.</p>
+            </div>
+            <div class="book-action" aria-hidden="true">Open <span>→</span></div>
+            <a class="book-link" href="./distsys/" aria-label="Read Foundations of Distributed Systems"></a>
+          </article>
+        </li>
+      </ol>
+    </section>
+
+    <footer>
+      <p>Petko Minkov · Bay Area</p>
+      <a href="../">Back to home →</a>
+    </footer>
+  </main>
+</body>
+</html>

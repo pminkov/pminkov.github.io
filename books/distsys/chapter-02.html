@@ -1,0 +1,1736 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Chapter 2 of Foundations of Distributed Systems: physical clocks, logical clocks, causality, and global states.">
+  <title>Chapter 2: Time and Causality</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f0e7;
+      --surface: #fbf8f1;
+      --ink: #20231f;
+      --muted: #676a62;
+      --rule: #d2cec2;
+      --accent: #3d5b4f;
+      --accent-soft: #dce5df;
+      --blue: #315f78;
+      --blue-soft: #dce9ef;
+      --ochre: #8a6125;
+      --ochre-soft: #eee2cc;
+      --red: #9b4b42;
+      --red-soft: #efddda;
+      --violet: #66517d;
+      --violet-soft: #e7e0ec;
+      --teal: #35676a;
+      --teal-soft: #dbe8e6;
+      --neutral-soft: #e9e6de;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 20px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.62;
+    }
+
+    a {
+      color: var(--accent);
+      text-underline-offset: 3px;
+    }
+
+    a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.8rem;
+    }
+
+    .topbar a { text-decoration: none; }
+
+    .book-name {
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .book-name a { color: inherit; }
+
+    .chapter-header {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 24px;
+      padding: 48px 0 42px;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .chapter-number {
+      display: grid;
+      width: 64px;
+      height: 64px;
+      place-items: center;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 50%;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.15;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 500;
+      letter-spacing: -0.035em;
+    }
+
+    .dek {
+      max-width: 700px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 760px);
+      gap: 56px;
+      align-items: start;
+      justify-content: center;
+      padding-top: 34px;
+    }
+
+    .chapter-nav {
+      position: sticky;
+      top: 24px;
+      padding: 18px;
+      background: color-mix(in srgb, var(--surface) 86%, transparent);
+      border: 1px solid var(--rule);
+      border-radius: 9px;
+    }
+
+    .chapter-nav p {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .chapter-nav ol {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .chapter-nav li + li { border-top: 1px solid var(--rule); }
+
+    .chapter-nav a {
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      gap: 4px;
+      padding: 9px 0;
+      color: var(--ink);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      text-decoration: none;
+    }
+
+    .chapter-nav a span { color: var(--muted); }
+    .chapter-nav a:hover { color: var(--accent); }
+
+    article { min-width: 0; }
+
+    .chapter-abstract {
+      margin: 0 0 24px;
+      padding: 22px 24px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--blue);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .chapter-abstract-label {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--blue);
+      font-size: 0.69rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .chapter-abstract p {
+      margin: 0;
+      color: #424640;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 0.98rem;
+      line-height: 1.65;
+    }
+
+    .chapter-abstract p + p { margin-top: 11px; }
+
+    .chapter-abstract strong {
+      color: #243d51;
+      font-weight: 700;
+    }
+
+    .section {
+      padding: 0 0 54px;
+      margin: 0 0 54px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .section-label {
+      margin: 0 0 6px;
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 20px;
+      font-size: clamp(1.65rem, 4vw, 2.3rem);
+      font-weight: 550;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      margin: 30px 0 8px;
+      font-size: 1.13rem;
+    }
+
+    p { margin: 0 0 16px; }
+
+    .callout {
+      margin: 24px 0;
+      padding: 18px 20px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+    }
+
+    .callout-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .callout > strong:not(.callout-label) {
+      display: block;
+      margin-bottom: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.05rem;
+    }
+
+    .callout p:last-child { margin-bottom: 0; }
+
+    .terminology {
+      background: var(--accent-soft);
+      border-color: color-mix(in srgb, var(--accent) 24%, transparent);
+    }
+
+    .terminology .callout-label { color: var(--accent); }
+
+    .assumption {
+      background: var(--ochre-soft);
+      border-color: color-mix(in srgb, var(--ochre) 24%, transparent);
+    }
+
+    .assumption .callout-label { color: var(--ochre); }
+
+    .result {
+      background: var(--blue-soft);
+      border-color: color-mix(in srgb, var(--blue) 24%, transparent);
+    }
+
+    .result .callout-label { color: var(--blue); }
+
+    .failure {
+      background: var(--red-soft);
+      border-color: color-mix(in srgb, var(--red) 24%, transparent);
+    }
+
+    .failure .callout-label { color: var(--red); }
+
+    .example {
+      background: var(--violet-soft);
+      border-color: color-mix(in srgb, var(--violet) 24%, transparent);
+    }
+
+    .example .callout-label { color: var(--violet); }
+
+    .example-flow {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0;
+      padding: 14px;
+      background: color-mix(in srgb, var(--surface) 72%, transparent);
+      border: 1px solid color-mix(in srgb, var(--violet) 22%, transparent);
+      border-radius: 7px;
+    }
+
+    .flow-row {
+      display: grid;
+      grid-template-columns: 86px minmax(150px, 1fr) 86px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .flow-party {
+      padding: 6px 8px;
+      color: var(--violet);
+      background: var(--surface);
+      border: 1px solid color-mix(in srgb, var(--violet) 25%, transparent);
+      border-radius: 5px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .flow-link {
+      position: relative;
+      min-height: 30px;
+      display: grid;
+      place-items: center;
+      color: var(--violet);
+      text-align: center;
+    }
+
+    .flow-link::before {
+      content: "";
+      position: absolute;
+      right: 4px;
+      left: 4px;
+      top: 50%;
+      border-top: 1px solid var(--violet);
+    }
+
+    .flow-link::after {
+      content: "";
+      position: absolute;
+      right: 3px;
+      top: calc(50% - 4px);
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-left: 7px solid var(--violet);
+    }
+
+    .flow-link.reverse::after {
+      right: auto;
+      left: 3px;
+      border-right: 7px solid var(--violet);
+      border-left: 0;
+    }
+
+    .flow-link.delayed::before { border-top-style: dashed; }
+
+    .flow-link span {
+      position: relative;
+      z-index: 1;
+      padding: 2px 6px;
+      background: color-mix(in srgb, var(--surface) 88%, var(--violet-soft));
+      font-size: 0.7rem;
+      font-weight: 750;
+      line-height: 1.25;
+    }
+
+    .flow-outcome {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 9px;
+      align-items: baseline;
+      justify-content: center;
+      padding: 9px 11px;
+      color: var(--violet);
+      background: var(--surface);
+      border-left: 3px solid var(--violet);
+      font-size: 0.76rem;
+      text-align: center;
+    }
+
+    .flow-outcome span { color: var(--muted); }
+
+    .clock-flow-label {
+      color: var(--violet);
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .clock-event-row {
+      display: grid;
+      grid-template-columns: 82px minmax(92px, 1fr) 136px;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .clock-event {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      color: var(--violet);
+      font-size: 0.73rem;
+      font-weight: 750;
+    }
+
+    .clock-event b {
+      display: grid;
+      flex: 0 0 22px;
+      height: 22px;
+      place-items: center;
+      color: var(--surface);
+      background: var(--violet);
+      border-radius: 50%;
+      font-size: 0.66rem;
+    }
+
+    .clock-reading {
+      display: grid;
+      gap: 1px;
+      padding: 7px 9px;
+      background: var(--surface);
+      border: 1px solid color-mix(in srgb, var(--violet) 25%, transparent);
+      border-radius: 5px;
+    }
+
+    .clock-reading small {
+      color: var(--muted);
+      font-size: 0.62rem;
+    }
+
+    .clock-reading code { font-size: 0.72rem; }
+
+    .clock-gap {
+      padding-left: 92px;
+      color: var(--muted);
+      font-size: 0.67rem;
+    }
+
+    .flow-error {
+      display: grid;
+      grid-template-columns: auto auto 1fr;
+      gap: 8px 12px;
+      align-items: center;
+      padding: 10px 12px;
+      color: var(--red);
+      background: var(--red-soft);
+      border: 1px solid color-mix(in srgb, var(--red) 30%, transparent);
+      border-left: 4px solid var(--red);
+      border-radius: 5px;
+      font-size: 0.74rem;
+    }
+
+    .flow-error-label {
+      font-size: 0.64rem;
+      font-weight: 850;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .flow-error code {
+      color: var(--red);
+      font-size: 0.72rem;
+    }
+
+    .flow-error strong { color: var(--ink); }
+
+    .example-table-wrap {
+      margin: 14px 0;
+      overflow-x: auto;
+      border: 1px solid color-mix(in srgb, var(--violet) 22%, transparent);
+      border-radius: 6px;
+    }
+
+    .example-table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+      background: color-mix(in srgb, var(--surface) 72%, transparent);
+      font-size: 0.78rem;
+    }
+
+    .example-table th,
+    .example-table td {
+      padding: 9px 11px;
+      text-align: left;
+      border-top: 1px solid color-mix(in srgb, var(--violet) 18%, transparent);
+    }
+
+    .example-table thead th {
+      color: var(--violet);
+      border-top: 0;
+      font-size: 0.66rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .example-table td:first-child { font-weight: 700; }
+
+    .term-list {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      gap: 8px 16px;
+      margin: 0;
+      font-size: 0.84rem;
+    }
+
+    .term-list dt {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .term-list dd { margin: 0; }
+
+    .formula {
+      display: block;
+      margin: 12px 0 4px;
+      overflow-x: auto;
+      color: #273b34;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .rule-list {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+      margin: 22px 0;
+      list-style: none;
+      counter-reset: rule;
+    }
+
+    .rule-list li {
+      counter-increment: rule;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .rule-list li::before {
+      content: counter(rule);
+      display: grid;
+      width: 26px;
+      height: 26px;
+      place-items: center;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 800;
+    }
+
+    .protocol,
+    .worked-trace {
+      margin: 24px 0;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+    }
+
+    .block-heading {
+      display: block;
+      padding: 11px 15px;
+      color: var(--muted);
+      background: var(--neutral-soft);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .protocol ol {
+      display: grid;
+      gap: 9px;
+      padding: 16px 22px 16px 42px;
+      margin: 0;
+      font-size: 0.84rem;
+    }
+
+    .worked-trace table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .worked-trace th,
+    .worked-trace td {
+      padding: 9px 12px;
+      text-align: left;
+      border-top: 1px solid var(--rule);
+    }
+
+    .worked-trace th {
+      color: var(--muted);
+      background: var(--surface);
+      font-size: 0.67rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .section-summary {
+      margin-top: 28px;
+      padding: 18px 20px;
+      background: var(--surface);
+      border-top: 3px solid var(--accent);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .section-summary > strong {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1rem;
+    }
+
+    .section-summary ul {
+      margin: 9px 0 0;
+      padding-left: 20px;
+      font-size: 0.84rem;
+    }
+
+    .applications {
+      margin: 0 0 18px;
+      padding: 23px;
+      background: var(--teal-soft);
+      border: 1px solid color-mix(in srgb, var(--teal) 26%, transparent);
+      border-top: 4px solid var(--teal);
+      border-radius: 0 0 9px 9px;
+    }
+
+    .applications-label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--teal);
+      font-size: 0.69rem;
+      font-weight: 850;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .applications h2 {
+      margin-bottom: 10px;
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
+    }
+
+    .applications-intro {
+      max-width: 650px;
+      margin-bottom: 19px;
+      color: #465654;
+      font-size: 0.86rem;
+    }
+
+    .application-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .application-card {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      padding: 15px;
+      background: var(--surface);
+      border: 1px solid color-mix(in srgb, var(--teal) 24%, transparent);
+      border-radius: 7px;
+    }
+
+    .application-concept {
+      margin-bottom: 7px;
+      color: var(--teal);
+      font-size: 0.64rem;
+      font-weight: 850;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .application-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.02rem;
+    }
+
+    .application-card p {
+      margin: 0 0 12px;
+      color: #4f5652;
+      font-size: 0.77rem;
+      line-height: 1.55;
+    }
+
+    .application-card a {
+      margin-top: auto;
+      color: var(--teal);
+      font-size: 0.7rem;
+      font-weight: 750;
+    }
+
+    .notation {
+      display: inline-flex;
+      padding: 1px 5px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.88em;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    figure {
+      margin: 28px 0;
+      padding: 18px;
+      overflow: hidden;
+      background: #ece8df;
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+    }
+
+    figcaption {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    figcaption strong { color: var(--ink); }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .legend span {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .swatch.blue { background: var(--blue); }
+    .swatch.ochre { background: var(--ochre); }
+    .swatch.hollow { background: transparent; border: 2px solid var(--muted); }
+
+    /* Diagram 1: physical clocks */
+    .clock-diagram {
+      display: grid;
+      grid-template-columns: 76px minmax(430px, 1fr);
+      gap: 12px;
+      min-width: 540px;
+      overflow-x: auto;
+    }
+
+    .clock-labels,
+    .clock-tracks {
+      display: grid;
+      grid-template-rows: repeat(3, 42px);
+      gap: 9px;
+    }
+
+    .clock-labels span {
+      display: flex;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.73rem;
+      font-weight: 700;
+    }
+
+    .clock-track {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background-image: linear-gradient(to right, var(--rule) 1px, transparent 1px);
+      background-size: 20% 100%;
+      border-bottom: 1px solid #aaa79f;
+    }
+
+    .ticks {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tick {
+      display: grid;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      color: white;
+      background: var(--accent);
+      border-radius: 50%;
+      font-size: 0.62rem;
+      font-weight: 700;
+    }
+
+    .fast .ticks { width: 92%; }
+    .slow .ticks { width: 100%; padding-right: 9%; }
+    .fast .tick { background: var(--blue); }
+    .slow .tick { background: var(--ochre); }
+
+    /* Diagrams 2 and 5: event lanes */
+    .lanes {
+      min-width: 600px;
+      overflow-x: auto;
+    }
+
+    .lane {
+      display: grid;
+      grid-template-columns: 42px repeat(5, 1fr);
+      gap: 8px;
+      align-items: center;
+      min-height: 58px;
+      background: linear-gradient(var(--rule), var(--rule)) 50px 50% / calc(100% - 58px) 1px no-repeat;
+    }
+
+    .lane-name {
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+
+    .event {
+      z-index: 1;
+      justify-self: center;
+      display: grid;
+      min-width: 44px;
+      min-height: 32px;
+      padding: 4px 7px;
+      place-items: center;
+      color: white;
+      background: var(--accent);
+      border: 3px solid #ece8df;
+      border-radius: 16px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    .event.blue { background: var(--blue); }
+    .event.ochre { background: var(--ochre); }
+    .event.empty { visibility: hidden; }
+
+    .lamport-sequence {
+      min-width: 620px;
+    }
+
+    .lamport-sequence .lane {
+      grid-template-columns: 42px repeat(5, 1fr);
+    }
+
+    .event.action {
+      grid-auto-flow: column;
+      gap: 6px;
+      min-width: 92px;
+      padding-inline: 10px;
+    }
+
+    .event.action b {
+      font-size: 0.72rem;
+    }
+
+    .event.action small {
+      font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.59rem;
+      font-weight: 750;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .message-transfer {
+      display: grid;
+      grid-template-columns: auto minmax(90px, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      min-height: 52px;
+      margin-left: 50px;
+      color: var(--red);
+      font-size: 0.69rem;
+      font-weight: 750;
+    }
+
+    .transfer-endpoint {
+      padding: 4px 7px;
+      background: color-mix(in srgb, var(--red) 9%, transparent);
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .transfer-line {
+      position: relative;
+      height: 2px;
+      background: var(--red);
+    }
+
+    .transfer-line::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: -4px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--red);
+      border-right: 2px solid var(--red);
+      transform: rotate(45deg);
+    }
+
+    .transfer-line span {
+      position: absolute;
+      left: 50%;
+      bottom: 7px;
+      padding: 0 6px;
+      background: #ece8df;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+
+    /* Diagram 3: vector clocks */
+    .vector-table {
+      width: 100%;
+      min-width: 530px;
+      overflow-x: auto;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .vector-table th,
+    .vector-table td {
+      padding: 10px 9px;
+      text-align: center;
+      border: 1px solid var(--rule);
+    }
+
+    .vector-table th {
+      color: var(--muted);
+      background: var(--surface);
+      font-size: 0.68rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .vector {
+      color: var(--accent);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 700;
+    }
+
+    .comparison {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+
+    /* Diagram 4: causal dependencies */
+    .causal-sequence {
+      min-width: 700px;
+    }
+
+    .causal-sequence .lane {
+      grid-template-columns: 42px repeat(6, 1fr);
+    }
+
+    /* Diagram 5: cut */
+    .cut-wrap {
+      position: relative;
+      min-width: 600px;
+    }
+
+    .cut-line {
+      position: absolute;
+      z-index: 3;
+      top: 0;
+      bottom: 0;
+      left: 61%;
+      width: 2px;
+      background: var(--red);
+    }
+
+    .cut-line::before {
+      content: "cut C";
+      position: absolute;
+      top: -3px;
+      left: 7px;
+      color: var(--red);
+      font-size: 0.7rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .in-transit {
+      position: absolute;
+      z-index: 2;
+      top: 68px;
+      left: 48%;
+      width: 25%;
+      height: 2px;
+      background: var(--red);
+      transform: rotate(22deg);
+      transform-origin: left;
+    }
+
+    .in-transit::after {
+      content: "in transit";
+      position: absolute;
+      left: 35%;
+      top: -21px;
+      color: var(--red);
+      font-size: 0.65rem;
+      white-space: nowrap;
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .check {
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      font-size: 0.84rem;
+    }
+
+    .check strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent);
+    }
+
+    .chapter-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 38px;
+      padding-top: 18px;
+      color: var(--muted);
+      border-top: 1px solid var(--rule);
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 860px) {
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .chapter-nav {
+        position: static;
+      }
+
+      .chapter-nav ol {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 18px;
+      }
+
+      .chapter-nav li + li { border-top: 0; }
+      .chapter-nav li { border-bottom: 1px solid var(--rule); }
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 28px, 760px); }
+
+      .chapter-header {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 34px 0 30px;
+      }
+
+      .chapter-number {
+        width: 48px;
+        height: 48px;
+      }
+
+      .chapter-nav ol { grid-template-columns: 1fr; }
+      .check-grid { grid-template-columns: 1fr; }
+      .term-list { grid-template-columns: 1fr; gap: 3px; }
+      .term-list dd { margin-bottom: 8px; }
+      .example-flow { padding: 11px; }
+      .flow-row { grid-template-columns: 66px minmax(118px, 1fr) 66px; gap: 6px; }
+      .flow-party { padding-inline: 4px; font-size: 0.65rem; }
+      .flow-link span { font-size: 0.64rem; }
+      .clock-event-row { grid-template-columns: 62px minmax(74px, 1fr) 104px; gap: 6px; }
+      .clock-event { gap: 5px; font-size: 0.66rem; }
+      .clock-reading { padding-inline: 6px; }
+      .clock-reading code { font-size: 0.64rem; }
+      .clock-gap { padding-left: 68px; }
+      .flow-error { grid-template-columns: 1fr auto; }
+      .flow-error strong { grid-column: 1 / -1; }
+      .application-grid { grid-template-columns: 1fr; }
+      figure { padding: 14px; overflow-x: auto; }
+      .chapter-footer { flex-direction: column; gap: 7px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="topbar" aria-label="Book navigation">
+      <a href="index.html">← Table of contents</a>
+      <span class="book-name"><a href="reader-guide.html">Reader’s Guide</a> · Foundations of Distributed Systems</span>
+    </nav>
+
+    <header class="chapter-header">
+      <div class="chapter-number" aria-hidden="true">02</div>
+      <div>
+        <p class="eyebrow">Chapter 2</p>
+        <h1>Time and Causality</h1>
+        <p class="dek">A distributed system has no single observer and no universally available clock. Its ordering claims must be constructed from local events and exchanged information.</p>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="chapter-nav" aria-label="Chapter sections">
+        <p>In this chapter</p>
+        <ol>
+          <li><a href="#chapter-abstract"><span>2.A</span> Chapter Abstract</a></li>
+          <li><a href="#physical-clocks"><span>2.1</span> Physical Clock Assumptions</a></li>
+          <li><a href="#lamport-clocks"><span>2.2</span> Lamport Clocks</a></li>
+          <li><a href="#vector-clocks"><span>2.3</span> Vector Clocks</a></li>
+          <li><a href="#causal-histories"><span>2.4</span> Causal Histories</a></li>
+          <li><a href="#global-states"><span>2.5</span> Global States and Cuts</a></li>
+          <li><a href="#applications"><span>2.6</span> Applications</a></li>
+        </ol>
+      </nav>
+
+      <article>
+        <section class="chapter-abstract" id="chapter-abstract" aria-labelledby="chapter-abstract-label">
+          <span class="chapter-abstract-label" id="chapter-abstract-label">2.A · Chapter abstract</span>
+          <p>This chapter develops two ways to reason about the order of events in a distributed system. <strong>Physical clocks</strong> estimate when events occur, but oscillator drift and uncertain network delay prevent machines from observing one exact shared time.</p>
+          <p><strong>Logical clocks</strong> instead describe causal order. <strong>Lamport clocks</strong> preserve happens-before, while <strong>vector clocks</strong> also identify concurrency. <strong>Causal histories</strong> expose the resulting partial order directly.</p>
+          <p>The final section uses <strong>consistent cuts</strong> and distributed snapshots to construct global states without simultaneous observation. Examples trace timestamp updates, compare vector values, and show how messages in transit become part of recorded channel state. Together, these tools separate physical precedence from causal dependence and make the assumptions behind ordering claims explicit.</p>
+        </section>
+
+        <aside class="callout example">
+          <span class="callout-label">Example</span>
+          <strong>Changing an address before placing an order</strong>
+          <p>Replica P and replica Q are servers holding separate copies of the customer’s data. The customer’s browser talks to both of them:</p>
+          <div class="example-flow" role="img" aria-label="The browser sends an address change to replica P. P returns success with address version 42. The browser sends an order requiring version 42 to replica Q, while replication of version 42 from P to Q is still delayed. Q waits for version 42 before processing the order.">
+            <div class="flow-row">
+              <span class="flow-party">Browser</span>
+              <span class="flow-link"><span>1 · Change address</span></span>
+              <span class="flow-party">Replica P</span>
+            </div>
+            <div class="flow-row">
+              <span class="flow-party">Browser</span>
+              <span class="flow-link reverse"><span>2 · Success + version 42</span></span>
+              <span class="flow-party">Replica P</span>
+            </div>
+            <div class="flow-row">
+              <span class="flow-party">Browser</span>
+              <span class="flow-link"><span>3 · Order requires 42</span></span>
+              <span class="flow-party">Replica Q</span>
+            </div>
+            <div class="flow-row">
+              <span class="flow-party">Replica P</span>
+              <span class="flow-link delayed"><span>Version 42 still in transit</span></span>
+              <span class="flow-party">Replica Q</span>
+            </div>
+            <div class="flow-outcome"><strong>Replica Q waits for version 42</strong><span>then processes the order</span></div>
+          </div>
+          <p>Receiving step 2 is what it means for the customer to have <strong>observed</strong> the update: the system has confirmed it to the browser. The customer does not inspect either server.</p>
+          <p>The browser carries version 42 into step 3. That requirement is the <strong>causal context</strong>. Without it, Q may process the order immediately with the old address because P’s update is still in transit.</p>
+        </aside>
+
+        <section class="section" id="physical-clocks">
+          <p class="section-label">2.1</p>
+          <h2>Physical Clock Assumptions</h2>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <dl class="term-list">
+              <dt>Instant</dt><dd>One point in time. An instant has no duration; an interval is the span between two instants.</dd>
+              <dt>Reference time</dt><dd>An ideal timeline used by the mathematical model to compare clocks. Processes cannot read it directly.</dd>
+              <dt>Physical clock</dt><dd>A machine’s mechanism for estimating elapsed time and assigning time-of-day readings.</dd>
+              <dt>Clock reading</dt><dd>The value returned by a physical clock at a particular instant.</dd>
+            </dl>
+          </aside>
+
+          <p>Each machine, or node, has a hardware clock driven by an oscillator. Here <em>p</em> names a process. Processes can share a machine, but a distributed-system model usually places them on separate machines; each process reads the clock of the machine on which it runs.</p>
+
+          <p>Let <span class="notation">t</span> denote an instant on the ideal reference timeline. The expression <span class="notation">Cₚ(t)</span> means “the value process p’s machine clock would show at reference instant t.” The model uses t to discuss accuracy. Process p can read C<sub>p</sub>, but it cannot independently look up t.</p>
+
+          <aside class="callout assumption">
+            <span class="callout-label">Assumption</span>
+            <strong>Bounded clock drift</strong>
+            <p>A common model assumes that every hardware clock’s rate differs from the reference rate by at most ρ. Without a drift bound, a clock could advance arbitrarily fast or slowly and no finite resynchronization schedule could bound its error.</p>
+            <code class="formula">1 − ρ ≤ dCₚ(t)/dt ≤ 1 + ρ</code>
+          </aside>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <dl class="term-list">
+              <dt>Skew</dt><dd>The difference between two clock readings at the same reference instant.</dd>
+              <dt>Drift</dt><dd>The difference between clock rates. Drift causes skew to change over time.</dd>
+              <dt>Offset</dt><dd>The signed difference between one clock and a chosen reference clock.</dd>
+            </dl>
+            <code class="formula">skew(p,q,t) = |Cₚ(t) − Cq(t)|</code>
+          </aside>
+
+          <aside class="callout example">
+            <span class="callout-label">Example · continued</span>
+            <strong>The address change happened first, but its timestamp says otherwise</strong>
+            <p>Suppose P’s clock is 20 milliseconds ahead of reference time, while Q’s clock is 20 milliseconds behind. The events occur 10 milliseconds apart:</p>
+            <div class="example-flow" role="img" aria-label="Replica P saves the address first and records 10:00:00.120. Ten milliseconds later, replica Q receives the order and records 10:00:00.090. Sorting the timestamps produces the wrong conclusion that the order happened first.">
+              <span class="clock-flow-label">What actually happens</span>
+              <div class="clock-event-row">
+                <span class="flow-party">Replica P</span>
+                <span class="clock-event"><b>1</b> Saves address</span>
+                <span class="clock-reading"><small>P’s clock</small><code>10:00:00.120</code></span>
+              </div>
+              <div class="clock-gap">↓ 10 ms later in reference time</div>
+              <div class="clock-event-row">
+                <span class="flow-party">Replica Q</span>
+                <span class="clock-event"><b>2</b> Receives order</span>
+                <span class="clock-reading"><small>Q’s clock</small><code>10:00:00.090</code></span>
+              </div>
+              <div class="flow-error">
+                <span class="flow-error-label">Wrong conclusion</span>
+                <code>.090 &lt; .120</code>
+                <strong>“The order happened first.”</strong>
+              </div>
+            </div>
+            <p>The clocks have not stopped working; each is simply offset from the other. The red conclusion is what fails: a smaller reading on a different machine does not necessarily mean an earlier event.</p>
+            <p>Physical timestamps can prove this order only when the known clock uncertainty is smaller than the separation between the events. The version token from the first example avoids that assumption: it tells Q directly that the order depends on the address update.</p>
+          </aside>
+
+          <figure>
+            <div class="legend" aria-hidden="true">
+              <span><i class="swatch"></i> reference</span>
+              <span><i class="swatch blue"></i> fast clock</span>
+              <span><i class="swatch ochre"></i> slow clock</span>
+            </div>
+            <div class="clock-diagram" role="img" aria-label="Three clocks begin together. A fast clock reaches later readings sooner, while a slow clock falls behind, so their skew increases over time.">
+              <div class="clock-labels">
+                <span>reference</span>
+                <span>clock A</span>
+                <span>clock B</span>
+              </div>
+              <div class="clock-tracks">
+                <div class="clock-track"><div class="ticks"><span class="tick">0</span><span class="tick">1</span><span class="tick">2</span><span class="tick">3</span><span class="tick">4</span><span class="tick">5</span></div></div>
+                <div class="clock-track fast"><div class="ticks"><span class="tick">0</span><span class="tick">1</span><span class="tick">2</span><span class="tick">3</span><span class="tick">4</span><span class="tick">5</span></div></div>
+                <div class="clock-track slow"><div class="ticks"><span class="tick">0</span><span class="tick">1</span><span class="tick">2</span><span class="tick">3</span><span class="tick">4</span><span class="tick">5</span></div></div>
+              </div>
+            </div>
+            <figcaption><strong>Rate error accumulates.</strong> The horizontal position represents reference time. Clock A reaches each numbered reading earlier; clock B reaches it later. Periodic synchronization reduces skew but does not remove drift.</figcaption>
+          </figure>
+
+          <h3>Synchronization over a network</h3>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <dl class="term-list">
+              <dt>Round-trip delay</dt><dd>The elapsed client time from sending a request to receiving its reply, less time spent processing at the server.</dd>
+              <dt>Uncertainty</dt><dd>The range of clock offsets compatible with the observed timestamps and unknown one-way delays.</dd>
+            </dl>
+          </aside>
+
+          <p>A client sends a request at local time t<sub>0</sub>. The server records receive and send times t<sub>1</sub> and t<sub>2</sub>. The client receives the reply at t<sub>3</sub>. These four readings support an estimate of network delay and the server’s offset from the client.</p>
+          <code class="formula">delay ≈ (t₃ − t₀) − (t₂ − t₁)</code>
+          <code class="formula">offset ≈ ((t₁ − t₀) + (t₂ − t₃)) / 2</code>
+
+          <aside class="callout assumption">
+            <span class="callout-label">Assumption</span>
+            <strong>Approximately symmetric network delay</strong>
+            <p>The offset formula assigns half of the round-trip delay to each direction. If the request and reply experience substantially different delays, the estimate is biased.</p>
+          </aside>
+
+          <div class="worked-trace">
+            <span class="block-heading">Worked trace · one synchronization exchange</span>
+            <div style="overflow-x:auto">
+              <table>
+                <thead><tr><th>Reading</th><th>Value</th><th>Meaning</th></tr></thead>
+                <tbody>
+                  <tr><td>t₀</td><td><code>100</code></td><td>Client sends request</td></tr>
+                  <tr><td>t₁</td><td><code>114</code></td><td>Server receives request</td></tr>
+                  <tr><td>t₂</td><td><code>116</code></td><td>Server sends reply</td></tr>
+                  <tr><td>t₃</td><td><code>126</code></td><td>Client receives reply</td></tr>
+                  <tr><td>Estimate</td><td><code>delay = 24, offset = +2</code></td><td>Server clock appears 2 units ahead</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <aside class="callout result">
+            <span class="callout-label">Key result</span>
+            <strong>Synchronization produces a bounded estimate, not exact global time</strong>
+            <p>Unknown one-way delay prevents the client from identifying one exact reference instant for the server’s reading. Correct systems retain an uncertainty bound or tolerate overlapping time intervals.</p>
+          </aside>
+
+          <div class="section-summary">
+            <strong>Section summary</strong>
+            <ul>
+              <li>An instant belongs to the model’s reference timeline; a clock reading is a machine’s estimate at that instant.</li>
+              <li>Skew measures disagreement now. Drift describes how that disagreement changes.</li>
+              <li>Network synchronization narrows uncertainty but does not create a perfectly shared clock.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section" id="lamport-clocks">
+          <p class="section-label">2.2</p>
+          <h2>Lamport Clocks</h2>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <dl class="term-list">
+              <dt>Event</dt><dd>One indivisible step in the execution model, such as a local operation, message send, or message receive.</dd>
+              <dt>Happens-before</dt><dd>The smallest relation containing local process order and send-before-receive order, and closed under transitivity.</dd>
+              <dt>Concurrent events</dt><dd>Two events for which neither happens before the other.</dd>
+              <dt>Logical clock</dt><dd>A mechanism that assigns values to events to preserve an ordering relation, without estimating physical time.</dd>
+              <dt>Timestamp</dt><dd>The logical-clock value attached to an event or message.</dd>
+            </dl>
+          </aside>
+
+          <p>The happens-before relation, written <span class="notation">a → b</span>, is built from three rules:</p>
+
+          <ol class="rule-list">
+            <li><span>If a and b occur on the same process and a occurs first, then a → b.</span></li>
+            <li><span>If a sends a message and b receives that same message, then a → b.</span></li>
+            <li><span>If a → b and b → c, then a → c.</span></li>
+          </ol>
+
+          <p>A Lamport clock is one integer counter per process. It preserves happens-before by advancing on local work and carrying the current value with every message.</p>
+
+          <div class="protocol">
+            <span class="block-heading">Protocol · Lamport clock update</span>
+            <ol>
+              <li>Before each local event, process p increments its counter: <code>Lₚ ← Lₚ + 1</code>.</li>
+              <li>A sent message carries the sender’s new counter value.</li>
+              <li>On receiving timestamp t, process q sets <code>Lq ← max(Lq, t) + 1</code>.</li>
+            </ol>
+          </div>
+
+          <aside class="callout example">
+            <span class="callout-label">Example · continued</span>
+            <strong>The address dependency crosses machines without wall-clock time</strong>
+            <p>Now give replica P, the customer’s browser, and replica Q Lamport counters. The success response and the later order request carry counter values from one process to the next:</p>
+            <div class="example-table-wrap">
+              <table class="example-table">
+                <thead>
+                  <tr><th>Event</th><th>Lamport update</th><th>Recorded value</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>P saves the address</td><td><code>16 + 1</code></td><td><code>17</code></td></tr>
+                  <tr><td>P sends success</td><td><code>17 + 1</code></td><td><code>18</code>, carried to browser</td></tr>
+                  <tr><td>Browser receives success</td><td><code>max(4, 18) + 1</code></td><td><code>19</code></td></tr>
+                  <tr><td>Browser sends order</td><td><code>19 + 1</code></td><td><code>20</code>, carried to Q</td></tr>
+                  <tr><td>Q receives order</td><td><code>max(7, 20) + 1</code></td><td><code>21</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>The values preserve the chain <span class="notation">address saved → success received → order received</span>: <code>17 &lt; 19 &lt; 21</code>. Clock offset cannot reverse it because no physical time-of-day readings are compared.</p>
+            <p>This does not make the new address appear at Q. The Lamport timestamp records order; the address version identifies the state Q must have. A system can carry both, or use an ordered replication log in which the address version is derived from the logical order. Q still waits until that required update has been applied.</p>
+          </aside>
+
+          <figure>
+            <div class="legend" aria-hidden="true">
+              <span><i class="swatch"></i> process P</span>
+              <span><i class="swatch blue"></i> process Q</span>
+              <span><i class="swatch ochre"></i> process R</span>
+            </div>
+            <div class="lamport-sequence" role="img" aria-label="Lamport clock sequence. Process P sends message m1 at timestamp 2. Process Q receives m1 at timestamp 3, then sends message m2 at timestamp 4. Process R receives m2 at timestamp 5.">
+              <div class="lane">
+                <span class="lane-name">P</span>
+                <span class="event" style="grid-column:2">1</span>
+                <span class="event action" style="grid-column:3"><b>2</b><small>send m₁</small></span>
+                <span class="event" style="grid-column:5">3</span>
+              </div>
+              <div class="message-transfer" aria-hidden="true">
+                <span class="transfer-endpoint">P · 2 send</span>
+                <span class="transfer-line"><span>m₁ carries 2</span></span>
+                <span class="transfer-endpoint">Q · 3 receive</span>
+              </div>
+              <div class="lane">
+                <span class="lane-name">Q</span>
+                <span class="event blue" style="grid-column:2">1</span>
+                <span class="event action blue" style="grid-column:4"><b>3</b><small>receive m₁</small></span>
+                <span class="event action blue" style="grid-column:5"><b>4</b><small>send m₂</small></span>
+              </div>
+              <div class="message-transfer" aria-hidden="true">
+                <span class="transfer-endpoint">Q · 4 send</span>
+                <span class="transfer-line"><span>m₂ carries 4</span></span>
+                <span class="transfer-endpoint">R · 5 receive</span>
+              </div>
+              <div class="lane">
+                <span class="lane-name">R</span>
+                <span class="event ochre" style="grid-column:2">1</span>
+                <span class="event ochre" style="grid-column:3">2</span>
+                <span class="event action ochre" style="grid-column:6"><b>5</b><small>receive m₂</small></span>
+              </div>
+            </div>
+            <figcaption><strong>Receives advance beyond sends.</strong> Q receives timestamp 2 while its local counter is 1, so it records max(1,2)+1 = 3. R receives timestamp 4 while its local counter is 2, so it records max(2,4)+1 = 5.</figcaption>
+          </figure>
+
+          <aside class="callout result">
+            <span class="callout-label">Key result</span>
+            <strong>Lamport clock condition</strong>
+            <p>If event a happens before event b, the Lamport timestamp of a is smaller than the Lamport timestamp of b.</p>
+            <code class="formula">a → b  ⇒  L(a) &lt; L(b)</code>
+          </aside>
+
+          <aside class="callout failure">
+            <span class="callout-label">Failure case</span>
+            <strong>The converse is not valid</strong>
+            <p>From L(a) &lt; L(b), one cannot conclude a → b. Two concurrent events can receive different Lamport timestamps because the counters compress too much history into one number.</p>
+          </aside>
+
+          <p>To obtain a total order for log entries or tie-breaking, a system can compare pairs <span class="notation">(L(a), process(a))</span>. This orders every pair of events, but the process identifier adds administrative order rather than causal information.</p>
+
+          <div class="section-summary">
+            <strong>Section summary</strong>
+            <ul>
+              <li>Happens-before is generated by local order, message delivery, and transitivity.</li>
+              <li>Lamport timestamps respect causality but do not identify concurrency.</li>
+              <li>A total order derived from timestamps is useful bookkeeping, not a proof of causation.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section" id="vector-clocks">
+          <p class="section-label">2.3</p>
+          <h2>Vector Clocks</h2>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <dl class="term-list">
+              <dt>Vector clock</dt><dd>A timestamp containing one counter per process in the model.</dd>
+              <dt>Component</dt><dd>One position in the vector, associated with one process.</dd>
+              <dt>Component-wise maximum</dt><dd>A vector formed by taking the larger value at each position.</dd>
+              <dt>Dominates</dt><dd>Vector X dominates Y when every component of X is at least the corresponding component of Y.</dd>
+            </dl>
+          </aside>
+
+          <p>For n processes, process p stores a vector V<sub>p</sub> of length n. The component V<sub>p</sub>[i] summarizes how many events from process i are known to p. This retains enough information to distinguish causal order from concurrency.</p>
+
+          <div class="protocol">
+            <span class="block-heading">Protocol · vector clock update</span>
+            <ol>
+              <li>Before a local event, p increments its own component <code>Vₚ[p]</code>.</li>
+              <li>A sent message carries the sender’s complete vector.</li>
+              <li>On receipt, q takes the component-wise maximum of its vector and the message vector, then increments <code>Vq[q]</code>.</li>
+            </ol>
+          </div>
+
+          <figure>
+            <div style="overflow-x:auto">
+              <table class="vector-table">
+                <thead>
+                  <tr><th>Event</th><th>Process</th><th>Vector</th><th>Comparison</th><th>Meaning</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>a</td><td>P</td><td class="vector">[1,0,0]</td><td rowspan="2"><span class="comparison">a &lt; b</span></td><td rowspan="2">a happens before b</td></tr>
+                  <tr><td>b</td><td>Q</td><td class="vector">[1,2,0]</td></tr>
+                  <tr><td>c</td><td>P</td><td class="vector">[2,0,0]</td><td rowspan="2"><span class="comparison">c ∥ d</span></td><td rowspan="2">c and d are concurrent</td></tr>
+                  <tr><td>d</td><td>R</td><td class="vector">[1,0,2]</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figcaption><strong>Compare component by component.</strong> [1,0,0] is below [1,2,0], so a → b. Neither [2,0,0] nor [1,0,2] dominates the other, so c ∥ d.</figcaption>
+          </figure>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <strong>Strict vector order</strong>
+            <p>V(a) &lt; V(b) when every component of V(a) is less than or equal to the corresponding component of V(b), and at least one component is strictly less.</p>
+            <code class="formula">V(a) &lt; V(b) ⇔ (∀i, V(a)[i] ≤ V(b)[i]) and V(a) ≠ V(b)</code>
+          </aside>
+
+          <aside class="callout result">
+            <span class="callout-label">Key result</span>
+            <strong>Vector clocks characterize happens-before exactly</strong>
+            <code class="formula">a → b  ⇔  V(a) &lt; V(b)</code>
+            <code class="formula">a ∥ b  ⇔  V(a) ≰ V(b) and V(b) ≰ V(a)</code>
+          </aside>
+
+          <aside class="callout failure">
+            <span class="callout-label">Limit</span>
+            <strong>Metadata grows with the participant set</strong>
+            <p>A standard vector contains one component per process. Large or changing memberships therefore require variants such as version vectors, dotted version vectors, interval tree clocks, or application-specific dependency sets.</p>
+          </aside>
+
+          <div class="section-summary">
+            <strong>Section summary</strong>
+            <ul>
+              <li>Each vector component summarizes one process’s known progress.</li>
+              <li>Comparable vectors identify causal order; incomparable vectors identify concurrency.</li>
+              <li>The additional information improves precision but increases metadata cost.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section" id="causal-histories">
+          <p class="section-label">2.4</p>
+          <h2>Causal Histories</h2>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <dl class="term-list">
+              <dt>Causal history</dt><dd>The set of events known to precede an event. In this section, H(e) also includes e itself.</dd>
+              <dt>Partial order</dt><dd>An ordering in which some pairs are comparable and others are not.</dd>
+              <dt>Causal path</dt><dd>A chain of local-order or message edges connecting one event to another.</dd>
+              <dt>Dependency</dt><dd>A relation indicating that one event may rely on information produced by another.</dd>
+            </dl>
+          </aside>
+
+          <p>Let H(e) denote the causal history of event e. A direct representation could attach a unique identifier for every known prior event. Then set inclusion would expose order: if H(a) is a proper subset of H(b), b includes everything known at a and at least one additional event.</p>
+
+          <figure>
+            <div class="legend" aria-hidden="true">
+              <span><i class="swatch"></i> process P</span>
+              <span><i class="swatch blue"></i> process Q</span>
+              <span><i class="swatch ochre"></i> process R</span>
+            </div>
+            <div class="causal-sequence" role="img" aria-label="Causal history across three processes. On process P, event p2 sends message m1. Event q2 on process Q receives m1, and later event q3 sends m2. Event r2 on process R receives m2. Local process order and these message edges form a causal path from p2 through q2 and q3 to r2.">
+              <div class="lane">
+                <span class="lane-name">P</span>
+                <span class="event" style="grid-column:2">p1</span>
+                <span class="event action" style="grid-column:3"><b>p2</b><small>send m₁</small></span>
+                <span class="event" style="grid-column:6">p3</span>
+              </div>
+              <div class="message-transfer" aria-hidden="true">
+                <span class="transfer-endpoint">p2 · send</span>
+                <span class="transfer-line"><span>m₁ establishes p2 → q2</span></span>
+                <span class="transfer-endpoint">q2 · receive</span>
+              </div>
+              <div class="lane">
+                <span class="lane-name">Q</span>
+                <span class="event blue" style="grid-column:2">q1</span>
+                <span class="event action blue" style="grid-column:4"><b>q2</b><small>receive m₁</small></span>
+                <span class="event action blue" style="grid-column:5"><b>q3</b><small>send m₂</small></span>
+              </div>
+              <div class="message-transfer" aria-hidden="true">
+                <span class="transfer-endpoint">q3 · send</span>
+                <span class="transfer-line"><span>m₂ establishes q3 → r2</span></span>
+                <span class="transfer-endpoint">r2 · receive</span>
+              </div>
+              <div class="lane">
+                <span class="lane-name">R</span>
+                <span class="event ochre" style="grid-column:2">r1</span>
+                <span class="event action ochre" style="grid-column:6"><b>r2</b><small>receive m₂</small></span>
+                <span class="event ochre" style="grid-column:7">r3</span>
+              </div>
+            </div>
+            <figcaption><strong>Causality forms a directed acyclic graph.</strong> Each process lane runs left to right. The labeled message rows state their exact send and receive endpoints. Together, local order and the two messages give p2 → q2 → q3 → r2. Events with no path in either direction remain concurrent.</figcaption>
+          </figure>
+
+          <aside class="callout failure">
+            <span class="callout-label">Invalid inference</span>
+            <strong>Concurrent does not mean simultaneous</strong>
+            <p>Concurrent events need not occur at the same physical instant. It means only that the model has no causal path in either direction. One may occur earlier in wall-clock time without being able to influence the other.</p>
+          </aside>
+
+          <h3>From histories to compact metadata</h3>
+          <p>Full histories grow by one identifier per event. Vector clocks compress the same information when events belong to a fixed set of sequential processes. A component value k represents a known prefix: knowing event p<sub>k</sub> implies knowing p<sub>1</sub> through p<sub>k−1</sub>.</p>
+
+          <aside class="callout result">
+            <span class="callout-label">Operational consequence</span>
+            <strong>Concurrent updates have no causally selected winner</strong>
+            <p>If two updates are concurrent, neither was created with knowledge of the other. A replicated system must preserve both, merge them, or apply an explicit conflict rule. Causality alone cannot choose one.</p>
+          </aside>
+
+          <div class="section-summary">
+            <strong>Section summary</strong>
+            <ul>
+              <li>A causal history makes the dependencies of an event explicit.</li>
+              <li>The resulting order is partial because concurrent pairs remain incomparable.</li>
+              <li>Vector clocks compress causal histories by representing known process prefixes.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section" id="global-states">
+          <p class="section-label">2.5</p>
+          <h2>Global States and Cuts</h2>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <dl class="term-list">
+              <dt>Local state</dt><dd>The variables and execution position recorded by one process.</dd>
+              <dt>Channel state</dt><dd>The messages sent but not yet received across one communication channel.</dd>
+              <dt>Global state</dt><dd>One local state per process together with all channel states.</dd>
+              <dt>Cut</dt><dd>A boundary selecting one prefix of events from each process history.</dd>
+              <dt>Snapshot</dt><dd>A recorded global state intended to represent one possible point in a distributed execution.</dd>
+            </dl>
+          </aside>
+
+          <p>Processes do not need to pause at the same physical instant to define a global state. A cut selects how far into each local history the snapshot extends. The selected local prefixes determine the process states; messages crossing the boundary determine the channel states.</p>
+
+          <figure>
+            <div class="legend" aria-hidden="true">
+              <span><i class="swatch"></i> event before cut</span>
+              <span><i class="swatch hollow"></i> event after cut</span>
+            </div>
+            <div class="cut-wrap" role="img" aria-label="A consistent cut across three process timelines. A message was sent before the cut and received after it, so the message is recorded as in transit.">
+              <div class="lane"><span class="lane-name">P</span><span class="event">p1</span><span class="event">p2</span><span class="event">p3</span><span class="event empty">–</span><span class="event empty">–</span></div>
+              <div class="lane"><span class="lane-name">Q</span><span class="event blue">q1</span><span class="event blue">q2</span><span class="event empty">–</span><span class="event blue" style="background:var(--surface);color:var(--blue);border-color:var(--blue)">q3</span><span class="event empty">–</span></div>
+              <div class="lane"><span class="lane-name">R</span><span class="event ochre">r1</span><span class="event empty">–</span><span class="event ochre">r2</span><span class="event empty">–</span><span class="event ochre" style="background:var(--surface);color:var(--ochre);border-color:var(--ochre)">r3</span></div>
+              <span class="cut-line" aria-hidden="true"></span>
+              <span class="in-transit" aria-hidden="true"></span>
+            </div>
+            <figcaption><strong>A channel has state too.</strong> The cut contains the send at p2 but not the receive at q3. The message is therefore part of the channel state: it is in transit at the snapshot boundary.</figcaption>
+          </figure>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <strong>Consistent cut</strong>
+            <p>A cut is consistent when it is closed under happens-before. If the cut contains an event, it must also contain every causal predecessor of that event.</p>
+            <code class="formula">b ∈ C and a → b  ⇒  a ∈ C</code>
+          </aside>
+
+          <div class="check-grid">
+            <div class="check"><strong>Allowed</strong>Send included, receive excluded. The message is recorded in the channel state.</div>
+            <div class="check"><strong>Not allowed</strong>Receive included, send excluded. The snapshot contains an effect without its cause.</div>
+          </div>
+
+          <aside class="callout failure">
+            <span class="callout-label">Failure case</span>
+            <strong>An inconsistent cut cannot describe a reachable execution prefix</strong>
+            <p>A receive event depends on its send event. Recording the receive without the send violates closure under happens-before.</p>
+          </aside>
+
+          <h3>Distributed snapshots</h3>
+
+          <aside class="callout assumption">
+            <span class="callout-label">Assumption</span>
+            <strong>Chandy–Lamport channel model</strong>
+            <p>The basic snapshot protocol assumes reliable, directed FIFO channels: messages are not lost, and messages from one sender arrive on a channel in send order.</p>
+          </aside>
+
+          <div class="protocol">
+            <span class="block-heading">Protocol · record a distributed snapshot</span>
+            <ol>
+              <li>The initiator records its local state and sends a marker on every outgoing channel before sending later application messages.</li>
+              <li>On receiving its first marker, a process records its local state, records that incoming channel as empty, and forwards markers on its outgoing channels.</li>
+              <li>For every other incoming channel, the process records arriving application messages until that channel’s marker arrives. Those messages form the channel state.</li>
+              <li>The snapshot is complete when every process state and every incoming channel state has been recorded.</li>
+            </ol>
+          </div>
+
+          <aside class="callout terminology">
+            <span class="callout-label">Terminology</span>
+            <strong>Stable property</strong>
+            <p>A property that remains true once it becomes true. Termination and deadlock are standard examples under the appropriate system model.</p>
+          </aside>
+
+          <aside class="callout result">
+            <span class="callout-label">Key result</span>
+            <strong>A consistent snapshot supports global reasoning without a shared physical clock</strong>
+            <p>The marker protocol reconstructs a consistent global state from local observations. Its correctness comes from causal and channel-order reasoning, not from simultaneous clock readings.</p>
+          </aside>
+
+          <div class="section-summary">
+            <strong>Section summary</strong>
+            <ul>
+              <li>A global state includes both process state and messages in transit.</li>
+              <li>A consistent cut contains every cause of every event it contains.</li>
+              <li>Snapshot protocols record consistent states without stopping all processes at one physical instant.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="applications" id="applications" aria-labelledby="applications-title">
+          <span class="applications-label">2.6 · Applications</span>
+          <h2 id="applications-title">Where these ideas appear</h2>
+          <p class="applications-intro">These systems make different choices about time and order. The point is not that they implement the chapter identically, but that each turns one of its concepts into an operational mechanism.</p>
+
+          <div class="application-grid">
+            <article class="application-card">
+              <span class="application-concept">Bounded physical time</span>
+              <h3>Google Spanner</h3>
+              <p>TrueTime reports an interval containing the possible current time. Spanner assigns transaction timestamps and waits out the remaining uncertainty before exposing a commit. This lets externally consistent transaction order agree with the order clients observe.</p>
+              <a href="https://docs.cloud.google.com/spanner/docs/true-time-external-consistency">Spanner documentation ↗</a>
+            </article>
+
+            <article class="application-card">
+              <span class="application-concept">Partition-local order</span>
+              <h3>Apache Kafka</h3>
+              <p>Kafka assigns sequential offsets inside each totally ordered partition. Consumers and replicas follow that log order instead of comparing machine clocks. Different partitions do not form one global order, so related events are commonly routed by key to the same partition.</p>
+              <a href="https://kafka.apache.org/documentation/">Kafka documentation ↗</a>
+            </article>
+
+            <article class="application-card">
+              <span class="application-concept">Causal context</span>
+              <h3>MongoDB</h3>
+              <p>Causally consistent sessions track operation time and cluster time across requests. With majority read and write concerns, a dependent read can wait until the receiving server has reached the required cluster time—the same shape as carrying version 42 to replica Q.</p>
+              <a href="https://www.mongodb.com/docs/manual/core/causal-consistency-read-write-concerns/">MongoDB documentation ↗</a>
+            </article>
+          </div>
+        </section>
+      </article>
+    </div>
+
+    <footer class="chapter-footer">
+      <a href="index.html">← Table of contents</a>
+      <span>Chapter 2 · Time and Causality</span>
+    </footer>
+  </main>
+</body>
+</html>

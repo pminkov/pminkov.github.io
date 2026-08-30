@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Table of contents for Foundations of Distributed Systems: Models, Protocols, and Limits.">
+  <title>Foundations of Distributed Systems — Contents</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f0e7;
+      --paper-raised: #fbf8f1;
+      --ink: #20231f;
+      --muted: #666960;
+      --rule: #d2cec2;
+      --accent: #3d5b4f;
+      --accent-soft: #dce5df;
+      --unfinished: #e6e4de;
+      --unfinished-ink: #74766f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 48px 0 72px;
+    }
+
+    .book-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 32px;
+      align-items: end;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 750;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 500;
+      letter-spacing: -0.035em;
+      line-height: 1.02;
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .edition {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .reader-guide {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: center;
+      margin-top: 22px;
+      padding: 18px 20px;
+      color: inherit;
+      background: var(--accent-soft);
+      border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--rule));
+      border-radius: 9px;
+      text-decoration: none;
+    }
+
+    .reader-guide:hover,
+    .reader-guide:focus-visible {
+      border-color: var(--accent);
+    }
+
+    .reader-guide-label {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--accent);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .reader-guide strong {
+      display: block;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .reader-guide p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .reader-guide-action {
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .contents-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: baseline;
+      margin: 30px 0 18px;
+    }
+
+    .contents-heading h2 {
+      margin: 0;
+      font-size: 0.82rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .contents-heading p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .chapters {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      counter-reset: chapter;
+    }
+
+    .chapter {
+      counter-increment: chapter;
+      position: relative;
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr);
+      gap: 16px;
+      padding: 22px;
+      background: color-mix(in srgb, var(--paper-raised) 86%, transparent);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+    }
+
+    .chapter.is-available {
+      transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+    }
+
+    .chapter.is-available:hover {
+      border-color: color-mix(in srgb, var(--accent) 50%, var(--rule));
+      box-shadow: 0 6px 18px color-mix(in srgb, var(--ink) 7%, transparent);
+      transform: translateY(-1px);
+    }
+
+    .chapter-main-link {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      border-radius: 10px;
+    }
+
+    .chapter.is-available > div {
+      position: relative;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .chapter.is-available > div a { pointer-events: auto; }
+
+    .chapter.is-unfinished {
+      color: var(--unfinished-ink);
+      background: var(--unfinished);
+      border-color: color-mix(in srgb, var(--rule) 75%, transparent);
+    }
+
+    .chapter::before {
+      content: counter(chapter, decimal-leading-zero);
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 50%;
+      font-size: 0.74rem;
+      font-weight: 750;
+      letter-spacing: 0.04em;
+    }
+
+    .chapter.is-unfinished::before {
+      color: #777971;
+      background: #d5d4ce;
+    }
+
+    .chapter-status {
+      display: inline-block;
+      margin-bottom: 7px;
+      color: var(--accent);
+      font-size: 0.64rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .is-unfinished .chapter-status { color: #777971; }
+
+    .chapter h3 {
+      margin: 2px 0 14px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.24rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .chapter a {
+      color: inherit;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .chapter a:hover,
+    .chapter a:focus-visible {
+      color: var(--accent);
+    }
+
+    .chapter a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    .sections {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      counter-reset: section;
+    }
+
+    .sections li {
+      display: grid;
+      grid-template-columns: 2.6rem minmax(0, 1fr);
+      gap: 8px;
+      padding: 7px 0;
+      color: #464a44;
+      border-top: 1px solid var(--rule);
+      font-size: 0.88rem;
+    }
+
+    .sections li:not(.abstract-section) { counter-increment: section; }
+
+    .sections li::before {
+      content: counter(chapter) "." counter(section);
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sections .abstract-section::before { content: counter(chapter) ".A"; }
+
+    .is-unfinished .sections li {
+      color: var(--unfinished-ink);
+      border-color: #d1d0ca;
+    }
+
+    .sections a {
+      display: block;
+      margin: -7px 0;
+      padding: 7px 0;
+      border-radius: 3px;
+      transition: background-color 120ms ease, box-shadow 120ms ease, color 120ms ease;
+    }
+
+    .sections a:hover,
+    .sections a:focus-visible {
+      color: #24483b;
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+      font-weight: 700;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      margin-top: 30px;
+      padding-top: 18px;
+      color: var(--muted);
+      border-top: 1px solid var(--rule);
+      font-size: 0.76rem;
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 28px, 600px);
+        padding-top: 28px;
+      }
+
+      .book-header {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .chapters {
+        grid-template-columns: 1fr;
+      }
+
+      .edition {
+        white-space: normal;
+      }
+
+      .reader-guide {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .chapter {
+        grid-template-columns: 36px minmax(0, 1fr);
+        gap: 12px;
+        padding: 18px 16px;
+      }
+
+      .chapter::before {
+        width: 34px;
+        height: 34px;
+      }
+
+      .contents-heading,
+      footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .sections a { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="book-header">
+      <div>
+        <p class="eyebrow">Table of contents</p>
+        <h1>Foundations of Distributed Systems</h1>
+        <p class="subtitle">Models, Protocols, and Limits</p>
+      </div>
+      <p class="edition">Theory reference · 10 chapters</p>
+    </header>
+
+    <a class="reader-guide" href="reader-guide.html">
+      <span>
+        <span class="reader-guide-label">Front matter</span>
+        <strong>Reader’s Guide</strong>
+        <p>Chapter structure, visual conventions, diagram notation, and reading guidance.</p>
+      </span>
+      <span class="reader-guide-action">Read the guide →</span>
+    </a>
+
+    <section aria-labelledby="contents-title">
+      <div class="contents-heading">
+        <h2 id="contents-title">Contents</h2>
+        <p>10 chapters · Chapters 1–2 available</p>
+      </div>
+
+      <ol class="chapters">
+        <li class="chapter is-available">
+          <a class="chapter-main-link" href="chapter-01.html" aria-label="Open Chapter 1: System Models"></a>
+          <div>
+            <span class="chapter-status">Available</span>
+            <h3>System Models</h3>
+            <ol class="sections">
+              <li class="abstract-section"><a href="chapter-01.html#chapter-abstract">Chapter Abstract</a></li>
+              <li><a href="chapter-01.html#processes-channels-events">Processes, Channels, and Events</a></li>
+              <li><a href="chapter-01.html#synchrony">Synchronous and Asynchronous Execution</a></li>
+              <li><a href="chapter-01.html#failure-models">Failure Models</a></li>
+              <li><a href="chapter-01.html#executions">Executions and Admissibility</a></li>
+              <li><a href="chapter-01.html#properties">Safety and Liveness Properties</a></li>
+              <li><a href="chapter-01.html#applications">Applications</a></li>
+            </ol>
+          </div>
+        </li>
+
+        <li class="chapter is-available">
+          <a class="chapter-main-link" href="chapter-02.html" aria-label="Open Chapter 2: Time and Causality"></a>
+          <div>
+            <span class="chapter-status">Available</span>
+            <h3>Time and Causality</h3>
+            <ol class="sections">
+              <li class="abstract-section"><a href="chapter-02.html#chapter-abstract">Chapter Abstract</a></li>
+              <li><a href="chapter-02.html#physical-clocks">Physical Clock Assumptions</a></li>
+              <li><a href="chapter-02.html#lamport-clocks">Lamport Clocks</a></li>
+              <li><a href="chapter-02.html#vector-clocks">Vector Clocks</a></li>
+              <li><a href="chapter-02.html#causal-histories">Causal Histories</a></li>
+              <li><a href="chapter-02.html#global-states">Global States and Cuts</a></li>
+              <li><a href="chapter-02.html#applications">Applications</a></li>
+            </ol>
+          </div>
+        </li>
+
+        <li class="chapter is-unfinished">
+          <div>
+            <span class="chapter-status">Not written</span>
+            <h3>Communication Abstractions</h3>
+            <ol class="sections">
+              <li>Point-to-Point Links</li>
+              <li>Reliable Broadcast</li>
+              <li>Causal Broadcast</li>
+              <li>Total-Order Broadcast</li>
+              <li>Quorums and Intersection</li>
+            </ol>
+          </div>
+        </li>
+
+        <li class="chapter is-unfinished">
+          <div>
+            <span class="chapter-status">Not written</span>
+            <h3>Distributed Agreement</h3>
+            <ol class="sections">
+              <li>Consensus Specification</li>
+              <li>Impossibility in Asynchronous Systems</li>
+              <li>Failure Detectors</li>
+              <li>Randomized Consensus</li>
+              <li>Byzantine Agreement</li>
+            </ol>
+          </div>
+        </li>
+
+        <li class="chapter is-unfinished">
+          <div>
+            <span class="chapter-status">Not written</span>
+            <h3>Replication Theory</h3>
+            <ol class="sections">
+              <li>State-Machine Replication</li>
+              <li>Primary–Backup Protocols</li>
+              <li>Log Replication</li>
+              <li>Replica Divergence</li>
+              <li>Reconfiguration</li>
+            </ol>
+          </div>
+        </li>
+
+        <li class="chapter is-unfinished">
+          <div>
+            <span class="chapter-status">Not written</span>
+            <h3>Consistency Models</h3>
+            <ol class="sections">
+              <li>Linearizability</li>
+              <li>Sequential Consistency</li>
+              <li>Causal Consistency</li>
+              <li>Eventual Consistency</li>
+              <li>Session Guarantees</li>
+            </ol>
+          </div>
+        </li>
+
+        <li class="chapter is-unfinished">
+          <div>
+            <span class="chapter-status">Not written</span>
+            <h3>Distributed Transactions</h3>
+            <ol class="sections">
+              <li>Serializability</li>
+              <li>Concurrency Control</li>
+              <li>Atomic Commit</li>
+              <li>Distributed Deadlock</li>
+              <li>Transaction Recovery</li>
+            </ol>
+          </div>
+        </li>
+
+        <li class="chapter is-unfinished">
+          <div>
+            <span class="chapter-status">Not written</span>
+            <h3>Knowledge and Coordination</h3>
+            <ol class="sections">
+              <li>Local and Common Knowledge</li>
+              <li>Coordinated Attack</li>
+              <li>Epistemic Models</li>
+              <li>Coordination Lower Bounds</li>
+              <li>Knowledge-Based Programs</li>
+            </ol>
+          </div>
+        </li>
+
+        <li class="chapter is-unfinished">
+          <div>
+            <span class="chapter-status">Not written</span>
+            <h3>Self-Stabilization and Dynamics</h3>
+            <ol class="sections">
+              <li>Legitimate Configurations</li>
+              <li>Convergence and Closure</li>
+              <li>Population Protocols</li>
+              <li>Dynamic Networks</li>
+              <li>Churn and Membership</li>
+            </ol>
+          </div>
+        </li>
+
+        <li class="chapter is-unfinished">
+          <div>
+            <span class="chapter-status">Not written</span>
+            <h3>Limits and Tradeoffs</h3>
+            <ol class="sections">
+              <li>CAP and Its Formal Scope</li>
+              <li>Latency–Consistency Tradeoffs</li>
+              <li>Space and Message Complexity</li>
+              <li>Lower-Bound Techniques</li>
+              <li>Compositional Reasoning</li>
+            </ol>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <footer>
+      <span>Foundations of Distributed Systems</span>
+      <span>Contents</span>
+    </footer>
+  </main>
+</body>
+</html>

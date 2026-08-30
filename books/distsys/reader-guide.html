@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Reader’s guide to the structure, notation, diagrams, and visual conventions used in Foundations of Distributed Systems.">
+  <title>Reader’s Guide — Foundations of Distributed Systems</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f4f0e7;
+      --surface: #fbf8f1;
+      --ink: #20231f;
+      --muted: #676a62;
+      --rule: #d2cec2;
+      --green: #3d5b4f;
+      --green-soft: #dce5df;
+      --blue: #315f78;
+      --blue-soft: #dce9ef;
+      --ochre: #8a6125;
+      --ochre-soft: #eee2cc;
+      --red: #934940;
+      --red-soft: #efddda;
+      --violet: #66517d;
+      --violet-soft: #e7e0ec;
+      --teal: #35676a;
+      --teal-soft: #dbe8e6;
+      --neutral-soft: #e9e6de;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 22px;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.62;
+    }
+
+    a {
+      color: var(--green);
+      text-underline-offset: 3px;
+    }
+
+    a:focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 4px;
+    }
+
+    .page {
+      width: min(1160px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 72px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: center;
+      padding-bottom: 18px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.8rem;
+    }
+
+    .topbar a { text-decoration: none; }
+
+    .guide-header {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 24px;
+      padding: 48px 0 42px;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .guide-mark {
+      display: grid;
+      width: 64px;
+      height: 64px;
+      place-items: center;
+      color: var(--green);
+      background: var(--green-soft);
+      border-radius: 50%;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1rem;
+      font-style: italic;
+    }
+
+    .eyebrow,
+    .section-label,
+    .specimen-label {
+      margin: 0;
+      font-size: 0.69rem;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow,
+    .section-label { color: var(--green); }
+
+    h1, h2, h3 {
+      font-family: Georgia, "Times New Roman", serif;
+      line-height: 1.15;
+    }
+
+    h1 {
+      margin: 7px 0 0;
+      font-size: clamp(2.2rem, 6vw, 3.8rem);
+      font-weight: 500;
+      letter-spacing: -0.035em;
+    }
+
+    .dek {
+      max-width: 720px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 210px minmax(0, 760px);
+      gap: 56px;
+      align-items: start;
+      justify-content: center;
+      padding-top: 34px;
+    }
+
+    .guide-nav {
+      position: sticky;
+      top: 24px;
+      padding: 17px;
+      background: color-mix(in srgb, var(--surface) 86%, transparent);
+      border: 1px solid var(--rule);
+      border-radius: 9px;
+    }
+
+    .guide-nav > p {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.67rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .guide-nav ul {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .guide-nav li + li { border-top: 1px solid var(--rule); }
+
+    .guide-nav a {
+      display: block;
+      padding: 9px 0;
+      color: var(--ink);
+      font-size: 0.78rem;
+      text-decoration: none;
+    }
+
+    .guide-nav a:hover { color: var(--green); }
+
+    article { min-width: 0; }
+
+    .section {
+      padding-bottom: 52px;
+      margin-bottom: 52px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
+      border-bottom: 0;
+    }
+
+    h2 {
+      margin: 6px 0 20px;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 550;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      margin: 28px 0 9px;
+      font-size: 1.13rem;
+    }
+
+    p { margin: 0 0 16px; }
+
+    .chapter-flow {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+      margin: 24px 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: flow;
+    }
+
+    .chapter-flow li {
+      counter-increment: flow;
+      position: relative;
+      padding: 13px 10px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 7px;
+      font-size: 0.72rem;
+      line-height: 1.35;
+    }
+
+    .chapter-flow li::before {
+      content: counter(flow, decimal-leading-zero);
+      display: block;
+      margin-bottom: 5px;
+      color: var(--green);
+      font-size: 0.63rem;
+      font-weight: 800;
+    }
+
+    .chapter-flow li:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      right: -8px;
+      color: var(--green);
+      background: var(--paper);
+      transform: translate(50%, -50%);
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .principle {
+      padding: 16px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      font-size: 0.82rem;
+    }
+
+    .principle strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--green);
+    }
+
+    .abstract-specimen {
+      margin: 22px 0;
+      padding: 20px 22px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-top: 3px solid var(--blue);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .abstract-specimen > span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .abstract-specimen p {
+      margin: 0;
+      color: #464a44;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .abstract-specimen p + p { margin-top: 10px; }
+
+    .abstract-specimen p strong {
+      color: #243d51;
+      font-weight: 700;
+    }
+
+    .abstract-rules {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 0;
+      margin: 18px 0 26px;
+      list-style: none;
+    }
+
+    .abstract-rules li {
+      padding: 13px;
+      color: var(--muted);
+      background: var(--neutral-soft);
+      border-radius: 7px;
+      font-size: 0.76rem;
+    }
+
+    .abstract-rules strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    .specimen-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin: 25px 0;
+    }
+
+    .specimen {
+      min-height: 148px;
+      padding: 18px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+    }
+
+    .specimen-label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .specimen strong {
+      display: block;
+      margin-bottom: 7px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.06rem;
+    }
+
+    .specimen p {
+      margin: 0;
+      color: #4f534d;
+      font-size: 0.82rem;
+    }
+
+    .terminology {
+      background: var(--green-soft);
+      border-color: color-mix(in srgb, var(--green) 24%, transparent);
+    }
+
+    .terminology .specimen-label { color: var(--green); }
+
+    .assumption {
+      background: var(--ochre-soft);
+      border-color: color-mix(in srgb, var(--ochre) 24%, transparent);
+    }
+
+    .assumption .specimen-label { color: var(--ochre); }
+
+    .result {
+      background: var(--blue-soft);
+      border-color: color-mix(in srgb, var(--blue) 24%, transparent);
+    }
+
+    .result .specimen-label { color: var(--blue); }
+
+    .failure {
+      background: var(--red-soft);
+      border-color: color-mix(in srgb, var(--red) 24%, transparent);
+    }
+
+    .failure .specimen-label { color: var(--red); }
+
+    .example {
+      background: var(--violet-soft);
+      border-color: color-mix(in srgb, var(--violet) 24%, transparent);
+    }
+
+    .example .specimen-label { color: var(--violet); }
+
+    .specimen.example {
+      grid-column: 1 / -1;
+      min-height: 0;
+    }
+
+    .application {
+      background: var(--teal-soft);
+      border-color: color-mix(in srgb, var(--teal) 24%, transparent);
+    }
+
+    .application .specimen-label { color: var(--teal); }
+
+    .specimen.application {
+      grid-column: 1 / -1;
+      min-height: 0;
+    }
+
+    .usage-note {
+      margin: 22px 0;
+      padding: 15px 17px;
+      color: var(--muted);
+      background: var(--neutral-soft);
+      border-left: 3px solid #8b8b84;
+      border-radius: 0 7px 7px 0;
+      font-size: 0.83rem;
+    }
+
+    .usage-note strong { color: var(--ink); }
+
+    .trace {
+      margin: 26px 0;
+      overflow-x: auto;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+    }
+
+    .trace-header {
+      padding: 12px 14px;
+      color: var(--muted);
+      background: var(--neutral-soft);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    th, td {
+      padding: 9px 12px;
+      text-align: left;
+      border-top: 1px solid var(--rule);
+    }
+
+    th {
+      color: var(--muted);
+      background: var(--surface);
+      font-size: 0.67rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    code {
+      color: #273b34;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .protocol {
+      margin: 24px 0;
+      padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+    }
+
+    .protocol > strong {
+      display: block;
+      margin-bottom: 11px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1rem;
+    }
+
+    .protocol ol {
+      display: grid;
+      gap: 9px;
+      padding-left: 25px;
+      margin: 0;
+      font-size: 0.82rem;
+    }
+
+    .diagram-key {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 24px 0;
+    }
+
+    .key-item {
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 13px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 7px;
+      font-size: 0.78rem;
+    }
+
+    .sample {
+      position: relative;
+      display: block;
+      height: 24px;
+    }
+
+    .sample.node::before,
+    .sample.hollow::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      background: var(--green);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .sample.hollow::before {
+      background: transparent;
+      border: 2px solid var(--green);
+    }
+
+    .sample.arrow::before,
+    .sample.cut::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 5px;
+      right: 7px;
+      height: 2px;
+      background: var(--red);
+    }
+
+    .sample.arrow::after {
+      content: "";
+      position: absolute;
+      top: calc(50% - 4px);
+      right: 5px;
+      width: 8px;
+      height: 8px;
+      border-top: 2px solid var(--red);
+      border-right: 2px solid var(--red);
+      transform: rotate(45deg);
+    }
+
+    .sample.cut::before {
+      top: 1px;
+      bottom: 1px;
+      left: 50%;
+      right: auto;
+      width: 2px;
+      height: auto;
+    }
+
+    .notation-list {
+      display: grid;
+      gap: 9px;
+      padding: 0;
+      margin: 22px 0;
+      list-style: none;
+    }
+
+    .notation-list li {
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      gap: 14px;
+      align-items: baseline;
+      padding-bottom: 9px;
+      border-bottom: 1px solid var(--rule);
+      font-size: 0.84rem;
+    }
+
+    .notation {
+      display: inline-flex;
+      justify-content: center;
+      padding: 3px 7px;
+      color: var(--green);
+      background: var(--green-soft);
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 750;
+    }
+
+    .cross-reference {
+      margin: 24px 0;
+      padding: 14px 16px;
+      color: var(--muted);
+      border: 1px solid var(--rule);
+      border-radius: 7px;
+      font-size: 0.82rem;
+    }
+
+    .cross-reference strong {
+      color: var(--green);
+      text-transform: uppercase;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+    }
+
+    .summary {
+      margin-top: 26px;
+      padding: 18px 20px;
+      background: var(--surface);
+      border-top: 3px solid var(--green);
+      border-radius: 0 0 8px 8px;
+    }
+
+    .summary strong {
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .summary ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+      font-size: 0.84rem;
+    }
+
+    .guide-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 36px;
+      padding-top: 18px;
+      color: var(--muted);
+      border-top: 1px solid var(--rule);
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 850px) {
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .guide-nav { position: static; }
+
+      .guide-nav ul {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 18px;
+      }
+
+      .guide-nav li + li { border-top: 0; }
+      .guide-nav li { border-bottom: 1px solid var(--rule); }
+    }
+
+    @media (max-width: 620px) {
+      .page { width: min(100% - 28px, 760px); }
+
+      .guide-header {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 34px 0 30px;
+      }
+
+      .guide-mark {
+        width: 48px;
+        height: 48px;
+      }
+
+      .chapter-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .chapter-flow li:not(:last-child)::after {
+        content: "↓";
+        top: auto;
+        right: 50%;
+        bottom: -8px;
+        transform: translate(50%, 50%);
+      }
+      .principles, .abstract-rules, .specimen-grid, .diagram-key { grid-template-columns: 1fr; }
+      .guide-footer { flex-direction: column; gap: 7px; }
+    }
+
+    @media (max-width: 440px) {
+      .guide-nav ul { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; gap: 7px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="topbar" aria-label="Book navigation">
+      <a href="index.html">← Table of contents</a>
+      <span>Foundations of Distributed Systems</span>
+    </nav>
+
+    <header class="guide-header">
+      <div class="guide-mark" aria-hidden="true">i</div>
+      <div>
+        <p class="eyebrow">Front matter</p>
+        <h1>Reader’s Guide</h1>
+        <p class="dek">How chapters are structured, what the recurring visual elements mean, and how diagrams and notation should be read.</p>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="guide-nav" aria-label="Reader’s guide sections">
+        <p>In this guide</p>
+        <ul>
+          <li><a href="#organization">Chapter organization</a></li>
+          <li><a href="#applications">Applications</a></li>
+          <li><a href="#visual-language">Visual language</a></li>
+          <li><a href="#working-elements">Traces and protocols</a></li>
+          <li><a href="#diagrams">Reading diagrams</a></li>
+          <li><a href="#notation">Notation</a></li>
+        </ul>
+      </nav>
+
+      <article>
+        <section class="section" id="organization">
+          <p class="section-label">Structure</p>
+          <h2>Chapter organization</h2>
+          <p>The book develops each topic from model to consequence. Definitions are introduced before algorithms that depend on them, and guarantees are stated together with the assumptions under which they hold.</p>
+          <p>The prose is compact and literal. Terms are defined before use, and an analogy never substitutes for the underlying model. Examples focus on executions, state transitions, and counterexamples.</p>
+
+          <ol class="chapter-flow" aria-label="Typical chapter sequence">
+            <li>Chapter abstract</li>
+            <li>Problem and model</li>
+            <li>Terminology</li>
+            <li>Mechanism or protocol</li>
+            <li>Guarantees and limits</li>
+            <li>Summary</li>
+            <li>Applications</li>
+          </ol>
+
+          <h3>Chapter abstract</h3>
+          <p>Every chapter begins with one compact abstract. It is a first-class destination in the chapter navigation and table of contents, labeled <strong>N.A</strong> so the technical sections can retain their existing numbers. It should prepare the reader without requiring knowledge of the chapter’s notation or proofs. The abstract states the problem, names the main conceptual route, and identifies the conclusion or capability the chapter develops. Two or three short paragraphs separate those parts, while selective bold text exposes the terms that organize the chapter.</p>
+
+          <div class="abstract-specimen">
+            <span>N.A · Chapter abstract</span>
+            <p>This chapter develops two ways to reason about the order of events in a distributed system. <strong>Physical clocks</strong> estimate when events occur, but oscillator drift and uncertain network delay prevent machines from observing one exact shared time.</p>
+            <p><strong>Logical clocks</strong> instead describe causal order. <strong>Lamport clocks</strong> preserve happens-before, while <strong>vector clocks</strong> also identify concurrency. <strong>Causal histories</strong> expose the resulting partial order directly.</p>
+            <p>The final section uses <strong>consistent cuts</strong> and distributed snapshots to construct global states without simultaneous observation. Examples trace timestamp updates, compare vector values, and show how messages in transit become part of recorded channel state. Together, these tools separate physical precedence from causal dependence and make the assumptions behind ordering claims explicit.</p>
+          </div>
+
+          <ul class="abstract-rules">
+            <li><strong>100–160 words</strong>Long enough to map the argument; short enough to read before committing to the chapter.</li>
+            <li><strong>Two or three paragraphs</strong>Separate the problem, conceptual route, and outcome instead of presenting one dense block.</li>
+            <li><strong>Self-contained</strong>No unexplained symbols, citations, proof steps, or references to figures not yet seen.</li>
+            <li><strong>Selective emphasis</strong>Bold three to six terms that carry the structure of the chapter; do not emphasize full sentences.</li>
+          </ul>
+
+          <h3 id="applications">Applications</h3>
+          <p>Every chapter ends with a numbered Applications section immediately after its final theory section—for example, Chapter 2 uses <strong>2.6</strong>. It contains three real-world systems that use, approximate, or deliberately limit the concepts developed in the chapter. Each entry names the relevant concept, describes one concrete mechanism, states an important boundary when needed, and links to primary technical documentation. These entries connect theory to implementation; they are not product recommendations.</p>
+
+          <div class="principles">
+            <div class="principle"><strong>Local before global</strong>Start with what one process can observe, then construct system-wide claims.</div>
+            <div class="principle"><strong>Assumptions stay visible</strong>Timing, failure, and channel assumptions appear near the claim they support.</div>
+            <div class="principle"><strong>Examples are traces</strong>Examples show state changes and message flow rather than relying on analogy.</div>
+          </div>
+        </section>
+
+        <section class="section" id="visual-language">
+          <p class="section-label">Conventions</p>
+          <h2>Visual language</h2>
+          <p>Color identifies six recurring kinds of information. Every colored element also has a written label and a distinct border, so color is never the only cue.</p>
+
+          <div class="specimen-grid">
+            <aside class="specimen terminology">
+              <span class="specimen-label">Terminology</span>
+              <strong>Clock skew</strong>
+              <p>The difference between two clock readings taken at the same reference instant.</p>
+            </aside>
+
+            <aside class="specimen assumption">
+              <span class="specimen-label">Assumption</span>
+              <strong>Reliable FIFO channels</strong>
+              <p>Messages are not lost, and each sender’s messages arrive in the order sent.</p>
+            </aside>
+
+            <aside class="specimen result">
+              <span class="specimen-label">Key result</span>
+              <strong>Lamport clock condition</strong>
+              <p>If a → b, then L(a) &lt; L(b). The converse does not necessarily hold.</p>
+            </aside>
+
+            <aside class="specimen failure">
+              <span class="specimen-label">Failure case</span>
+              <strong>Timestamp order is not causality</strong>
+              <p>L(a) &lt; L(b) alone does not prove that event a could have influenced event b.</p>
+            </aside>
+
+            <aside class="specimen example">
+              <span class="specimen-label">Example</span>
+              <strong>Changing an address before placing an order</strong>
+              <p>A customer updates an address at replica P and receives a success response containing a version token. When the next order reaches replica Q, the token tells Q to wait until it has applied that address version. The example makes <strong>causal context</strong> concrete before introducing the formal model.</p>
+            </aside>
+
+            <aside class="specimen application">
+              <span class="specimen-label">N.X · Applications</span>
+              <strong>From concept to deployed system</strong>
+              <p>Three entries at the end of a chapter connect its theory to concrete mechanisms in real systems. Each entry identifies the relevant concept, explains the mechanism briefly, and links to a primary source.</p>
+            </aside>
+          </div>
+
+          <div class="usage-note"><strong>Use rule:</strong> a terminology box appears at the first substantial introduction of a term. Later uses rely on normal text or a compact notation reminder rather than repeating the full box.</div>
+          <div class="usage-note"><strong>Example rule:</strong> begin with concrete actors and an observable problem, then connect the scenario to the formal concept it motivates. An example illustrates a mechanism or failure mode; it does not establish a guarantee.</div>
+          <div class="usage-note"><strong>Applications rule:</strong> include exactly three real systems at the end of a chapter. Prefer systems that make distinct design choices, describe only the mechanism relevant to the chapter, name important scope limits, and cite official documentation or a primary paper.</div>
+        </section>
+
+        <section class="section" id="working-elements">
+          <p class="section-label">Mechanics</p>
+          <h2>Traces and protocols</h2>
+          <p>Neutral elements carry procedural material. A worked trace records how state changes across events. A protocol block lists the actions a process performs.</p>
+
+          <div class="trace">
+            <div class="trace-header">Worked trace · receiving a Lamport timestamp</div>
+            <table>
+              <thead><tr><th>Step</th><th>Local clock</th><th>Message</th><th>New clock</th></tr></thead>
+              <tbody>
+                <tr><td>Before receive</td><td><code>Lq = 1</code></td><td><code>t = 2</code></td><td>—</td></tr>
+                <tr><td>Take maximum</td><td><code>max(1, 2)</code></td><td>—</td><td><code>2</code></td></tr>
+                <tr><td>Increment</td><td><code>2 + 1</code></td><td>—</td><td><code>Lq = 3</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="protocol">
+            <strong>Protocol · receive a timestamp t</strong>
+            <ol>
+              <li>Read the receiving process’s local counter <code>Lq</code>.</li>
+              <li>Set <code>Lq ← max(Lq, t) + 1</code>.</li>
+              <li>Associate the new value with the receive event.</li>
+            </ol>
+          </div>
+
+          <div class="summary">
+            <strong>Section summary</strong>
+            <ul>
+              <li>Traces explain a specific execution.</li>
+              <li>Protocols specify behavior for every admissible execution.</li>
+              <li>A trace illustrates a protocol; it does not prove the protocol correct.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section" id="diagrams">
+          <p class="section-label">Graphics</p>
+          <h2>Reading diagrams</h2>
+          <p>Unless a figure says otherwise, time advances from left to right. Horizontal lanes represent processes or nodes. Arrows between lanes represent messages or causal dependencies, not physical distance.</p>
+
+          <div class="diagram-key">
+            <div class="key-item"><span class="sample node" aria-hidden="true"></span><span><strong>Filled node</strong><br>Event included in the current state or cut.</span></div>
+            <div class="key-item"><span class="sample hollow" aria-hidden="true"></span><span><strong>Hollow node</strong><br>Event outside the current state or cut.</span></div>
+            <div class="key-item"><span class="sample arrow" aria-hidden="true"></span><span><strong>Directed arrow</strong><br>Message flow or dependency from cause to effect.</span></div>
+            <div class="key-item"><span class="sample cut" aria-hidden="true"></span><span><strong>Vertical line</strong><br>A cut across distributed execution histories.</span></div>
+          </div>
+
+          <div class="usage-note"><strong>Process colors:</strong> colors distinguish lanes within one figure. The labels P, Q, and R carry the meaning; green does not permanently refer to a particular kind of process.</div>
+        </section>
+
+        <section class="section" id="notation">
+          <p class="section-label">Reference</p>
+          <h2>Notation</h2>
+          <p>Symbols appear in a compact reminder when their meaning may not be immediate. Formal definitions remain in the main text.</p>
+
+          <ul class="notation-list">
+            <li><span class="notation">a → b</span><span>Event a happens before event b.</span></li>
+            <li><span class="notation">a ∥ b</span><span>Events a and b are concurrent.</span></li>
+            <li><span class="notation">Cₚ(t)</span><span>The clock read by process p at ideal reference time t.</span></li>
+            <li><span class="notation">V(a)</span><span>The vector timestamp associated with event a.</span></li>
+          </ul>
+
+          <div class="cross-reference"><strong>Cross-reference</strong><br>See Chapter 2, <a href="chapter-02.html#lamport-clocks">Lamport Clocks</a>, for the formal definition of happens-before and the logical-clock update rules.</div>
+
+          <div class="summary">
+            <strong>Guide summary</strong>
+            <ul>
+              <li>Green introduces terminology.</li>
+              <li>Ochre makes assumptions explicit.</li>
+              <li>Blue states results and guarantees.</li>
+              <li>Red marks failure cases and invalid inferences.</li>
+              <li>Violet presents concrete examples.</li>
+              <li>Teal connects chapter concepts to real-world applications.</li>
+              <li>Neutral blocks present traces, protocols, references, and summaries.</li>
+            </ul>
+          </div>
+        </section>
+      </article>
+    </div>
+
+    <footer class="guide-footer">
+      <a href="index.html">← Table of contents</a>
+      <span>Reader’s Guide</span>
+    </footer>
+  </main>
+</body>
+</html>
