@@ -3,85 +3,149 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Petko Minkov — software engineer, writer, and builder.">
-  <title>Petko Minkov — Software Engineer</title>
+  <meta name="description" content="Petko Minkov builds iOS and macOS apps and writes about software.">
+  <meta property="og:title" content="Petko Minkov — Apps, writing, and software">
+  <meta property="og:description" content="iOS and macOS apps, a coding blog, and open-source projects.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pminkov.github.io/">
+  <meta property="og:image" content="https://pminkov.github.io/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Petko Minkov — Apps, writing, and software">
+  <meta name="twitter:description" content="iOS and macOS apps, a coding blog, and open-source projects.">
+  <meta name="twitter:image" content="https://pminkov.github.io/og.png">
+  <title>Petko Minkov — Apps, writing, and software</title>
   <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
   <main>
     <header class="hero">
-      <nav class="socials" aria-label="Social links">
-        <a href="https://github.com/pminkov" aria-label="GitHub">
-          <img src="icons/github.svg" alt="">
-        </a>
-        <a href="https://www.linkedin.com/in/petkominkov/" aria-label="LinkedIn">
-          <img src="icons/linkedin.svg" alt="">
-        </a>
-        <a href="https://twitter.com/xpty" aria-label="X / Twitter">
-          <img src="icons/twitter.svg" alt="">
-        </a>
-      </nav>
+      <div class="masthead">
+        <p class="eyebrow">Software engineer · Bay Area</p>
+        <nav class="socials" aria-label="Social links">
+          <a href="https://github.com/pminkov" aria-label="GitHub">
+            <img src="icons/github.svg" alt="">
+          </a>
+          <a href="https://www.linkedin.com/in/petkominkov/" aria-label="LinkedIn">
+            <img src="icons/linkedin.svg" alt="">
+          </a>
+        </nav>
+      </div>
 
-      <p class="eyebrow">Software engineer · Bay Area</p>
-      <h1>Petko Minkov<span>.</span></h1>
-      <div class="hero-links">
-        <a class="blog-link" href="/blog">
-          Read my coding blog <span aria-hidden="true">↗</span>
-        </a>
-        <a class="blog-link" href="apps/">
-          Browse my apps <span aria-hidden="true">→</span>
-        </a>
+      <div class="hero-copy">
+        <h1>Petko Minkov<span>.</span></h1>
       </div>
     </header>
 
-    <section class="projects" aria-labelledby="projects-heading">
+    <section class="work" aria-labelledby="work-heading">
       <div class="section-heading">
-        <h2 id="projects-heading">Projects</h2>
+        <p class="eyebrow">Work</p>
+        <h2 id="work-heading">Apps / Blog / Projects</h2>
       </div>
 
-      <div class="project-grid">
-        <a class="project" href="https://github.com/pminkov/kubeutils">
-          <span class="project-number">01</span>
-          <h3>kubeutils</h3>
-          <p>Kubernetes command-line utilities.</p>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a class="project" href="https://github.com/pminkov/jupyterhub-hashauthenticator">
-          <span class="project-number">02</span>
-          <h3>hashauthenticator</h3>
-          <p>A secure hash authenticator for JupyterHub.</p>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a class="project" href="/commute">
-          <span class="project-number">03</span>
-          <h3>Commute Times</h3>
-          <p>Driving times between two locations.</p>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a class="project" href="https://github.com/pminkov/threadpool">
-          <span class="project-number">04</span>
-          <h3>threadpool</h3>
-          <p>A lightweight thread pool library in C.</p>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a class="project" href="http://nbviewer.jupyter.org/github/pminkov/notebooks/tree/master/">
-          <span class="project-number">05</span>
-          <h3>Jupyter Notebooks</h3>
-          <p>Experiments, explorations, and useful snippets.</p>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
-        <a class="project" href="https://github.com/pminkov/chrome-link-shortcuts">
-          <span class="project-number">06</span>
-          <h3>Link Shortcuts</h3>
-          <p>One-word shortcuts for your favorite pages.</p>
-          <span class="arrow" aria-hidden="true">↗</span>
-        </a>
+      <div class="work-grid">
+        <article class="work-card">
+          <div class="card-heading">
+            <span class="card-number">01</span>
+            <h3>Apps</h3>
+            <p class="card-intro">iOS and macOS apps for fitness, shopping, and productivity.</p>
+          </div>
+
+          <div class="card-list app-list">
+            <a href="https://keepfitsite.vercel.app/" target="_blank" rel="noopener noreferrer">
+              <img src="apps/icons/keepfit.png" alt="" width="36" height="36">
+              <span><strong>KeepFit</strong><small>Exercise tracking</small></span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a href="https://setcount-app.vercel.app/" target="_blank" rel="noopener noreferrer">
+              <img src="apps/icons/setcount.png" alt="" width="36" height="36">
+              <span><strong>SetCount</strong><small>Strength companion</small></span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a href="https://cartpick.vercel.app/" target="_blank" rel="noopener noreferrer">
+              <img src="apps/icons/cartpick.png" alt="" width="36" height="36">
+              <span><strong>CartPick</strong><small>Reusable grocery lists</small></span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a href="https://clearswitch.vercel.app/" target="_blank" rel="noopener noreferrer">
+              <img src="apps/icons/clearswitch.png" alt="" width="36" height="36">
+              <span><strong>ClearSwitch</strong><small>macOS app switcher</small></span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+          </div>
+
+          <a class="card-cta" href="apps/">Explore all apps <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="work-card">
+          <div class="card-heading">
+            <span class="card-number">02</span>
+            <p class="card-kicker">Writing</p>
+            <h3>Coding blog</h3>
+            <p class="card-intro">Notes on software, systems, data, and programming.</p>
+          </div>
+
+          <div class="card-list writing-list">
+            <a href="/blog/learning-parquet-with-duckdb.html">
+              <span><strong>Learning Parquet with DuckDB</strong><small>Data · 2023</small></span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+            <a href="/blog/simple-guide-to-ssh.html">
+              <span><strong>Simple guide to SSH</strong><small>Linux · 2017</small></span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+            <a href="/blog/what-happens-when-you-run-out-of-memory-in-linux.html">
+              <span><strong>What happens when you run out of memory?</strong><small>Linux · 2017</small></span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+
+          <a class="card-cta" href="/blog">Read the coding blog <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="work-card">
+          <div class="card-heading">
+            <span class="card-number">03</span>
+            <p class="card-kicker">Open source</p>
+            <h3>Projects</h3>
+            <p class="card-intro">A selection of older tools and experiments.</p>
+          </div>
+
+          <div class="card-list project-list">
+            <a href="https://github.com/pminkov/kubeutils">
+              <span><strong>kubeutils</strong><small>Kubernetes utilities</small></span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a href="https://github.com/pminkov/jupyterhub-hashauthenticator">
+              <span><strong>hashauthenticator</strong><small>JupyterHub authenticator</small></span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a href="/commute">
+              <span><strong>Commute Times</strong><small>Driving times between locations</small></span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+            <a href="https://github.com/pminkov/threadpool">
+              <span><strong>threadpool</strong><small>A thread pool library in C</small></span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a href="https://nbviewer.jupyter.org/github/pminkov/notebooks/tree/master/">
+              <span><strong>Jupyter Notebooks</strong><small>Experiments and snippets</small></span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+            <a href="https://github.com/pminkov/chrome-link-shortcuts">
+              <span><strong>Link Shortcuts</strong><small>Shortcuts for favorite pages</small></span>
+              <span class="arrow" aria-hidden="true">↗</span>
+            </a>
+          </div>
+
+          <a class="card-cta" href="https://github.com/pminkov">Browse on GitHub <span aria-hidden="true">↗</span></a>
+        </article>
       </div>
     </section>
 
     <footer>
-      <a href="/blog">Read the blog <span aria-hidden="true">→</span></a>
+      <p>Petko Minkov · Bay Area</p>
+      <a href="apps/">All apps <span aria-hidden="true">→</span></a>
     </footer>
   </main>
 </body>
