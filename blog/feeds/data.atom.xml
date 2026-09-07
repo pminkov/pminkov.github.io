@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog - Data</title><link href="https://pminkov.github.io/blog/" rel="alternate"></link><link href="https://pminkov.github.io/blog/feeds/data.atom.xml" rel="self"></link><id>https://pminkov.github.io/blog/</id><updated>2023-10-08T15:36:00-07:00</updated><entry><title>Learning Parquet with DuckDB</title><link href="https://pminkov.github.io/blog/learning-parquet-with-duckdb.html" rel="alternate"></link><published>2023-10-08T15:36:00-07:00</published><updated>2023-10-08T15:36:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2023-10-08:/blog/learning-parquet-with-duckdb.html</id><summary type="html">&lt;p&gt;I was interested in learning more about &lt;a href="https://parquet.apache.org/"&gt;Parquet&lt;/a&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Petko's Coding Blog - Data</title><link href="https://pminkov.github.io/blog/" rel="alternate"/><link href="https://pminkov.github.io/blog/feeds/data.atom.xml" rel="self"/><id>https://pminkov.github.io/blog/</id><updated>2023-10-08T15:36:00-07:00</updated><entry><title>Learning Parquet with DuckDB</title><link href="https://pminkov.github.io/blog/learning-parquet-with-duckdb.html" rel="alternate"/><published>2023-10-08T15:36:00-07:00</published><updated>2023-10-08T15:36:00-07:00</updated><author><name>Petko Minkov</name></author><id>tag:pminkov.github.io,2023-10-08:/blog/learning-parquet-with-duckdb.html</id><summary type="html">&lt;p&gt;I was interested in learning more about &lt;a href="https://parquet.apache.org/"&gt;Parquet&lt;/a&gt;
 and picked DuckDB as a tool to explore Parquet datasets.&lt;/p&gt;
 &lt;p&gt;It wasn't easy to find good Parquet datasets, but I found two blog posts from MotherDuck
 (post &lt;a href="https://motherduck.com/blog/exploring-stackoverflow-with-duckdb-on-motherduck-1/"&gt;one&lt;/a&gt;
@@ -264,4 +264,4 @@ directories? For example, I can split by date and sort on &lt;code&gt;DisplayNam
 which filter on date and a &lt;code&gt;DisplayName&lt;/code&gt; prefix could possibly be made faster.&lt;/li&gt;
 &lt;li&gt;If I copy the Parquet file into a DuckDB table and &lt;a href="https://duckdb.org/docs/sql/indexes.html"&gt;create indexes&lt;/a&gt; on it, what kind of
 queries are going to become faster?&lt;/li&gt;
-&lt;/ul&gt;</content><category term="Data"></category></entry></feed>
+&lt;/ul&gt;</content><category term="Data"/></entry></feed>
