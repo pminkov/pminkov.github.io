@@ -1,47 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <meta charset="utf-8" />
-        <title>Socket Programming in Linux</title>
-        <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css" />
-        <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
-
-        <!--[if IE]>
-            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+    <meta name="description" content="Some time last year I wanted to learn more about network programming and multi threading and wrote a webserver in C. A few days ago I decided that my...">
+    <title>Socket Programming in Linux · Petko's Coding Blog</title>
+    <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css">
+    <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed">
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="https://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
-                <nav><ul>
-                    <li><a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/data.html">Data</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/django.html">Django</a></li>
-                    <li class="active"><a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/misc.html">Misc</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/python.html">Python</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="https://pminkov.github.io/blog/socket-programming-in-linux.html" rel="bookmark"
-           title="Permalink to Socket Programming in Linux">Socket Programming in Linux</a></h1>
-    </header>
+<body class="article-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <div class="entry-content">
-<div class="post-info">
-        <div class="published" title="2017-08-02T12:10:00-07:00">
-                Published: Wed 02 August 2017
-in <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+    <header class="site-header">
+        <div class="site-header__inner shell">
+            <a class="site-brand" href="https://pminkov.github.io/blog/" aria-label="Petko's Coding Blog home">
+                <span class="site-brand__mark" aria-hidden="true">PM</span>
+                <span class="site-brand__text">
+                    <strong>Petko Minkov</strong>
+                    <span>Coding notes</span>
+                </span>
+            </a>
+
+            <nav class="primary-nav" aria-label="Primary navigation">
+                <a href="https://pminkov.github.io/blog/">Writing</a>
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/tags.html">Tags</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Feed</a>
+            </nav>
         </div>
 
-</div><!-- /.post-info -->    </div>
-    <div>
-      <p>Some time last year I wanted to learn more about network programming and multi threading and wrote a <a href="https://github.com/pminkov/webserver/">webserver</a> in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote <a href="https://github.com/pminkov/webserver/blob/master/client.c">a client</a> too. It's now time to write a bit about how all of this works.</p>
+        <nav class="category-nav" aria-label="Topics">
+            <div class="category-nav__inner shell">
+                <span class="category-nav__label">Topics</span>
+                <a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a>
+                <a href="https://pminkov.github.io/blog/category/data.html">Data</a>
+                <a href="https://pminkov.github.io/blog/category/django.html">Django</a>
+                <a class="active" href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+                <a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a>
+                <a href="https://pminkov.github.io/blog/category/misc.html">Misc</a>
+                <a href="https://pminkov.github.io/blog/category/python.html">Python</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+<article class="article shell">
+    <header class="article-header">
+        <a class="eyebrow" href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+        <h1>Socket Programming in Linux</h1>
+<div class="post-info">
+    <time datetime="2017-08-02T12:10:00-07:00">Wed 02 August 2017</time>
+    <span aria-hidden="true">·</span>
+    <span>Filed under <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></span>
+    
+</div>    </header>
+
+    <div class="entry-content">
+        <p>Some time last year I wanted to learn more about network programming and multi threading and wrote a <a href="https://github.com/pminkov/webserver/">webserver</a> in C. A few days ago I decided that my learning in network programming is not quite complete without writing a client as well, so I wrote <a href="https://github.com/pminkov/webserver/blob/master/client.c">a client</a> too. It's now time to write a bit about how all of this works.</p>
 <p>Programming sockets in Linux is similar to all system programming in C. It's easy to make errors, so you have to be careful. It's difficult to comprehend the complexity and intricacy if you're just copying and pasting code from Stack Overflow. <a href="http://man7.org/tlpi/">The Linux Programming Interface</a> is a book that has several chapters dedicated to socket programming and it describes it very well, as well as throwing in a lot of information about how networks work and an excellent concise description of the TCP protocol. I highly recommend that book and I might write more about it in the future.</p>
 <p>So let's talk a bit about how to write a webserver and a client for it in C.</p>
 <p>Let's start with the server. The full code is in <a href="https://github.com/pminkov/webserver/blob/master/server.c">server.c</a>, but I'll summarize the imporatnt points:</p>
@@ -113,42 +131,36 @@ in <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
 <p>A final interesting thing to do is to run Wireshark and see what packets are going between the client and the server. To do this, I started the server on my Virtual box Ubuntu (192.168.1.135) and ran <code>curl</code> from my MacBook (192.168.1.86). Here's what I saw in Wireshark:</p>
 <p><center><img alt="Wireshark" src="https://pminkov.github.io/blog/images/wireshark.png"></center></p>
 <p>You can see the three way TCP handshake in the beginning (<code>SYN</code> followed by <code>SYN,ACK</code> followed by <code>ACK</code>) and everything else in between. It's definitely something interesting to try out.</p>
-    </div><!-- /.entry-content -->
-    <div class="comments">
-      <div id="disqus_thread"></div>
-      <script type="text/javascript">
-        var disqus_shortname = 'pminkov-blog';
-        var disqus_identifier = 'socket-programming-in-linux.html';
-        var disqus_url = 'https://pminkov.github.io/blog/socket-programming-in-linux.html';
-        (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//pminkov-blog.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-      </script>
-      <noscript>Please enable JavaScript to view the comments.</noscript>
     </div>
 
-  </article>
-</section>
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+    <section class="comments" aria-label="Comments">
+        <div id="disqus_thread"></div>
+        <script>
+            var disqus_shortname = 'pminkov-blog';
+            var disqus_identifier = 'socket-programming-in-linux.html';
+            var disqus_url = 'https://pminkov.github.io/blog/socket-programming-in-linux.html';
+            (function() {
+                var dsq = document.createElement('script');
+                dsq.async = true;
+                dsq.src = 'https://pminkov-blog.disqus.com/embed.js';
+                document.head.appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the comments.</noscript>
+    </section>
+</article>
+    </main>
 
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <!--
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                  Blah blha blah
-                </address>
-        </footer>
-        -->
-        <!-- /#contentinfo -->
+    <footer class="site-footer">
+        <div class="site-footer__inner shell">
+            <p><strong>Petko's Coding Blog</strong></p>
+            <nav aria-label="Footer navigation">
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/categories.html">Categories</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Atom feed</a>
+            </nav>
+        </div>
+    </footer>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -159,15 +171,6 @@ in <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
-</script>
-<script type="text/javascript">
-    var disqus_shortname = 'pminkov-blog';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
 </script>
 </body>
 </html>

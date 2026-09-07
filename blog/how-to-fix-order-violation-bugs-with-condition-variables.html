@@ -1,47 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <meta charset="utf-8" />
-        <title>How to fix order-violation bugs with condition variables.</title>
-        <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css" />
-        <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
-
-        <!--[if IE]>
-            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+    <meta name="description" content="Let's look at the following code and try to find the bug in it. Thread 1: void init() { ... mThread = PR_CreateThread(mMain, ...) ... } Thread 2: void...">
+    <title>How to fix order-violation bugs with condition variables. · Petko's Coding Blog</title>
+    <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css">
+    <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed">
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="https://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
-                <nav><ul>
-                    <li><a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/data.html">Data</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/django.html">Django</a></li>
-                    <li class="active"><a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/misc.html">Misc</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/python.html">Python</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="https://pminkov.github.io/blog/how-to-fix-order-violation-bugs-with-condition-variables.html" rel="bookmark"
-           title="Permalink to How to fix order-violation bugs with condition variables.">How to fix order-violation bugs with condition variables.</a></h1>
-    </header>
+<body class="article-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <div class="entry-content">
-<div class="post-info">
-        <div class="published" title="2016-11-29T11:22:00-08:00">
-                Published: Tue 29 November 2016
-in <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+    <header class="site-header">
+        <div class="site-header__inner shell">
+            <a class="site-brand" href="https://pminkov.github.io/blog/" aria-label="Petko's Coding Blog home">
+                <span class="site-brand__mark" aria-hidden="true">PM</span>
+                <span class="site-brand__text">
+                    <strong>Petko Minkov</strong>
+                    <span>Coding notes</span>
+                </span>
+            </a>
+
+            <nav class="primary-nav" aria-label="Primary navigation">
+                <a href="https://pminkov.github.io/blog/">Writing</a>
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/tags.html">Tags</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Feed</a>
+            </nav>
         </div>
 
-</div><!-- /.post-info -->    </div>
-    <div>
-      <p>Let's look at the following code and try to find the bug in it.</p>
+        <nav class="category-nav" aria-label="Topics">
+            <div class="category-nav__inner shell">
+                <span class="category-nav__label">Topics</span>
+                <a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a>
+                <a href="https://pminkov.github.io/blog/category/data.html">Data</a>
+                <a href="https://pminkov.github.io/blog/category/django.html">Django</a>
+                <a class="active" href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+                <a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a>
+                <a href="https://pminkov.github.io/blog/category/misc.html">Misc</a>
+                <a href="https://pminkov.github.io/blog/category/python.html">Python</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+<article class="article shell">
+    <header class="article-header">
+        <a class="eyebrow" href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+        <h1>How to fix order-violation bugs with condition variables.</h1>
+<div class="post-info">
+    <time datetime="2016-11-29T11:22:00-08:00">Tue 29 November 2016</time>
+    <span aria-hidden="true">·</span>
+    <span>Filed under <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></span>
+    
+</div>    </header>
+
+    <div class="entry-content">
+        <p>Let's look at the following code and try to find the bug in it.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">Thread</span><span class="w"> </span><span class="nt">1</span><span class="o">:</span>
 <span class="nt">void</span><span class="w"> </span><span class="nt">init</span><span class="o">()</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="err">...</span>
@@ -146,42 +164,36 @@ in <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
 
 <p>This scenario works too.</p>
 <p>There's one change that we should do though. Instead of an if statement in line 7, we should use a while. Why? Because when thread two wakes up in line 7 and obtains a lock on the mutex, it should re-verify that the condition that made it wait is not true anymore. While not a problem in this code segment, this can be a problem in other cases.</p>
-    </div><!-- /.entry-content -->
-    <div class="comments">
-      <div id="disqus_thread"></div>
-      <script type="text/javascript">
-        var disqus_shortname = 'pminkov-blog';
-        var disqus_identifier = 'how-to-fix-order-violation-bugs-with-condition-variables.html';
-        var disqus_url = 'https://pminkov.github.io/blog/how-to-fix-order-violation-bugs-with-condition-variables.html';
-        (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//pminkov-blog.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-      </script>
-      <noscript>Please enable JavaScript to view the comments.</noscript>
     </div>
 
-  </article>
-</section>
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+    <section class="comments" aria-label="Comments">
+        <div id="disqus_thread"></div>
+        <script>
+            var disqus_shortname = 'pminkov-blog';
+            var disqus_identifier = 'how-to-fix-order-violation-bugs-with-condition-variables.html';
+            var disqus_url = 'https://pminkov.github.io/blog/how-to-fix-order-violation-bugs-with-condition-variables.html';
+            (function() {
+                var dsq = document.createElement('script');
+                dsq.async = true;
+                dsq.src = 'https://pminkov-blog.disqus.com/embed.js';
+                document.head.appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the comments.</noscript>
+    </section>
+</article>
+    </main>
 
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <!--
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                  Blah blha blah
-                </address>
-        </footer>
-        -->
-        <!-- /#contentinfo -->
+    <footer class="site-footer">
+        <div class="site-footer__inner shell">
+            <p><strong>Petko's Coding Blog</strong></p>
+            <nav aria-label="Footer navigation">
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/categories.html">Categories</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Atom feed</a>
+            </nav>
+        </div>
+    </footer>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -192,15 +204,6 @@ in <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
-</script>
-<script type="text/javascript">
-    var disqus_shortname = 'pminkov-blog';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
 </script>
 </body>
 </html>

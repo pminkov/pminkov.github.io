@@ -1,47 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <meta charset="utf-8" />
-        <title>What happens when you run out of memory in Linux?</title>
-        <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css" />
-        <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
-
-        <!--[if IE]>
-            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+    <meta name="description" content="I've always been curious to figure out what happens when you run out of memory in Linux and recently I was experimenting with something that helped me...">
+    <title>What happens when you run out of memory in Linux? · Petko's Coding Blog</title>
+    <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css">
+    <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed">
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="https://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
-                <nav><ul>
-                    <li><a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/data.html">Data</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/django.html">Django</a></li>
-                    <li class="active"><a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/misc.html">Misc</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/python.html">Python</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="https://pminkov.github.io/blog/what-happens-when-you-run-out-of-memory-in-linux.html" rel="bookmark"
-           title="Permalink to What happens when you run out of memory in Linux?">What happens when you run out of memory in Linux?</a></h1>
-    </header>
+<body class="article-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <div class="entry-content">
-<div class="post-info">
-        <div class="published" title="2017-01-15T12:50:00-08:00">
-                Published: Sun 15 January 2017
-in <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+    <header class="site-header">
+        <div class="site-header__inner shell">
+            <a class="site-brand" href="https://pminkov.github.io/blog/" aria-label="Petko's Coding Blog home">
+                <span class="site-brand__mark" aria-hidden="true">PM</span>
+                <span class="site-brand__text">
+                    <strong>Petko Minkov</strong>
+                    <span>Coding notes</span>
+                </span>
+            </a>
+
+            <nav class="primary-nav" aria-label="Primary navigation">
+                <a href="https://pminkov.github.io/blog/">Writing</a>
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/tags.html">Tags</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Feed</a>
+            </nav>
         </div>
 
-</div><!-- /.post-info -->    </div>
-    <div>
-      <p>I've always been curious to figure out what happens when you run out of memory in Linux and recently I was experimenting with something that helped me figure it out. </p>
+        <nav class="category-nav" aria-label="Topics">
+            <div class="category-nav__inner shell">
+                <span class="category-nav__label">Topics</span>
+                <a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a>
+                <a href="https://pminkov.github.io/blog/category/data.html">Data</a>
+                <a href="https://pminkov.github.io/blog/category/django.html">Django</a>
+                <a class="active" href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+                <a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a>
+                <a href="https://pminkov.github.io/blog/category/misc.html">Misc</a>
+                <a href="https://pminkov.github.io/blog/category/python.html">Python</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+<article class="article shell">
+    <header class="article-header">
+        <a class="eyebrow" href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+        <h1>What happens when you run out of memory in Linux?</h1>
+<div class="post-info">
+    <time datetime="2017-01-15T12:50:00-08:00">Sun 15 January 2017</time>
+    <span aria-hidden="true">·</span>
+    <span>Filed under <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></span>
+    
+</div>    </header>
+
+    <div class="entry-content">
+        <p>I've always been curious to figure out what happens when you run out of memory in Linux and recently I was experimenting with something that helped me figure it out. </p>
 <p>I was trying out <a href="http://dhbox.org/">dhbox</a> deployment on an EC2 machine. dhbox allows you to start a virtual environment in which you can try out various data science tools. These virtual environments are run on Docker containers. These Docker containers take a lot of memory, so you can't run too many on a single machine. So far so good. But let's see what actually happens.</p>
 <p>Before we start, <a href="http://techblog.netflix.com/2015/11/linux-performance-analysis-in-60s.html">here</a> is a great document from the Netflix Eng blog that describes the tools that can be used to debug a slow Linux box. </p>
 <p>I deployed DHBox on an Ubuntu image in EC2 with 1GB of memory and no swap file. Yes, no swap file. Why? It seems like that's done, because having a swap file might incur a lot of EBS IO, which leads to high pricing. But still, this makes for an interesting debugging scenario, so let's continue.</p>
@@ -172,42 +190,36 @@ Swap:<span class="w">             </span><span class="m">0</span><span class="w"
 </code></pre></div>
 
 <p>Things would look different if there was a swap partition on the disk. I might try such a setup as well. If you think about it, the swap would allow some of the memory used by processes to be transferred to disk. That's a great win, because some parts of memory might be very rarely if at all accessed. However, without a swap, there's no such option.</p>
-    </div><!-- /.entry-content -->
-    <div class="comments">
-      <div id="disqus_thread"></div>
-      <script type="text/javascript">
-        var disqus_shortname = 'pminkov-blog';
-        var disqus_identifier = 'what-happens-when-you-run-out-of-memory-in-linux.html';
-        var disqus_url = 'https://pminkov.github.io/blog/what-happens-when-you-run-out-of-memory-in-linux.html';
-        (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//pminkov-blog.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-      </script>
-      <noscript>Please enable JavaScript to view the comments.</noscript>
     </div>
 
-  </article>
-</section>
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+    <section class="comments" aria-label="Comments">
+        <div id="disqus_thread"></div>
+        <script>
+            var disqus_shortname = 'pminkov-blog';
+            var disqus_identifier = 'what-happens-when-you-run-out-of-memory-in-linux.html';
+            var disqus_url = 'https://pminkov.github.io/blog/what-happens-when-you-run-out-of-memory-in-linux.html';
+            (function() {
+                var dsq = document.createElement('script');
+                dsq.async = true;
+                dsq.src = 'https://pminkov-blog.disqus.com/embed.js';
+                document.head.appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the comments.</noscript>
+    </section>
+</article>
+    </main>
 
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <!--
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                  Blah blha blah
-                </address>
-        </footer>
-        -->
-        <!-- /#contentinfo -->
+    <footer class="site-footer">
+        <div class="site-footer__inner shell">
+            <p><strong>Petko's Coding Blog</strong></p>
+            <nav aria-label="Footer navigation">
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/categories.html">Categories</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Atom feed</a>
+            </nav>
+        </div>
+    </footer>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -218,15 +230,6 @@ Swap:<span class="w">             </span><span class="m">0</span><span class="w"
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
-</script>
-<script type="text/javascript">
-    var disqus_shortname = 'pminkov-blog';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
 </script>
 </body>
 </html>

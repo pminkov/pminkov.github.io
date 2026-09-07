@@ -1,47 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <meta charset="utf-8" />
-        <title>Type checking in Python?</title>
-        <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css" />
-        <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
-
-        <!--[if IE]>
-            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+    <meta name="description" content="Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though. One that I use...">
+    <title>Type checking in Python? · Petko's Coding Blog</title>
+    <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css">
+    <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed">
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="https://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
-                <nav><ul>
-                    <li><a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/data.html">Data</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/django.html">Django</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/misc.html">Misc</a></li>
-                    <li class="active"><a href="https://pminkov.github.io/blog/category/python.html">Python</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="https://pminkov.github.io/blog/type-checking-in-python.html" rel="bookmark"
-           title="Permalink to Type checking in Python?">Type checking in Python?</a></h1>
-    </header>
+<body class="article-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <div class="entry-content">
-<div class="post-info">
-        <div class="published" title="2016-05-18T10:39:00-07:00">
-                Published: Wed 18 May 2016
-in <a href="https://pminkov.github.io/blog/category/python.html">Python</a>
+    <header class="site-header">
+        <div class="site-header__inner shell">
+            <a class="site-brand" href="https://pminkov.github.io/blog/" aria-label="Petko's Coding Blog home">
+                <span class="site-brand__mark" aria-hidden="true">PM</span>
+                <span class="site-brand__text">
+                    <strong>Petko Minkov</strong>
+                    <span>Coding notes</span>
+                </span>
+            </a>
+
+            <nav class="primary-nav" aria-label="Primary navigation">
+                <a href="https://pminkov.github.io/blog/">Writing</a>
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/tags.html">Tags</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Feed</a>
+            </nav>
         </div>
 
-</div><!-- /.post-info -->    </div>
-    <div>
-      <p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
+        <nav class="category-nav" aria-label="Topics">
+            <div class="category-nav__inner shell">
+                <span class="category-nav__label">Topics</span>
+                <a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a>
+                <a href="https://pminkov.github.io/blog/category/data.html">Data</a>
+                <a href="https://pminkov.github.io/blog/category/django.html">Django</a>
+                <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+                <a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a>
+                <a href="https://pminkov.github.io/blog/category/misc.html">Misc</a>
+                <a class="active" href="https://pminkov.github.io/blog/category/python.html">Python</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+<article class="article shell">
+    <header class="article-header">
+        <a class="eyebrow" href="https://pminkov.github.io/blog/category/python.html">Python</a>
+        <h1>Type checking in Python?</h1>
+<div class="post-info">
+    <time datetime="2016-05-18T10:39:00-07:00">Wed 18 May 2016</time>
+    <span aria-hidden="true">·</span>
+    <span>Filed under <a href="https://pminkov.github.io/blog/category/python.html">Python</a></span>
+    
+</div>    </header>
+
+    <div class="entry-content">
+        <p>Since Python is a dynamically typed language, it doesn't offer type checking out of the box. There are workarounds around this though.
 One that I use in my projects is the following:</p>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
   <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1"> != </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">t</span><span class="p">)</span>
@@ -70,42 +88,36 @@ One that I use in my projects is the following:</p>
 </code></pre></div>
 
 <p>So that's it - pretty simple. I use the <code>T</code> function every once in a while, to guard against type errors.</p>
-    </div><!-- /.entry-content -->
-    <div class="comments">
-      <div id="disqus_thread"></div>
-      <script type="text/javascript">
-        var disqus_shortname = 'pminkov-blog';
-        var disqus_identifier = 'type-checking-in-python.html';
-        var disqus_url = 'https://pminkov.github.io/blog/type-checking-in-python.html';
-        (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//pminkov-blog.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-      </script>
-      <noscript>Please enable JavaScript to view the comments.</noscript>
     </div>
 
-  </article>
-</section>
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+    <section class="comments" aria-label="Comments">
+        <div id="disqus_thread"></div>
+        <script>
+            var disqus_shortname = 'pminkov-blog';
+            var disqus_identifier = 'type-checking-in-python.html';
+            var disqus_url = 'https://pminkov.github.io/blog/type-checking-in-python.html';
+            (function() {
+                var dsq = document.createElement('script');
+                dsq.async = true;
+                dsq.src = 'https://pminkov-blog.disqus.com/embed.js';
+                document.head.appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the comments.</noscript>
+    </section>
+</article>
+    </main>
 
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <!--
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                  Blah blha blah
-                </address>
-        </footer>
-        -->
-        <!-- /#contentinfo -->
+    <footer class="site-footer">
+        <div class="site-footer__inner shell">
+            <p><strong>Petko's Coding Blog</strong></p>
+            <nav aria-label="Footer navigation">
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/categories.html">Categories</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Atom feed</a>
+            </nav>
+        </div>
+    </footer>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -116,15 +128,6 @@ One that I use in my projects is the following:</p>
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
-</script>
-<script type="text/javascript">
-    var disqus_shortname = 'pminkov-blog';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
 </script>
 </body>
 </html>

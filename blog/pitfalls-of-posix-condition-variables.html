@@ -1,47 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-        <meta charset="utf-8" />
-        <title>Pitfalls of POSIX condition variables.</title>
-        <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css" />
-        <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed" />
-
-        <!--[if IE]>
-            <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <![endif]-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)">
+    <meta name="description" content="I'm reading this awesome book about operating systems. I find that with OSs, you can't understand things by just reading the text. You have to write...">
+    <title>Pitfalls of POSIX condition variables. · Petko's Coding Blog</title>
+    <link rel="stylesheet" href="https://pminkov.github.io/blog/theme/css/main.css">
+    <link href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Petko's Coding Blog Atom Feed">
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="https://pminkov.github.io/blog/">Petko's Coding Blog </a></h1>
-                <nav><ul>
-                    <li><a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/data.html">Data</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/django.html">Django</a></li>
-                    <li class="active"><a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/misc.html">Misc</a></li>
-                    <li><a href="https://pminkov.github.io/blog/category/python.html">Python</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
-<section id="content" class="body">
-  <article>
-    <header>
-      <h1 class="entry-title">
-        <a href="https://pminkov.github.io/blog/pitfalls-of-posix-condition-variables.html" rel="bookmark"
-           title="Permalink to Pitfalls of POSIX condition variables.">Pitfalls of POSIX condition variables.</a></h1>
+<body class="article-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+        <div class="site-header__inner shell">
+            <a class="site-brand" href="https://pminkov.github.io/blog/" aria-label="Petko's Coding Blog home">
+                <span class="site-brand__mark" aria-hidden="true">PM</span>
+                <span class="site-brand__text">
+                    <strong>Petko Minkov</strong>
+                    <span>Coding notes</span>
+                </span>
+            </a>
+
+            <nav class="primary-nav" aria-label="Primary navigation">
+                <a href="https://pminkov.github.io/blog/">Writing</a>
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/tags.html">Tags</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Feed</a>
+            </nav>
+        </div>
+
+        <nav class="category-nav" aria-label="Topics">
+            <div class="category-nav__inner shell">
+                <span class="category-nav__label">Topics</span>
+                <a href="https://pminkov.github.io/blog/category/cloud.html">Cloud</a>
+                <a href="https://pminkov.github.io/blog/category/data.html">Data</a>
+                <a href="https://pminkov.github.io/blog/category/django.html">Django</a>
+                <a class="active" href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+                <a href="https://pminkov.github.io/blog/category/machine-learning.html">Machine Learning</a>
+                <a href="https://pminkov.github.io/blog/category/misc.html">Misc</a>
+                <a href="https://pminkov.github.io/blog/category/python.html">Python</a>
+            </div>
+        </nav>
     </header>
 
-    <div class="entry-content">
+    <main id="main-content">
+<article class="article shell">
+    <header class="article-header">
+        <a class="eyebrow" href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
+        <h1>Pitfalls of POSIX condition variables.</h1>
 <div class="post-info">
-        <div class="published" title="2016-11-24T20:23:00-08:00">
-                Published: Thu 24 November 2016
-in <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a>
-        </div>
-<p>Tags: <a href="https://pminkov.github.io/blog/tag/concurrency.html">Concurrency</a> </p>
-</div><!-- /.post-info -->    </div>
-    <div>
-      <p>I'm reading this awesome <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/">book</a> about operating systems. I find that with OSs, you can't understand things by just reading the text.
+    <time datetime="2016-11-24T20:23:00-08:00">Thu 24 November 2016</time>
+    <span aria-hidden="true">·</span>
+    <span>Filed under <a href="https://pminkov.github.io/blog/category/linux.html">Linux</a></span>
+<span aria-hidden="true">·</span>
+<span class="tag-list">
+<a href="https://pminkov.github.io/blog/tag/concurrency.html">#Concurrency</a></span>
+    
+</div>    </header>
+
+    <div class="entry-content">
+        <p>I'm reading this awesome <a href="http://pages.cs.wisc.edu/~remzi/OSTEP/">book</a> about operating systems. I find that with OSs, you can't understand things by just reading the text.
 You have to write code, write out things on paper and read certain passages multiple times. That's the difference between learning and reading. Hopefully I'm learning something.</p>
 <p>So this book has a nice chapter on <a href="https://computing.llnl.gov/tutorials/pthreads/#ConditionVariables">condition variables</a>. The way condition variables operate is fairly clear, but I found two pitfalls that I had to dig deeper into in order to see what's going on.</p>
 <p>First, a crash course in how condition variables operate. I'm using shortened function names for readability. A condition variable is a variable that you can use to make a thread wait for some condition to be true. So roughly, it looks like this:</p>
@@ -70,42 +91,36 @@ Thread one will then lock the mutex and once it's done with its work, it will un
 </blockquote>
 <p>Well this one caused me to scratch my head when I was going through one of the exercises in the book. I assumed a call to <code>signal()</code> simply unblocks all the waiting threads. No, it possibly unblocks only one of them. Apparently there's a <code>pthread_cond_broadcast</code> <a href="https://linux.die.net/man/3/pthread_cond_signal">function</a> that can unblock all waiting threads.</p>
 <p>So that's it. Happy coding.</p>
-    </div><!-- /.entry-content -->
-    <div class="comments">
-      <div id="disqus_thread"></div>
-      <script type="text/javascript">
-        var disqus_shortname = 'pminkov-blog';
-        var disqus_identifier = 'pitfalls-of-posix-condition-variables.html';
-        var disqus_url = 'https://pminkov.github.io/blog/pitfalls-of-posix-condition-variables.html';
-        (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//pminkov-blog.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-        })();
-      </script>
-      <noscript>Please enable JavaScript to view the comments.</noscript>
     </div>
 
-  </article>
-</section>
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+    <section class="comments" aria-label="Comments">
+        <div id="disqus_thread"></div>
+        <script>
+            var disqus_shortname = 'pminkov-blog';
+            var disqus_identifier = 'pitfalls-of-posix-condition-variables.html';
+            var disqus_url = 'https://pminkov.github.io/blog/pitfalls-of-posix-condition-variables.html';
+            (function() {
+                var dsq = document.createElement('script');
+                dsq.async = true;
+                dsq.src = 'https://pminkov-blog.disqus.com/embed.js';
+                document.head.appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the comments.</noscript>
+    </section>
+</article>
+    </main>
 
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <!--
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                  Blah blha blah
-                </address>
-        </footer>
-        -->
-        <!-- /#contentinfo -->
+    <footer class="site-footer">
+        <div class="site-footer__inner shell">
+            <p><strong>Petko's Coding Blog</strong></p>
+            <nav aria-label="Footer navigation">
+                <a href="https://pminkov.github.io/blog/archives.html">Archive</a>
+                <a href="https://pminkov.github.io/blog/categories.html">Categories</a>
+                <a href="https://pminkov.github.io/blog/feeds/all.atom.xml" type="application/atom+xml">Atom feed</a>
+            </nav>
+        </div>
+    </footer>
 
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -116,15 +131,6 @@ Thread one will then lock the mutex and once it's done with its work, it will un
   ga('create', 'UA-243631-7', 'auto');
   ga('send', 'pageview');
 
-</script>
-<script type="text/javascript">
-    var disqus_shortname = 'pminkov-blog';
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = 'https://' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
 </script>
 </body>
 </html>
