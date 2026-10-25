@@ -124,7 +124,7 @@ h2 {
 
 .work-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -136,16 +136,20 @@ h2 {
   padding: 22px 24px 20px;
 }
 
-.work-card:first-child {
+.work-card:nth-child(odd) {
   padding-left: 0;
 }
 
-.work-card:last-child {
+.work-card:nth-child(even) {
   padding-right: 0;
 }
 
-.work-card + .work-card {
+.work-card:nth-child(even) {
   border-left: 1px solid var(--line);
+}
+
+.work-card:nth-child(n + 3) {
+  border-top: 1px solid var(--line);
 }
 
 .card-heading {
@@ -419,8 +423,8 @@ footer a {
   }
 
   .work-card,
-  .work-card:first-child,
-  .work-card:last-child {
+  .work-card:nth-child(odd),
+  .work-card:nth-child(even) {
     display: grid;
     grid-template-columns: minmax(220px, 0.8fr) minmax(280px, 1.2fr);
     gap: 0 28px;
@@ -478,8 +482,8 @@ footer a {
   }
 
   .work-card,
-  .work-card:first-child,
-  .work-card:last-child {
+  .work-card:nth-child(odd),
+  .work-card:nth-child(even) {
     display: flex;
     padding: 22px 0 24px;
   }

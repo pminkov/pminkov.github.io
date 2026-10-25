@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Explore Oakland’s neighborhoods on an interactive map."
+    />
+    <title>Oakland neighborhoods</title>
+    <link rel="stylesheet" href="map.css" />
+  </head>
+  <body>
+    <main>
+      <canvas
+        id="map"
+        tabindex="0"
+        aria-label="Oakland neighborhood map. Click a neighborhood for its name. Drag to pan, scroll to zoom, or use the arrow and plus/minus keys."
+      ></canvas>
+      <header>
+        <div>
+          <h1>Oakland neighborhoods</h1>
+          <p id="name" aria-live="polite"></p>
+        </div>
+        <nav aria-label="Map controls">
+          <button id="all">View all</button>
+          <button id="zoomIn" aria-label="Zoom in">+</button>
+          <button id="zoomOut" aria-label="Zoom out">−</button>
+        </nav>
+      </header>
+      <p id="tileNotice" hidden>
+        Street map unavailable. Neighborhood outlines remain visible.
+      </p>
+      <footer>
+        Boundaries: City of Oakland ·
+        <a
+          href="https://www.openstreetmap.org/copyright"
+          target="_blank"
+          rel="noopener"
+          >© OpenStreetMap contributors</a
+        >
+      </footer>
+    </main>
+    <script src="data.js"></script>
+    <script src="map.js"></script>
+  </body>
+</html>
